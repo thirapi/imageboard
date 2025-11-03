@@ -31,9 +31,12 @@ export class BoardRepository implements IBoardRepository {
   }
 
   async create(board: Partial<Board>): Promise<Board> {
+    if (!board.id) throw new Error("Board ID is required");
+
     const [result] = await db
       .insert(boards)
       .values({
+        id: board.id,
         name: board.name!,
         description: board.description ?? null,
         threadCount: board.threadCount ?? 0,
@@ -42,6 +45,7 @@ export class BoardRepository implements IBoardRepository {
 
     return result as Board;
   }
+
 
   async incrementThreadCount(boardId: string): Promise<void> {
     await db
