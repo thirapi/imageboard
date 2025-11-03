@@ -26,6 +26,7 @@ import { ImagePlus, Send, Plus } from "lucide-react";
 import { createThreadAction } from "@/app/thread.action";
 import { useRouter } from "next/navigation";
 import { Board } from "@/lib/types";
+import { toast } from "sonner";
 
 interface NewThreadModalProps {
   boards?: Board[];
@@ -64,10 +65,11 @@ export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps)
       setContent("");
       setImage(null);
       setOpen(false);
-
+      toast.success("Thread created successfully!");
       router.refresh();
     } catch (err) {
       console.error("Failed to create thread", err);
+      toast.error("Failed to create thread. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -149,7 +151,7 @@ export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps)
                 <Label htmlFor="content">Message</Label>
                 <Textarea
                   id="content"
-                  placeholder="Write your message..."
+                  placeholder="Write your message..."                  
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={6}

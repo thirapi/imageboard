@@ -1,25 +1,21 @@
-"use client"
-
-import { useState } from "react"
-import { ThreadCard } from "./thread-card"
-import { ThreadListItem } from "./thread-list-item"
-import type { Thread } from "@/lib/types"
+import { ThreadCard } from "./thread-card";
+import { ThreadListItem } from "./thread-list-item";
+import type { Thread } from "@/lib/types";
 
 interface ThreadGridProps {
-  threads: Thread[]
+  threads: Thread[];
+  viewMode: "grid" | "list";
 }
 
-export function ThreadGrid({ threads }: ThreadGridProps) {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-
+export function ThreadGrid({ threads, viewMode }: ThreadGridProps) {
   if (viewMode === "list") {
     return (
-      <div className="space-y-2">
+      <div className="space-y-4 py-10">
         {threads.map((thread) => (
           <ThreadListItem key={thread.id} thread={thread} />
         ))}
       </div>
-    )
+    );
   }
 
   return (
@@ -28,5 +24,5 @@ export function ThreadGrid({ threads }: ThreadGridProps) {
         <ThreadCard key={thread.id} thread={thread} />
       ))}
     </div>
-  )
+  );
 }
