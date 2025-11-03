@@ -1,27 +1,31 @@
-import { MainHeader } from "@/components/layout/main-header"
-import { BoardHeader } from "@/components/board/board-header"
-import { ThreadGrid } from "@/components/board/thread-grid"
-import { boards, threads } from "@/lib/dummy-data"
-import { notFound } from "next/navigation"
+import { MainHeader } from "@/components/layout/main-header";
+import { BoardHeader } from "@/components/board/board-header";
+import { ThreadGrid } from "@/components/board/thread-grid";
+import { boards, threads } from "@/lib/dummy-data";
+import { notFound } from "next/navigation";
+import { getAllBoardsAction } from "@/app/board.action";
+import { getThreadsByBoardAction } from "@/app/thread.action";
 
 interface BoardPageProps {
   params: {
-    boardId: string
-  }
+    boardId: string;
+  };
 }
 
-export default function BoardPage({ params }: BoardPageProps) {
-  const board = boards.find((b) => b.id === params.boardId)
+export default async function BoardPage({ params }: BoardPageProps) {
+  const boards = await getAllBoardsAction();
+
+  const board = boards.find((b) => b.id === params.boardId);
 
   if (!board) {
-    notFound()
+    notFound();
   }
 
-  const boardThreads = threads.filter((thread) => thread.boardId === params.boardId)
+  const boardThreads = await getThreadsByBoardAction(params.boardId);
 
   return (
     <div className="min-h-screen bg-background">
-      <MainHeader />
+      <MainHeader boards={boards} />
       <main>
         <BoardHeader board={board} />
         <div className="container mx-auto px-4 py-6">
@@ -29,5 +33,5 @@ export default function BoardPage({ params }: BoardPageProps) {
         </div>
       </main>
     </div>
-  )
+  );
 }

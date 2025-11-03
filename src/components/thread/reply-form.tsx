@@ -1,43 +1,71 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ImagePlus, Send } from "lucide-react"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ImagePlus, Send } from "lucide-react";
+import { createRepliesAction } from "@/app/reply.action";
+import { useRouter } from "next/navigation";
 
 interface ReplyFormProps {
-  threadId: string
+  threadId: string;
 }
 
 export function ReplyForm({ threadId }: ReplyFormProps) {
-  const [content, setContent] = useState("")
-  const [image, setImage] = useState<File | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [content, setContent] = useState("");
+  const [replyTo, setReplyTo] = useState<string | undefined>(undefined);
+  const [image, setImage] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<{ text: string; replyTo?: string }>;
+      setContent((prev) => prev + custom.detail.text);
+      if (custom.detail.replyTo) {
+        setReplyTo(custom.detail.replyTo);
+      }
+    };
+
+    window.addEventListener("prefill-reply", handler);
+    return () => window.removeEventListener("prefill-reply", handler);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!content.trim()) return
+    e.preventDefault();
+    if (!content.trim()) return;
 
-    setIsSubmitting(true)
-    // In a real app, this would submit to an API
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setContent("")
-    setImage(null)
-    setIsSubmitting(false)
-  }
+    setIsSubmitting(true);
+    try {
+      await createRepliesAction({
+        threadId,
+        content,
+        author: "Anonymous",
+        replyTo,
+      });
+
+      setContent("");
+      setReplyTo(undefined);
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to post reply", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setImage(file)
+      setImage(file);
     }
-  }
+  };
 
   return (
     <Card>
@@ -52,9 +80,9 @@ export function ReplyForm({ threadId }: ReplyFormProps) {
             </Avatar>
             <div className="flex-1 space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="content">Message</Label>
+                <Label htmlFor="reply-textarea">Message</Label>
                 <Textarea
-                  id="content"
+                  id="reply-textarea"
                   placeholder="Write your reply..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
@@ -64,7 +92,7 @@ export function ReplyForm({ threadId }: ReplyFormProps) {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                   <Label htmlFor="image" className="cursor-pointer">
                     <Button type="button" variant="outline" size="sm" asChild>
                       <span>
@@ -75,9 +103,12 @@ export function ReplyForm({ threadId }: ReplyFormProps) {
                   </Label>
                   <Input id="image" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                   {image && <span className="text-sm text-muted-foreground">{image.name}</span>}
-                </div>
+                </div> */}
 
-                <Button type="submit" disabled={!content.trim() || isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={!content.trim() || isSubmitting}
+                >
                   <Send className="w-4 h-4 mr-2" />
                   {isSubmitting ? "Posting..." : "Post Reply"}
                 </Button>
@@ -87,5 +118,5 @@ export function ReplyForm({ threadId }: ReplyFormProps) {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

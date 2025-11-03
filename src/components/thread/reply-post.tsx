@@ -1,35 +1,57 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Clock, Quote } from "lucide-react"
-import type { ReplyType } from "@/lib/types"
-import { formatDistanceToNow } from "date-fns"
-import { cn } from "@/lib/utils"
-import { ModerationModal } from "@/components/modals/moderation-modal"
+import { useState } from "react";
+import Image from "next/image";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Clock, Quote } from "lucide-react";
+import type { ReplyType } from "@/lib/types";
+import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
+import { ModerationModal } from "@/components/modals/moderation-modal";
 
 interface ReplyPostProps {
-  reply: ReplyType
+  reply: ReplyType;
 }
 
 export function ReplyPost({ reply }: ReplyPostProps) {
-  const [isQuoted, setIsQuoted] = useState(false)
+  const [isQuoted, setIsQuoted] = useState(false);
 
   const handleQuote = () => {
-    setIsQuoted(!isQuoted)
-    // In a real app, this would add the quote to the reply form
-  }
+    setIsQuoted(true);
+
+    window.dispatchEvent(
+      new CustomEvent("prefill-reply", {
+        detail: {
+          text: `>> ${reply.id.slice(0, 8)}\n`,
+          replyTo: reply.id,
+        },
+      })
+    );
+
+    const el = document.getElementById("reply-textarea");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      (el as HTMLTextAreaElement).focus();
+    }
+  };
 
   return (
-    <Card className={cn("ml-4", reply.replyTo && "ml-8 border-l-4 border-l-primary/50")}>
+    <Card
+      id={`reply-${reply.id}`}
+      className={cn(
+        "ml-4",
+        reply.replyTo && "ml-8 border-l-4 border-l-primary/50"
+      )}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="w-7 h-7">
-              <AvatarFallback className="text-xs">{reply.author.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-xs">
+                {reply.author.charAt(0)}
+              </AvatarFallback>
             </Avatar>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -39,12 +61,29 @@ export function ReplyPost({ reply }: ReplyPostProps) {
                 <Clock className="w-3 h-3" />
                 {formatDistanceToNow(reply.createdAt, { addSuffix: true })}
                 <span>•</span>
-                <span>No. {reply.id}</span>
+                <span>No. {reply.id.slice(0, 8)}</span>
                 {reply.replyTo && (
-                  <>
-                    <span>•</span>
-                    <span className="text-primary cursor-pointer hover:underline">&gt;&gt;{reply.replyTo}</span>
-                  </>
+                  <span
+                    className="text-primary cursor-pointer hover:underline"
+                    onClick={() => {
+                      const el = document.getElementById(
+                        `reply-${reply.replyTo}`
+                      );
+                      if (el) {
+                        el.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
+                        el.classList.add("ring-2", "ring-primary");
+                        setTimeout(
+                          () => el.classList.remove("ring-2", "ring-primary"),
+                          1500
+                        );
+                      }
+                    }}
+                  >
+                    &gt;&gt;{reply.replyTo.slice(0, 8)}
+                  </span>
                 )}
               </div>
             </div>
@@ -78,5 +117,5 @@ export function ReplyPost({ reply }: ReplyPostProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

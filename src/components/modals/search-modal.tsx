@@ -1,56 +1,53 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Search, Clock, MessageSquare, TrendingUp } from "lucide-react"
-import { threads, boards } from "@/lib/dummy-data"
-import { formatDistanceToNow } from "date-fns"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search, Clock, MessageSquare, TrendingUp } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { Board, Thread } from "@/lib/types";
 
 interface SearchModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  boards: Board[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function SearchModal({ open, onOpenChange }: SearchModalProps) {
-  const [query, setQuery] = useState("")
-  const [results, setResults] = useState<typeof threads>([])
-  const router = useRouter()
+export function SearchModal({ boards, open, onOpenChange }: SearchModalProps) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Thread[]>([]);
+  const router = useRouter();
 
-  const recentSearches = ["JavaScript tutorial", "anime recommendations", "Linux setup"]
-  const trendingTopics = ["programming", "gaming", "anime", "technology"]
-
-  useEffect(() => {
-    if (query.trim()) {
-      const filtered = threads.filter(
-        (thread) =>
-          thread.title.toLowerCase().includes(query.toLowerCase()) ||
-          thread.content.toLowerCase().includes(query.toLowerCase()),
-      )
-      setResults(filtered)
-    } else {
-      setResults([])
-    }
-  }, [query])
+  const recentSearches = [
+    "JavaScript tutorial",
+    "anime recommendations",
+    "Linux setup",
+  ];
+  const trendingTopics = ["programming", "gaming", "anime", "technology"];
 
   const handleSearch = (searchQuery: string) => {
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      onOpenChange(false)
-      setQuery("")
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      onOpenChange(false);
+      setQuery("");
     }
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    handleSearch(query)
-  }
+    e.preventDefault();
+    handleSearch(query);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,16 +71,18 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
           {query.trim() && results.length > 0 && (
             <ScrollArea className="max-h-60">
               <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Search Results</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Search Results
+                </h3>
                 {results.map((thread) => {
-                  const board = boards.find((b) => b.id === thread.boardId)
+                  const board = boards.find((b) => b.id === thread.boardId);
                   return (
                     <div
                       key={thread.id}
                       className="p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
                       onClick={() => {
-                        router.push(`/thread/${thread.id}`)
-                        onOpenChange(false)
+                        router.push(`/thread/${thread.id}`);
+                        onOpenChange(false);
                       }}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -93,11 +92,17 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                               {board?.name}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(thread.createdAt, { addSuffix: true })}
+                              {formatDistanceToNow(thread.createdAt, {
+                                addSuffix: true,
+                              })}
                             </span>
                           </div>
-                          <h4 className="font-medium text-sm line-clamp-1">{thread.title}</h4>
-                          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{thread.content}</p>
+                          <h4 className="font-medium text-sm line-clamp-1">
+                            {thread.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                            {thread.content}
+                          </p>
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <MessageSquare className="w-3 h-3" />
@@ -105,7 +110,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </div>
             </ScrollArea>
@@ -159,11 +164,13 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
             <div className="text-center py-8 text-muted-foreground">
               <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>No threads found for "{query}"</p>
-              <p className="text-sm">Try different keywords or browse boards directly</p>
+              <p className="text-sm">
+                Try different keywords or browse boards directly
+              </p>
             </div>
           )}
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

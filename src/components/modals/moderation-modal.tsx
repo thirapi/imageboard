@@ -38,7 +38,7 @@ export function ModerationModal({ type, postId, trigger }: ModerationModalProps)
     if (type === "delete" && !reason.trim()) return
 
     setIsSubmitting(true)
-    // In a real app, this would submit to an API
+
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     setReason("")
