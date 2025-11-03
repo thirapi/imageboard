@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "db:seed": "tsx scripts/seed.ts",
+    "db:seed:dev": "tsx scripts/dev-seed.ts",
     "db:reset": "tsx scripts/reset.ts",
     "db:migrate": "npx drizzle-kit migrate",
     "db:generate": "npx drizzle-kit generate",
@@ -12,6 +13,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@neondatabase/serverless": "^1.0.1",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -37,7 +39,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.4",

@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
@@ -9,14 +8,22 @@ import { Grid3X3, List, Pin, Clock, MessageSquare } from "lucide-react"
 import type { Board } from "@/lib/types"
 import { NewThreadModal } from "@/components/modals/new-thread-modal"
 
+
 interface BoardHeaderProps {
-  board: Board
+  board: Board;
+  viewMode: "grid" | "list";
+  setViewMode: (mode: "grid" | "list") => void;
+  sortKey: string;
+  setSortKey: (key: any) => void;
 }
 
-export function BoardHeader({ board }: BoardHeaderProps) {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [sortBy, setSortBy] = useState("lastReply")
-
+export function BoardHeader({
+  board,
+  viewMode,
+  setViewMode,
+  sortKey,
+  setSortKey,
+}: BoardHeaderProps) {
   return (
     <div className="border-b bg-card">
       <div className="p-6 space-y-4">
@@ -52,7 +59,7 @@ export function BoardHeader({ board }: BoardHeaderProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select value={sortKey} onValueChange={setSortKey}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
@@ -63,13 +70,13 @@ export function BoardHeader({ board }: BoardHeaderProps) {
                       Last Reply
                     </div>
                   </SelectItem>
-                  <SelectItem value="created">
+                  <SelectItem value="createdAt">
                     <div className="flex items-center gap-2">
                       <Pin className="w-4 h-4" />
                       Created
                     </div>
                   </SelectItem>
-                  <SelectItem value="replies">
+                  <SelectItem value="replyCount">
                     <div className="flex items-center gap-2">
                       <MessageSquare className="w-4 h-4" />
                       Replies
