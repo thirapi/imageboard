@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,48 +14,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Search, ChevronDown, Plus, Home } from "lucide-react"
-import { boards, threads } from "@/lib/dummy-data"
-import { ModeToggle } from "@/components/mode-toggle"
-import { NewThreadModal } from "@/components/modals/new-thread-modal"
-import { SearchModal } from "@/components/modals/search-modal"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Search, ChevronDown, Plus, Home } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
+import { NewThreadModal } from "@/components/modals/new-thread-modal";
+import { SearchModal } from "@/components/modals/search-modal";
+import { Board } from "@/lib/types";
 
-export function MainHeader() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
+interface MainHeaderProps {
+  boards: Board[];
+  currentBoard?: Board;
+}
 
-  const getCurrentBoard = () => {
-    // Check if we're on a board page
-    const boardMatch = pathname.match(/^\/board\/(.+)$/)
-    if (boardMatch) {
-      return boards.find((board) => board.id === boardMatch[1])
-    }
+export function MainHeader({ boards = [], currentBoard }: MainHeaderProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-    // Check if we're on a thread page
-    const threadMatch = pathname.match(/^\/thread\/(.+)$/)
-    if (threadMatch) {
-      const thread = threads.find((thread) => thread.id === threadMatch[1])
-      if (thread) {
-        return boards.find((board) => board.id === thread.boardId)
-      }
-    }
-
-    return null
-  }
-
-  const currentBoard = getCurrentBoard()
+  const displayBoard =
+    currentBoard || boards.find((board) => pathname.startsWith(`/board/${board.id}`));
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery("")
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
     }
-  }
+  };
 
   return (
     <>
@@ -64,7 +51,9 @@ export function MainHeader() {
           {/* Brand */}
           <Link href="/" className="flex items-center gap-3 flex-shrink-0">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">IB</span>
+              <span className="text-primary-foreground font-bold text-sm">
+                IB
+              </span>
             </div>
             <span className="font-bold text-xl">Imageboard</span>
           </Link>
@@ -74,10 +63,13 @@ export function MainHeader() {
             {/* Board Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2 bg-transparent min-w-0 flex-shrink-0">
+                <Button
+                  variant="outline"
+                  className="gap-2 bg-transparent min-w-0 flex-shrink-0"
+                >
                   <Home className="w-4 h-4" />
                   <span className="hidden sm:inline truncate max-w-32">
-                    {currentBoard ? currentBoard.name : "All Boards"}
+                    {displayBoard ? displayBoard.name : "All Boards"}
                   </span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
@@ -92,12 +84,17 @@ export function MainHeader() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                {boards.map((board) => (
+                {boards?.map((board) => (
                   <DropdownMenuItem key={board.id} asChild>
-                    <Link href={`/board/${board.id}`} className="flex items-center justify-between">
+                    <Link
+                      href={`/board/${board.id}`}
+                      className="flex items-center justify-between"
+                    >
                       <div>
                         <div className="font-medium">{board.name}</div>
-                        <div className="text-xs text-muted-foreground line-clamp-1">{board.description}</div>
+                        <div className="text-xs text-muted-foreground line-clamp-1">
+                          {board.description}
+                        </div>
                       </div>
                       <Badge variant="secondary" className="text-xs">
                         {board.threadCount}
@@ -109,7 +106,10 @@ export function MainHeader() {
             </DropdownMenu>
 
             {/* Desktop Search */}
-            <form onSubmit={handleSearch} className="relative hidden md:block flex-1 max-w-sm">
+            <form
+              onSubmit={handleSearch}
+              className="relative hidden md:block flex-1 max-w-sm"
+            >
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search threads..."
@@ -131,6 +131,7 @@ export function MainHeader() {
               </Button>
 
               <NewThreadModal
+                boards={boards}
                 trigger={
                   <Button size="sm" className="gap-2">
                     <Plus className="w-4 h-4" />
@@ -144,7 +145,11 @@ export function MainHeader() {
         </div>
       </header>
 
-      <SearchModal open={isSearchModalOpen} onOpenChange={setIsSearchModalOpen} />
+      <SearchModal
+        boards={boards}
+        open={isSearchModalOpen}
+        onOpenChange={setIsSearchModalOpen}
+      />
     </>
-  )
+  );
 }

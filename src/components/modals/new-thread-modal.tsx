@@ -1,55 +1,86 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ImagePlus, Send, Plus } from "lucide-react"
-import { boards } from "@/lib/dummy-data"
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ImagePlus, Send, Plus } from "lucide-react";
+import { createThreadAction } from "@/app/thread.action";
+import { useRouter } from "next/navigation";
+import { Board } from "@/lib/types";
 
 interface NewThreadModalProps {
-  boardId?: string
-  trigger?: React.ReactNode
+  boards?: Board[];
+  boardId?: string;
+  trigger?: React.ReactNode;
 }
 
-export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
-  const [open, setOpen] = useState(false)
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [selectedBoard, setSelectedBoard] = useState(boardId || "")
-  const [image, setImage] = useState<File | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps) {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [selectedBoard, setSelectedBoard] = useState(boardId || "");
+  const [image, setImage] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim() || !content.trim() || !selectedBoard) return
+    e.preventDefault();
+    if (!title.trim() || !content.trim() || !selectedBoard) return;
 
-    setIsSubmitting(true)
-    // In a real app, this would submit to an API
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setIsSubmitting(true);
 
-    // Reset form
-    setTitle("")
-    setContent("")
-    setImage(null)
-    setIsSubmitting(false)
-    setOpen(false)
-  }
+    try {
+      await createThreadAction({
+        boardId: selectedBoard,
+        title,
+        content,
+        author: "Anonymous", 
+        image: image ? URL.createObjectURL(image) : undefined,
+        createdAt: new Date(),
+        replyCount: 0,
+      });
+
+      setTitle("");
+      setContent("");
+      setImage(null);
+      setOpen(false);
+
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to create thread", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setImage(file)
+      setImage(file);
     }
-  }
+  };
 
-  const selectedBoardData = boards.find((b) => b.id === selectedBoard)
+  const selectedBoardData = boards?.find((b) => b.id === selectedBoard);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -75,18 +106,22 @@ export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
                   <SelectValue placeholder="Select a board" />
                 </SelectTrigger>
                 <SelectContent>
-                  {boards.map((board) => (
+                  {boards?.map((board) => (
                     <SelectItem key={board.id} value={board.id}>
                       <div className="flex flex-col items-start">
                         <span className="font-medium">{board.name}</span>
-                        <span className="text-xs text-muted-foreground">{board.description}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {board.description}
+                        </span>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {selectedBoardData && (
-                <p className="text-sm text-muted-foreground">Posting to {selectedBoardData.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  Posting to {selectedBoardData.name}
+                </p>
               )}
             </div>
           )}
@@ -100,7 +135,9 @@ export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
               onChange={(e) => setTitle(e.target.value)}
               maxLength={100}
             />
-            <p className="text-xs text-muted-foreground">{title.length}/100 characters</p>
+            <p className="text-xs text-muted-foreground">
+              {title.length}/100 characters
+            </p>
           </div>
 
           <div className="flex items-start gap-3">
@@ -119,10 +156,12 @@ export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
                   className="resize-none"
                   maxLength={2000}
                 />
-                <p className="text-xs text-muted-foreground">{content.length}/2000 characters</p>
+                <p className="text-xs text-muted-foreground">
+                  {content.length}/2000 characters
+                </p>
               </div>
 
-              <div className="space-y-3">
+              {/* <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="image" className="cursor-pointer">
                     <Button type="button" variant="outline" size="sm" asChild>
@@ -132,8 +171,18 @@ export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
                       </span>
                     </Button>
                   </Label>
-                  <Input id="image" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-                  {image && <span className="text-sm text-muted-foreground">{image.name}</span>}
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  {image && (
+                    <span className="text-sm text-muted-foreground">
+                      {image.name}
+                    </span>
+                  )}
                 </div>
 
                 {image && (
@@ -154,7 +203,7 @@ export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
                     </Button>
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -163,10 +212,22 @@ export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
               Posting as <span className="font-medium">Anonymous</span>
             </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={!title.trim() || !content.trim() || !selectedBoard || isSubmitting}>
+              <Button
+                type="submit"
+                disabled={
+                  !title.trim() ||
+                  !content.trim() ||
+                  !selectedBoard ||
+                  isSubmitting
+                }
+              >
                 <Send className="w-4 h-4 mr-2" />
                 {isSubmitting ? "Creating..." : "Create Thread"}
               </Button>
@@ -175,5 +236,5 @@ export function NewThreadModal({ boardId, trigger }: NewThreadModalProps) {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,30 +1,35 @@
-import { MainHeader } from "@/components/layout/main-header"
-import { ThreadPost } from "@/components/thread/thread-post"
-import { ReplyList } from "@/components/thread/reply-list"
-import { ReplyForm } from "@/components/thread/reply-form"
-import { ThreadNavigation } from "@/components/thread/thread-navigation"
-import { threads, replies, boards } from "@/lib/dummy-data"
-import { notFound } from "next/navigation"
+import { MainHeader } from "@/components/layout/main-header";
+import { ThreadPost } from "@/components/thread/thread-post";
+import { ReplyList } from "@/components/thread/reply-list";
+import { ReplyForm } from "@/components/thread/reply-form";
+import { ThreadNavigation } from "@/components/thread/thread-navigation";
+import { threads, replies, boards } from "@/lib/dummy-data";
+import { notFound } from "next/navigation";
+import { getThreadByIdAction } from "@/app/thread.action";
+import { getRepliesByThreadAction } from "@/app/reply.action";
+import { getAllBoardsAction } from "@/app/board.action";
 
 interface ThreadPageProps {
   params: {
-    threadId: string
-  }
+    threadId: string;
+  };
 }
 
-export default function ThreadPage({ params }: ThreadPageProps) {
-  const thread = threads.find((t) => t.id === params.threadId)
+export default async function ThreadPage({ params }: ThreadPageProps) {
+  const boards = await getAllBoardsAction();
+
+  const thread = await getThreadByIdAction(params.threadId);
 
   if (!thread) {
-    notFound()
+    notFound();
   }
 
-  const board = boards.find((b) => b.id === thread.boardId)
-  const threadReplies = replies.filter((reply) => reply.threadId === params.threadId)
+  const board = boards.find((b) => b.id === thread.boardId);
+  const threadReplies = await getRepliesByThreadAction(thread.id);
 
   return (
     <div className="min-h-screen bg-background">
-      <MainHeader />
+      <MainHeader boards={boards} currentBoard={board} />
       <main>
         <ThreadNavigation thread={thread} board={board} />
         <div className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
@@ -34,5 +39,5 @@ export default function ThreadPage({ params }: ThreadPageProps) {
         </div>
       </main>
     </div>
-  )
+  );
 }

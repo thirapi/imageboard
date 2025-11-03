@@ -10,18 +10,23 @@ import {
   Pin,
   MessagesSquare,
 } from "lucide-react";
-import { boards, threads, replies } from "@/lib/dummy-data";
+import { threads, replies } from "@/lib/dummy-data";
 import Link from "next/link";
+import { getAllBoardsAction } from "./board.action";
+import { getPopularThreadsAction } from "./thread.action";
+import { getTotalPostsAction } from "./stats.action";
 
-export default function HomePage() {
-  const popularThreads = threads
-    .sort((a, b) => b.replyCount - a.replyCount)
-    .slice(0, 6);
-  const totalPosts = threads.length + replies.length;
+export default async function HomePage() {
+  const boards = await getAllBoardsAction();
+
+  const popularThreads = await getPopularThreadsAction(5);
+
+  const totalPosts = await getTotalPostsAction();
+  // const totalPosts = threads.length + replies.length;
 
   return (
     <div className="min-h-screen bg-background">
-      <MainHeader />
+      <MainHeader boards={boards} />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Hero Section */}
@@ -107,7 +112,7 @@ export default function HomePage() {
           </div>
 
           {/* Stats Section */}
-          <div className="border-t pt-8">
+          {/* <div className="border-t pt-8">
             <h3 className="text-lg font-medium text-center mb-4 text-muted-foreground">
               Community Stats
             </h3>
@@ -116,7 +121,7 @@ export default function HomePage() {
                 <MessageSquare className="w-4 h-4 text-primary" />
                 <span className="text-muted-foreground">Total Posts:</span>
                 <span className="font-semibold">
-                  {totalPosts.toLocaleString()}
+                  {totalPosts.totalPosts}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -130,7 +135,7 @@ export default function HomePage() {
                 <span className="font-semibold">1,068 GB</span>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>

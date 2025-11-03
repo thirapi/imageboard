@@ -1,20 +1,22 @@
-import Image from "next/image"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Pin, Clock, Reply } from "lucide-react"
-import type { Thread } from "@/lib/types"
-import { formatDistanceToNow } from "date-fns"
-import { ModerationModal } from "@/components/modals/moderation-modal"
+"use client";
+
+import Image from "next/image";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Pin, Clock, Reply } from "lucide-react";
+import type { Thread } from "@/lib/types";
+import { formatDistanceToNow } from "date-fns";
+import { ModerationModal } from "@/components/modals/moderation-modal";
 
 interface ThreadPostProps {
-  thread: Thread
+  thread: Thread;
 }
 
 export function ThreadPost({ thread }: ThreadPostProps) {
   return (
-    <Card className="border-2">
+    <Card id={`reply-${thread.id}`} className="border-2">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -35,15 +37,38 @@ export function ThreadPost({ thread }: ThreadPostProps) {
                 <Clock className="w-3 h-3" />
                 {formatDistanceToNow(thread.createdAt, { addSuffix: true })}
                 <span>•</span>
-                <span>No. {thread.id}</span>
+                <span>No. {thread.id.slice(0, 8)}</span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+
+                window.dispatchEvent(
+                  new CustomEvent("prefill-reply", {
+                    detail: {
+                      text: `>> ${thread.id.slice(0, 8)}\n`,
+                      replyTo: thread.id
+                    },
+                  })
+                );
+
+                const el = document.getElementById(
+                  "reply-textarea"
+                ) as HTMLTextAreaElement | null;
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "center" });
+                  el.focus();
+                }
+              }}
+            >
               <Reply className="w-4 h-4" />
             </Button>
+
             <ModerationModal type="report" postId={thread.id} />
             <ModerationModal type="delete" postId={thread.id} />
           </div>
@@ -70,5 +95,5 @@ export function ThreadPost({ thread }: ThreadPostProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,30 +1,31 @@
-"use client"
+"use client";
 
-import { useSearchParams } from "next/navigation"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ThreadCard } from "@/components/board/thread-card"
-import { Search, Filter } from "lucide-react"
-import { threads, boards } from "@/lib/dummy-data"
+import { useSearchParams } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ThreadCard } from "@/components/board/thread-card";
+import { Search, Filter } from "lucide-react";
+import { threads, boards } from "@/lib/dummy-data";
+import { getAllBoardsAction } from "@/app/board.action";
+import { searchThreadsAction } from "@/app/thread.action";
+import { Board, Thread } from "@/lib/types";
 
-export function SearchResults() {
-  const searchParams = useSearchParams()
-  const query = searchParams.get("q") || ""
+interface SearchResultsProps {
+  boards: Board[];
+  threads: Thread[];
+  query: string;
+}
 
-  const results = threads.filter(
-    (thread) =>
-      thread.title.toLowerCase().includes(query.toLowerCase()) ||
-      thread.content.toLowerCase().includes(query.toLowerCase()),
-  )
-
-  const boardCounts = results.reduce(
-    (acc, thread) => {
-      acc[thread.boardId] = (acc[thread.boardId] || 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
+export function SearchResults({
+  boards,
+  threads: results,
+  query,
+}: SearchResultsProps) {
+  const boardCounts = results.reduce((acc, thread) => {
+    acc[thread.boardId] = (acc[thread.boardId] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -47,12 +48,12 @@ export function SearchResults() {
             <h3 className="text-sm font-medium mb-3">Results by Board</h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(boardCounts).map(([boardId, count]) => {
-                const board = boards.find((b) => b.id === boardId)
+                const board = boards.find((b) => b.id === boardId);
                 return (
                   <Badge key={boardId} variant="secondary" className="gap-1">
                     {board?.name} ({count})
                   </Badge>
-                )
+                );
               })}
             </div>
           </Card>
@@ -69,7 +70,9 @@ export function SearchResults() {
         <Card className="p-8 text-center">
           <Search className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
           <h3 className="text-lg font-medium mb-2">No results found</h3>
-          <p className="text-muted-foreground mb-4">We couldn't find any threads matching "{query}". Try:</p>
+          <p className="text-muted-foreground mb-4">
+            We couldn't find any threads matching "{query}". Try:
+          </p>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Using different keywords</li>
             <li>• Checking your spelling</li>
@@ -79,5 +82,5 @@ export function SearchResults() {
         </Card>
       )}
     </div>
-  )
+  );
 }
