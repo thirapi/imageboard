@@ -3,6 +3,7 @@ import { BoardClient } from "@/components/board/board-client";
 import { notFound } from "next/navigation";
 import { getAllBoardsAction } from "@/app/board.action";
 import { getThreadsByBoardAction } from "@/app/thread.action";
+import { Footer } from "@/components/layout/footer";
 
 interface BoardPageProps {
   params: {
@@ -21,11 +22,12 @@ export default async function BoardPage({ params }: BoardPageProps) {
   const threads = await getThreadsByBoardAction(params.boardId);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <MainHeader boards={boards} />
       <main>
         <BoardClient board={board} initialThreads={threads} />
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }

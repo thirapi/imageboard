@@ -1,3 +1,4 @@
+
 "use client";
 
 import type React from "react";
@@ -34,7 +35,11 @@ interface NewThreadModalProps {
   trigger?: React.ReactNode;
 }
 
-export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps) {
+export function NewThreadModal({
+  boards,
+  boardId,
+  trigger,
+}: NewThreadModalProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -50,16 +55,18 @@ export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps)
 
     setIsSubmitting(true);
 
+    const formData = new FormData();
+    formData.append("boardId", selectedBoard);
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("author", "Anonymous");
+
+    if (image) {
+      formData.append("image", image);
+    }
+
     try {
-      await createThreadAction({
-        boardId: selectedBoard,
-        title,
-        content,
-        author: "Anonymous", 
-        image: image ? URL.createObjectURL(image) : undefined,
-        createdAt: new Date(),
-        replyCount: 0,
-      });
+      await createThreadAction(formData);
 
       setTitle("");
       setContent("");
@@ -151,7 +158,7 @@ export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps)
                 <Label htmlFor="content">Message</Label>
                 <Textarea
                   id="content"
-                  placeholder="Write your message..."                  
+                  placeholder="Write your message..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={6}
@@ -163,7 +170,7 @@ export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps)
                 </p>
               </div>
 
-              {/* <div className="space-y-3">
+              <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="image" className="cursor-pointer">
                     <Button type="button" variant="outline" size="sm" asChild>
@@ -205,7 +212,7 @@ export function NewThreadModal({boards, boardId, trigger }: NewThreadModalProps)
                     </Button>
                   </div>
                 )}
-              </div> */}
+              </div>
             </div>
           </div>
 

@@ -4,47 +4,40 @@ import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp,
   MessageSquare,
-  Users,
-  HardDrive,
   Clock,
   Pin,
   MessagesSquare,
 } from "lucide-react";
-import { threads, replies } from "@/lib/dummy-data";
 import Link from "next/link";
 import { getAllBoardsAction } from "./board.action";
 import { getPopularThreadsAction } from "./thread.action";
 import { getTotalPostsAction } from "./stats.action";
+import { Footer } from "@/components/layout/footer";
+import { EditableHero } from "@/components/layout/editable-hero";
 
 export default async function HomePage() {
   const boards = await getAllBoardsAction();
 
   const popularThreads = await getPopularThreadsAction(5);
 
-  const totalPosts = await getTotalPostsAction();
-  // const totalPosts = threads.length + replies.length;
+  await getTotalPostsAction();
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <MainHeader boards={boards} />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          {/* Hero Section */}
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight">
-              Welcome to Imageboard
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              A modern, anonymous discussion platform. Choose a board below to
-              start browsing threads and join the conversation.
-            </p>
+          <div className="relative z-10 text-center space-y-6">
+            <EditableHero badge={"Imageboard"} heading={"The Imageboard Discussion Platform"} description={`An imageboard (informally known as an image-based bulletin board) is a type of online forum in
+              which users post images and text to start or contribute to discussion threads. The format prioritizes
+              anonymity, chronological surfacing, and topic-driven boards.`} boards={boards} popularThreads={popularThreads} />
           </div>
 
           {/* Boards Grid */}
           <div>
             <div className="flex items-center gap-3 mb-6">
               <MessagesSquare className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-semibold">Discussion Boards</h2>
+              <h2 className="text-xl md:text-2xl font-semibold">Discussion Boards</h2>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {boards.map((board) => (
@@ -52,14 +45,14 @@ export default async function HomePage() {
                   <Card className="p-6 hover:bg-accent transition-all duration-200 cursor-pointer h-full group">
                     <div className="space-y-4">
                       <div className="flex items-start justify-between">
-                        <h3 className="font-semibold text-xl group-hover:text-primary transition-colors">
+                        <h3 className="font-semibold text-lg md:text-xl group-hover:text-primary transition-colors">
                           {board.name}
                         </h3>
                         <Badge variant="secondary" className="shrink-0">
                           {board.threadCount} threads
                         </Badge>
                       </div>
-                      <p className="text-muted-foreground leading-relaxed">
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                         {board.description}
                       </p>
                     </div>
@@ -74,7 +67,7 @@ export default async function HomePage() {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <TrendingUp className="w-6 h-6 text-primary" />
-                <h2 className="text-2xl font-semibold">Popular Threads</h2>
+                <h2 className="text-xl md:text-2xl font-semibold">Popular Threads</h2>
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {popularThreads.map((thread) => {
@@ -87,7 +80,7 @@ export default async function HomePage() {
                             {thread.isPinned && (
                               <Pin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                             )}
-                            <h3 className="font-medium text-sm leading-tight line-clamp-2">
+                            <h3 className="font-medium text-sm md:text-base leading-tight line-clamp-2">
                               {thread.title}
                             </h3>
                           </div>
@@ -112,34 +105,9 @@ export default async function HomePage() {
               </div>
             </div>
           )}
-
-          {/* Stats Section */}
-          {/* <div className="border-t pt-8">
-            <h3 className="text-lg font-medium text-center mb-4 text-muted-foreground">
-              Community Stats
-            </h3>
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">Total Posts:</span>
-                <span className="font-semibold">
-                  {totalPosts.totalPosts}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">Current Users:</span>
-                <span className="font-semibold">225,951</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <HardDrive className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">Active Content:</span>
-                <span className="font-semibold">1,068 GB</span>
-              </div>
-            </div>
-          </div> */}
         </div>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
