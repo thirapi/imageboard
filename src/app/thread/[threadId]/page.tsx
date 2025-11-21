@@ -3,11 +3,11 @@ import { ThreadPost } from "@/components/thread/thread-post";
 import { ReplyList } from "@/components/thread/reply-list";
 import { ReplyForm } from "@/components/thread/reply-form";
 import { ThreadNavigation } from "@/components/thread/thread-navigation";
-import { threads, replies, boards } from "@/lib/dummy-data";
 import { notFound } from "next/navigation";
 import { getThreadByIdAction } from "@/app/thread.action";
 import { getRepliesByThreadAction } from "@/app/reply.action";
 import { getAllBoardsAction } from "@/app/board.action";
+import { Footer } from "@/components/layout/footer";
 
 interface ThreadPageProps {
   params: {
@@ -28,7 +28,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
   const threadReplies = await getRepliesByThreadAction(thread.id);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <MainHeader boards={boards} currentBoard={board} />
       <main>
         <ThreadNavigation thread={thread} board={board} />
@@ -38,6 +38,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
           <ReplyForm threadId={thread.id} />
         </div>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }

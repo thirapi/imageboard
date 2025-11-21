@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Suspense } from "react"
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css"
+import { PageBackground } from "@/components/layout/page-background"
 
 export const metadata: Metadata = {
   title: "Imageboard - Modern Anonymous Discussion",
@@ -24,7 +25,12 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Suspense fallback={null}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            {children}
+            <div className="relative min-h-screen bg-freemason">
+              <PageBackground />
+              <div className="relative z-10">
+                {children}
+              </div>
+            </div>
             <Toaster />
           </ThemeProvider>
         </Suspense>
