@@ -21,24 +21,34 @@ export function RevalidateButton() {
   const [isPending, startTransition] = useTransition();
   const [isDisabled, setIsDisabled] = useState(false);
   const [countdown, setCountdown] = useState(COOLDOWN);
+  const [prevIsPending, setPrevIsPending] = useState(false);
 
-  // This effect now handles both the countdown and the automatic refresh
+  // This effect detects when a refresh has finished and resets the countdown.
+  useEffect(() => {
+    if (prevIsPending && !isPending) {
+      setCountdown(COOLDOWN);
+    }
+    setPrevIsPending(isPending);
+  }, [isPending, prevIsPending]);
+
+  // This effect handles the countdown and triggers the automatic refresh.
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (document.hidden) return; // Don't refresh if the tab is not visible
+      // Pause countdown if the tab is hidden or a refresh is in progress.
+      if (document.hidden || isPending) {
+        return;
+      }
 
       setCountdown(prevCountdown => {
         if (prevCountdown <= 1) {
-          // When countdown hits zero, trigger a refresh if one isn't already pending
-          if (!isPending) {
-            startTransition(() => {
-              router.refresh();
-            });
-          }
-          // Reset for the next cycle
-          return COOLDOWN;
+          // When countdown hits zero, just trigger the refresh.
+          // The effect above will handle resetting the countdown when it's done.
+          startTransition(() => {
+            router.refresh();
+          });
+          return 0; // Keep countdown at 0 while refreshing.
         }
-        // Otherwise, just decrement the timer
+        // Otherwise, just decrement the timer.
         return prevCountdown - 1;
       });
     }, 1000);
@@ -53,8 +63,8 @@ export function RevalidateButton() {
       router.refresh();
     });
 
-    // Reset countdown and manage manual click cooldown
-    setCountdown(COOLDOWN);
+    // Cooldown to prevent spamming manual refresh.
+    // The countdown reset is now handled by the useEffect above.
     setTimeout(() => {
       setIsDisabled(false);
     }, 5000);
