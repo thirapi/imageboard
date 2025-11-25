@@ -101,7 +101,7 @@ export function NewThreadModal({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl h-[95vh] sm:h-auto overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Thread</DialogTitle>
         </DialogHeader>
@@ -216,15 +216,16 @@ export function NewThreadModal({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t">
+            <div className="text-sm text-muted-foreground hidden sm:block">
               Posting as <span className="font-medium">Anonymous</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                className="hidden sm:inline-flex"
               >
                 Cancel
               </Button>
@@ -236,6 +237,7 @@ export function NewThreadModal({
                   !selectedBoard ||
                   isSubmitting
                 }
+                className="w-full sm:w-auto"
               >
                 <Send className="w-4 h-4 mr-2" />
                 {isSubmitting ? "Creating..." : "Create Thread"}

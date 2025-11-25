@@ -56,11 +56,11 @@ export function MainHeader({ boards = [], currentBoard }: MainHeaderProps) {
                 IB
               </span>
             </div>
-            <span className="font-bold text-xl">Imageboard</span>
+            <span className="font-bold text-xl hidden sm:inline">Imageboard</span>
           </Link>
 
           {/* Navigation */}
-          <div className="flex items-center gap-3 flex-1 justify-end max-w-2xl">
+          <div className="flex items-center gap-1 sm:gap-2 flex-1 justify-end max-w-2xl">
             {/* Board Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

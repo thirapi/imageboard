@@ -51,7 +51,7 @@ export function SearchModal({ boards, open, onOpenChange }: SearchModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent className="sm:max-w-2xl h-[90vh] sm:h-auto">
         <DialogHeader>
           <DialogTitle>Search Threads</DialogTitle>
         </DialogHeader>
