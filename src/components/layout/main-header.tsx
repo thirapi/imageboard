@@ -21,6 +21,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { NewThreadModal } from "@/components/modals/new-thread-modal";
 import { SearchModal } from "@/components/modals/search-modal";
 import { Board } from "@/lib/types";
+import { RevalidateButton } from "./revalidate-button";
 
 interface MainHeaderProps {
   boards: Board[];
@@ -139,6 +140,7 @@ export function MainHeader({ boards = [], currentBoard }: MainHeaderProps) {
                   </Button>
                 }
               />
+              <RevalidateButton />
               <ModeToggle />
             </div>
           </div>
