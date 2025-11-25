@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-
 @custom-variant dark (&:is(.dark *));
+@custom-variant vaporwave (&:is(.vaporwave *));
+@custom-variant pastel (&:is(.pastel *));
 
 :root {
   --card: oklch(1 0 0);
@@ -74,6 +75,76 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.vaporwave {
+  --background: oklch(0.15 0.09 281.288);
+  --foreground: oklch(0.78 0.115 274.713);
+  --card: oklch(0.20 0.09 281.288);
+  --card-foreground: oklch(0.78 0.115 274.713);
+  --popover: oklch(0.20 0.09 281.288);
+  --popover-foreground: oklch(0.78 0.115 274.713);
+  --primary: oklch(0.71 0.15 320.0);
+  --primary-foreground: oklch(0.25 0.12 320.0);
+  --secondary: oklch(0.82 0.111 230.318);
+  --secondary-foreground: oklch(0.29 0.066 243.157);
+  --muted: oklch(0.25 0.09 281.288);
+  --muted-foreground: oklch(0.78 0.115 274.713);
+  --accent: oklch(0.65 0.183 50.0); /* Kurangi lightness ke 0.65: yellow lebih muted, nggak terlalu terang */
+  --accent-foreground: oklch(0.2 0.15 50.0); /* Foreground lebih dark & saturated biar kontras dengan bg hover (~7:1) */
+  --destructive: oklch(0.737 0.121 32.639);
+  --destructive-foreground: oklch(0.23501 0.096 290.329);
+  --border: oklch(0.25 0.09 281.288 / 20%);
+  --input: oklch(0.25 0.09 281.288 / 30%);
+  --ring: oklch(0.71 0.15 320.0 / 40%);
+  --chart-1: oklch(0.71 0.15 320.0);
+  --chart-2: oklch(0.82 0.111 230.318);
+  --chart-3: oklch(0.75 0.183 55.934);
+  --chart-4: oklch(0.77 0.152 181.912);
+  --chart-5: oklch(0.74 0.16 232.661);
+  --sidebar: oklch(0.15 0.09 281.288);
+  --sidebar-foreground: oklch(0.78 0.115 274.713);
+  --sidebar-primary: oklch(0.71 0.15 320.0);
+  --sidebar-primary-foreground: oklch(0.25 0.12 320.0);
+  --sidebar-accent: oklch(0.82 0.111 230.318);
+  --sidebar-accent-foreground: oklch(0.29 0.066 243.157);
+  --sidebar-border: oklch(0.25 0.09 281.288 / 20%);
+  --sidebar-ring: oklch(0.71 0.15 320.0 / 40%);
+}
+
+.pastel {
+  --background: oklch(0.91637 0.034 90.515);
+  --foreground: oklch(0.41 0.112 45.904);
+  --card: oklch(0.91637 0.034 90.515);
+  --card-foreground: oklch(0.41 0.112 45.904);
+  --popover: oklch(0.91637 0.034 90.515);
+  --popover-foreground: oklch(0.41 0.112 45.904);
+  --primary: oklch(0.8 0.08 30.0);
+  --primary-foreground: oklch(0.35 0.12 30.0);
+  --secondary: oklch(0.92 0.084 155.995);
+  --secondary-foreground: oklch(0.44 0.119 151.328);
+  --muted: oklch(0.88272 0.049 91.774);
+  --muted-foreground: oklch(0.41 0.112 45.904);
+  --accent: oklch(0.68 0.162 75.834);
+  --accent-foreground: oklch(0.41 0.112 45.904);
+  --destructive: oklch(0.7 0.191 22.216);
+  --destructive-foreground: oklch(0.4 0.123 38.172);
+  --border: oklch(0.84133 0.065 90.856);
+  --input: oklch(0.84133 0.065 90.856);
+  --ring: oklch(0.75 0.08 30.0);
+  --chart-1: oklch(0.8 0.08 30.0);
+  --chart-2: oklch(0.92 0.084 155.995);
+  --chart-3: oklch(0.68 0.162 75.834);
+  --chart-4: oklch(0.51 0.096 186.391);
+  --chart-5: oklch(0.58 0.158 241.966);
+  --sidebar: oklch(0.91637 0.034 90.515);
+  --sidebar-foreground: oklch(0.41 0.112 45.904);
+  --sidebar-primary: oklch(0.8 0.08 30.0);
+  --sidebar-primary-foreground: oklch(0.35 0.12 30.0);
+  --sidebar-accent: oklch(0.92 0.084 155.995);
+  --sidebar-accent-foreground: oklch(0.44 0.119 151.328);
+  --sidebar-border: oklch(0.84133 0.065 90.856);
+  --sidebar-ring: oklch(0.75 0.08 30.0);
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -119,24 +190,44 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground;
   }
-
   .bg-freemason {
     background-color: #e5e5f7;
     background-image:
-      repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.12) 75%, rgba(0,0,0,0.12)),
-      repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 25%, rgba(229,229,247,0.3) 25%, rgba(229,229,247,0.3) 75%, rgba(0,0,0,0.12) 75%, rgba(0,0,0,0.12));
+      repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.12) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.12) 75%, rgba(0, 0, 0, 0.12)),
+      repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.12) 25%, rgba(229, 229, 247, 0.3) 25%, rgba(229, 229, 247, 0.3) 75%, rgba(0, 0, 0, 0.12) 75%, rgba(0, 0, 0, 0.12));
     background-position: 0 0, 28px 28px;
     background-size: 56px 56px;
   }
   .dark .bg-freemason {
     background-color: #0b0b0f;
     background-image:
-      repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.08) 75%, rgba(255,255,255,0.08)),
-      repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 25%, rgba(20,20,30,0.3) 25%, rgba(20,20,30,0.3) 75%, rgba(255,255,255,0.08) 75%, rgba(255,255,255,0.08));
+      repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.08) 75%, rgba(255, 255, 255, 0.08)),
+      repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, rgba(20, 20, 30, 0.3) 25%, rgba(20, 20, 30, 0.3) 75%, rgba(255, 255, 255, 0.08) 75%, rgba(255, 255, 255, 0.08));
+  }
+  .vaporwave .bg-freemason {
+    background-image: none;
+    background-color: var(--background);
+  }
+  .pastel .bg-freemason {
+    background-image: none;
+    background-color: var(--background);
+  }
+}
+
+/* Override hover untuk subtle effect (khusus vaporwave) */
+@layer components {
+  .vaporwave .board-card:hover { /* Asumsi class dari saran sebelumnya; atau tambah di JSX */
+    background-color: oklch(0.65 0.183 50.0 / 20%); /* Opacity 20% biar blend soft, nggak mencolok */
   }
   
+  .vaporwave .group-hover\:text-primary {
+    color: oklch(0.71 0.15 320.0) !important; /* Magenta netral, tetep pop tapi nggak terlalu bright */
+  }
+  
+  .pastel .group-hover\:text-primary {
+    color: oklch(0.6 0.1 240.0) !important; /* Indigo soft, seperti sebelumnya */
+  }
 }
