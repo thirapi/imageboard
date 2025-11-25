@@ -15,6 +15,8 @@ import { getTotalPostsAction } from "./stats.action";
 import { Footer } from "@/components/layout/footer";
 import { EditableHero } from "@/components/layout/editable-hero";
 
+export const revalidate = 60; // Revalidate at most every 60 seconds
+
 export default async function HomePage() {
   const boards = await getAllBoardsAction();
 
