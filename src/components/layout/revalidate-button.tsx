@@ -23,7 +23,6 @@ export function RevalidateButton() {
   const [countdown, setCountdown] = useState(COOLDOWN);
   const [prevIsPending, setPrevIsPending] = useState(false);
 
-  // This effect detects when a refresh has finished and resets the countdown.
   useEffect(() => {
     if (prevIsPending && !isPending) {
       setCountdown(COOLDOWN);
@@ -31,30 +30,28 @@ export function RevalidateButton() {
     setPrevIsPending(isPending);
   }, [isPending, prevIsPending]);
 
-  // This effect handles the countdown and triggers the automatic refresh.
   useEffect(() => {
     const intervalId = setInterval(() => {
-      // Pause countdown if the tab is hidden or a refresh is in progress.
       if (document.hidden || isPending) {
         return;
       }
 
       setCountdown(prevCountdown => {
         if (prevCountdown <= 1) {
-          // When countdown hits zero, just trigger the refresh.
-          // The effect above will handle resetting the countdown when it's done.
-          startTransition(() => {
-            router.refresh();
+          // This now mirrors the manual click logic to ensure a fresh fetch.
+          startTransition(async () => {
+            await revalidatePageByPath(pathname); // Forcefully invalidate the server cache
+            router.refresh(); // Then fetch the new, non-cached page
           });
-          return 0; // Keep countdown at 0 while refreshing.
+          return 0;
         }
-        // Otherwise, just decrement the timer.
         return prevCountdown - 1;
       });
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [isPending, router]);
+    // Added pathname to the dependency array as it's used in the effect.
+  }, [isPending, router, pathname]);
 
   const handleClick = async () => {
     setIsDisabled(true);
@@ -63,8 +60,6 @@ export function RevalidateButton() {
       router.refresh();
     });
 
-    // Cooldown to prevent spamming manual refresh.
-    // The countdown reset is now handled by the useEffect above.
     setTimeout(() => {
       setIsDisabled(false);
     }, 5000);
