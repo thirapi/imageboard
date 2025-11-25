@@ -1,57 +1,74 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useRouter, usePathname } from 'next/navigation';
+import { useState, useTransition, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
+import { revalidatePageByPath } from '@/app/actions';
 
 const COOLDOWN = 60; // 60 seconds
 
 export function RevalidateButton() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [isDisabled, setIsDisabled] = useState(false);
   const [countdown, setCountdown] = useState(COOLDOWN);
+  const [prevIsPending, setPrevIsPending] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    if (prevIsPending && !isPending) {
+      setCountdown(COOLDOWN);
+    }
+    setPrevIsPending(isPending);
+  }, [isPending, prevIsPending]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (document.hidden || isPending) {
+        return;
+      }
+
+      setCountdown(prevCountdown => {
+        if (prevCountdown <= 1) {
+          // This now mirrors the manual click logic to ensure a fresh fetch.
+          startTransition(async () => {
+            await revalidatePageByPath(pathname); // Forcefully invalidate the server cache
+            router.refresh(); // Then fetch the new, non-cached page
+          });
+          return 0;
+        }
+        return prevCountdown - 1;
+      });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(intervalId);
+    // Added pathname to the dependency array as it's used in the effect.
+  }, [isPending, router, pathname]);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     setIsDisabled(true);
-    setCountdown(COOLDOWN);
-    startTransition(() => {
+    startTransition(async () => {
+      await revalidatePageByPath(pathname);
       router.refresh();
     });
+
     setTimeout(() => {
       setIsDisabled(false);
-    }, 5000); // 5-second spam prevention
+    }, 5000);
   };
 
-  useEffect(() => {
-    if (countdown === 0) {
-        setCountdown(COOLDOWN);
-        // We don't trigger a refresh here because the server's `revalidate` handles it.
-        // The countdown is purely a visual guide for the user.
-    }
-  }, [countdown]);
-
   const getTooltipContent = () => {
-    if (isPending) return "Refreshing...";
+    if (isPending) return 'Refreshing...';
     if (isDisabled) return `Cooldown...`;
-    if (countdown > 0) return `Auto-refresh in ${countdown}s`;
-    return "Ready to refresh";
+    return `Auto-refresh in ${countdown}s. Click to refresh now.`;
   };
 
   return (
@@ -65,8 +82,8 @@ export function RevalidateButton() {
             disabled={isPending || isDisabled}
           >
             <RefreshCw
-              className={cn("h-4 w-4", {
-                "animate-spin": isPending,
+              className={cn('h-4 w-4', {
+                'animate-spin': isPending,
               })}
             />
             <span className="sr-only">Refresh Data</span>
