@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState, useTransition, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -11,39 +11,53 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { revalidateHomePage } from '@/app/actions'; // <-- 1. Import the new action
+import { revalidatePageByPath } from '@/app/actions';
 
 const COOLDOWN = 60; // 60 seconds
 
 export function RevalidateButton() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [isDisabled, setIsDisabled] = useState(false);
   const [countdown, setCountdown] = useState(COOLDOWN);
 
+  // This effect now handles both the countdown and the automatic refresh
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : COOLDOWN));
+    const intervalId = setInterval(() => {
+      if (document.hidden) return; // Don't refresh if the tab is not visible
+
+      setCountdown(prevCountdown => {
+        if (prevCountdown <= 1) {
+          // When countdown hits zero, trigger a refresh if one isn't already pending
+          if (!isPending) {
+            startTransition(() => {
+              router.refresh();
+            });
+          }
+          // Reset for the next cycle
+          return COOLDOWN;
+        }
+        // Otherwise, just decrement the timer
+        return prevCountdown - 1;
+      });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(intervalId);
+  }, [isPending, router]);
 
-  // 2. Updated handleClick function
   const handleClick = async () => {
     setIsDisabled(true);
     startTransition(async () => {
-      // First, tell the server to invalidate the cache for the home page
-      await revalidateHomePage();
-      // Then, refresh the page to get the newly generated content
+      await revalidatePageByPath(pathname);
       router.refresh();
     });
 
-    // Reset countdown and manage cooldown period
+    // Reset countdown and manage manual click cooldown
     setCountdown(COOLDOWN);
     setTimeout(() => {
       setIsDisabled(false);
-    }, 5000); // 5-second spam prevention
+    }, 5000);
   };
 
   const getTooltipContent = () => {
