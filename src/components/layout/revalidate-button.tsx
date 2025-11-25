@@ -1,16 +1,17 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useRouter } from 'next/navigation';
+import { useState, useTransition, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
+import { revalidateHomePage } from '@/app/actions'; // <-- 1. Import the new action
 
 const COOLDOWN = 60; // 60 seconds
 
@@ -22,36 +23,33 @@ export function RevalidateButton() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+      setCountdown((prev) => (prev > 0 ? prev - 1 : COOLDOWN));
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const handleClick = () => {
+  // 2. Updated handleClick function
+  const handleClick = async () => {
     setIsDisabled(true);
-    setCountdown(COOLDOWN);
-    startTransition(() => {
+    startTransition(async () => {
+      // First, tell the server to invalidate the cache for the home page
+      await revalidateHomePage();
+      // Then, refresh the page to get the newly generated content
       router.refresh();
     });
+
+    // Reset countdown and manage cooldown period
+    setCountdown(COOLDOWN);
     setTimeout(() => {
       setIsDisabled(false);
     }, 5000); // 5-second spam prevention
   };
 
-  useEffect(() => {
-    if (countdown === 0) {
-        setCountdown(COOLDOWN);
-        // We don't trigger a refresh here because the server's `revalidate` handles it.
-        // The countdown is purely a visual guide for the user.
-    }
-  }, [countdown]);
-
   const getTooltipContent = () => {
-    if (isPending) return "Refreshing...";
+    if (isPending) return 'Refreshing...';
     if (isDisabled) return `Cooldown...`;
-    if (countdown > 0) return `Auto-refresh in ${countdown}s`;
-    return "Ready to refresh";
+    return `Auto-refresh in ${countdown}s. Click to refresh now.`;
   };
 
   return (
@@ -65,8 +63,8 @@ export function RevalidateButton() {
             disabled={isPending || isDisabled}
           >
             <RefreshCw
-              className={cn("h-4 w-4", {
-                "animate-spin": isPending,
+              className={cn('h-4 w-4', {
+                'animate-spin': isPending,
               })}
             />
             <span className="sr-only">Refresh Data</span>
