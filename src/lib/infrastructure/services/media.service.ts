@@ -1,8 +1,8 @@
 
 import cloudinary from "@/lib/config/cloudinary";
-import { IMediaRepository } from "@/lib/application/repositories/media.repository.interface";
+import { IMediaService } from "@/lib/application/services/media.service.interface";
 
-export class MediaRepository implements IMediaRepository {
+export class MediaService implements IMediaService {
   async upload(file: Buffer, fileName: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(

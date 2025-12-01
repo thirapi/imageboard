@@ -8,13 +8,13 @@ import { IncrementReplyCountUseCase } from "../application/use-cases/thread/incr
 import { PinThreadUseCase } from "../application/use-cases/thread/pin-thread.use-case";
 import { SearchThreadsUseCase } from "../application/use-cases/thread/search.use-case";
 import { BoardRepository } from "../infrastructure/repositories/board.repository";
-import { MediaRepository } from "../infrastructure/repositories/media.repository";
+import { MediaService } from "../infrastructure/services/media.service";
 import { ThreadRepository } from "../infrastructure/repositories/thread.repository";
 
 export class ThreadModule {
   private threadRepository: ThreadRepository;
   private boardRepository: BoardRepository;
-  private mediaRepository: MediaRepository;
+  private mediaService: MediaService;
 
   public getThreadsByBoardUseCase: GetThreadsByBoardUseCase;
   public getThreadByIdUseCase: GetThreadByIdUseCase;
@@ -27,7 +27,7 @@ export class ThreadModule {
   constructor() {
     this.threadRepository = new ThreadRepository();
     this.boardRepository = new BoardRepository();
-    this.mediaRepository = new MediaRepository();
+    this.mediaService = new MediaService();
 
     this.getThreadsByBoardUseCase = new GetThreadsByBoardUseCase(
       this.threadRepository
@@ -36,7 +36,7 @@ export class ThreadModule {
     this.createThreadUseCase = new CreateThreadUseCase(
       this.threadRepository,
       this.boardRepository,
-      this.mediaRepository
+      this.mediaService
     );
     this.pinThreadUseCase = new PinThreadUseCase(this.threadRepository);
     this.incrementReplyCountUseCase = new IncrementReplyCountUseCase(

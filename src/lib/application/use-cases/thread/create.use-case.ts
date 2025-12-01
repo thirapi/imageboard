@@ -1,14 +1,14 @@
 
 import { IThreadRepository } from "../../repositories/thread.repository.interface";
 import { IBoardRepository } from "../../repositories/board.repository.interface";
-import { IMediaRepository } from "../../repositories/media.repository.interface";
+import { IMediaService } from "../../services/media.service.interface";
 import { Thread } from "@/lib/types";
 
 export class CreateThreadUseCase {
   constructor(
     private threadRepository: IThreadRepository,
     private boardRepository: IBoardRepository,
-    private mediaRepository: IMediaRepository
+    private mediaService: IMediaService
   ) {}
 
   async execute(
@@ -21,7 +21,7 @@ export class CreateThreadUseCase {
 
     let imageUrl: string | undefined;
     if (file) {
-      imageUrl = await this.mediaRepository.upload(file.buffer, file.fileName);
+      imageUrl = await this.mediaService.upload(file.buffer, file.fileName);
     }
 
     const threadData = {
