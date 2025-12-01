@@ -42,16 +42,22 @@ export function ReplyForm({ threadId }: ReplyFormProps) {
     if (!content.trim()) return;
 
     setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append("threadId", threadId);
+    formData.append("content", content);
+    if (replyTo) {
+      formData.append("replyTo", replyTo);
+    }
+    if (image) {
+      formData.append("image", image);
+    }
+
     try {
-      await createRepliesAction({
-        threadId,
-        content,
-        author: "Anonymous",
-        replyTo,
-      });
+      await createRepliesAction(formData);
 
       setContent("");
       setReplyTo(undefined);
+      setImage(null);
       router.refresh();
     } catch (err) {
       console.error("Failed to post reply", err);
@@ -92,7 +98,7 @@ export function ReplyForm({ threadId }: ReplyFormProps) {
               </div>
 
               <div className="flex items-center justify-between">
-                {/* <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Label htmlFor="image" className="cursor-pointer">
                     <Button type="button" variant="outline" size="sm" asChild>
                       <span>
@@ -103,7 +109,7 @@ export function ReplyForm({ threadId }: ReplyFormProps) {
                   </Label>
                   <Input id="image" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                   {image && <span className="text-sm text-muted-foreground">{image.name}</span>}
-                </div> */}
+                </div>
 
                 <Button
                   type="submit"
