@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1765786626790,
+      "tag": "0000_damp_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765795970610,
+      "tag": "0001_seed-boards",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765905396190,
+      "tag": "0002_ambitious_earthquake",
+      "breakpoints": true
+    }
+  ]
+}
