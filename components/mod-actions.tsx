@@ -59,22 +59,22 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
 
       if (result?.success) {
         toast({
-          title: "Success",
-          description: "Action completed successfully",
+          title: "Sukses",
+          description: "Tindakan berhasil diselesaikan",
         })
         router.refresh()
       } else {
         toast({
-          title: "Error",
-          description: result?.error || "Failed to perform action",
+          title: "Kesalahan",
+          description: result?.error || "Gagal melakukan tindakan",
           variant: "destructive",
         })
       }
     } catch (error) {
       console.error("Error performing action:", error)
       toast({
-        title: "Error",
-        description: "An unexpected error occurred",
+        title: "Kesalahan",
+        description: "Terjadi kesalahan tak terduga",
         variant: "destructive",
       })
     } finally {
@@ -94,7 +94,7 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
             className="flex-1"
           >
             <Lock className="h-4 w-4 mr-2" />
-            Lock Thread
+            Kunci Thread
           </Button>
           <Button
             variant="outline"
@@ -104,7 +104,7 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
             className="flex-1"
           >
             <Pin className="h-4 w-4 mr-2" />
-            Pin Thread
+            Sematkan Thread
           </Button>
         </>
       )}
@@ -116,7 +116,7 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
         className="flex-1"
       >
         <Trash2 className="h-4 w-4 mr-2" />
-        Delete
+        Hapus
       </Button>
       <Button
         variant="outline"
@@ -126,7 +126,7 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
         className="flex-1"
       >
         <CheckCircle className="h-4 w-4 mr-2" />
-        Resolve
+        Selesaikan
       </Button>
       <Button
         variant="outline"
@@ -136,7 +136,7 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
         className="flex-1"
       >
         <XCircle className="h-4 w-4 mr-2" />
-        Dismiss
+        Abaikan
       </Button>
     </div>
   )

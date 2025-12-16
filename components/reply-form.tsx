@@ -48,11 +48,11 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
         setIsOpen(false)
         router.refresh()
       } else {
-        setError(result.error || "Failed to post reply")
+        setError(result.error || "Gagal mengirim balasan")
       }
     } catch (error) {
       console.error("Error posting reply:", error)
-      setError("An unexpected error occurred")
+      setError("Terjadi kesalahan tak terduga")
     } finally {
       setIsSubmitting(false)
     }
@@ -69,7 +69,7 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
     return (
       <Button onClick={() => setIsOpen(true)} className="w-full">
         <MessageSquare className="h-4 w-4 mr-2" />
-        Post Reply
+        Kirim Balasan
       </Button>
     )
   }
@@ -79,8 +79,8 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Post Reply</CardTitle>
-            <CardDescription>Add your response to this thread</CardDescription>
+            <CardTitle>Kirim Balasan</CardTitle>
+            <CardDescription>Tambahkan tanggapan Anda ke thread ini</CardDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={handleClose}>
             <X className="h-4 w-4" />
@@ -92,16 +92,16 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
           {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
           <div className="space-y-2">
-            <Label htmlFor="reply-author">Name (optional)</Label>
-            <Input id="reply-author" name="author" placeholder="Anonymous" maxLength={100} />
+            <Label htmlFor="reply-author">Nama (opsional)</Label>
+            <Input id="reply-author" name="author" placeholder="Anonim" maxLength={100} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reply-content">Content</Label>
+            <Label htmlFor="reply-content">Konten</Label>
             <Textarea
               id="reply-content"
               name="content"
-              placeholder="Enter your reply"
+              placeholder="Masukkan balasan Anda"
               required
               rows={5}
               className="resize-none"
@@ -112,10 +112,10 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
 
           <div className="flex gap-2">
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Posting..." : "Post Reply"}
+              {isSubmitting ? "Mengirim..." : "Kirim Balasan"}
             </Button>
             <Button type="button" variant="outline" onClick={handleClose}>
-              Cancel
+              Batal
             </Button>
           </div>
         </form>

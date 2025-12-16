@@ -18,11 +18,11 @@ export default async function ModPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-balance">Moderation Panel</h1>
-              <p className="text-sm text-muted-foreground">Review and manage reported content</p>
+              <h1 className="text-2xl font-bold text-balance">Panel Moderasi</h1>
+              <p className="text-sm text-muted-foreground">Tinjau dan kelola konten yang dilaporkan</p>
             </div>
             <Link href="/">
-              <Button variant="outline">Back to Home</Button>
+              <Button variant="outline">Kembali ke Beranda</Button>
             </Link>
           </div>
         </div>
@@ -31,7 +31,7 @@ export default async function ModPage() {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">
-            Pending Reports <Badge variant="destructive">{pendingReports?.length || 0}</Badge>
+            Laporan Tertunda <Badge variant="destructive">{pendingReports?.length || 0}</Badge>
           </h2>
           <div className="space-y-4">
             {pendingReports?.map((report) => (
@@ -40,7 +40,7 @@ export default async function ModPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <CardTitle className="text-base">
-                        {report.contentType === "thread" ? "Thread" : "Reply"} #{report.contentId}
+                        {report.contentType === "thread" ? "Thread" : "Balasan"} #{report.contentId}
                       </CardTitle>
                       <CardDescription>{report.reportedAt.toLocaleString()}</CardDescription>
                     </div>
@@ -49,7 +49,7 @@ export default async function ModPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium mb-1">Reason:</p>
+                    <p className="text-sm font-medium mb-1">Alasan:</p>
                     <p className="text-sm text-muted-foreground text-balance">{report.reason}</p>
                   </div>
                   <ModActions reportId={report.id} contentType={report.contentType} contentId={report.contentId} />
@@ -60,7 +60,7 @@ export default async function ModPage() {
             {pendingReports?.length === 0 && (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  <p>No pending reports</p>
+                  <p>Tidak ada laporan tertunda</p>
                 </CardContent>
               </Card>
             )}
@@ -68,7 +68,7 @@ export default async function ModPage() {
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Resolved Reports</h2>
+          <h2 className="text-xl font-semibold mb-4">Laporan yang Diselesaikan</h2>
           <div className="space-y-4">
             {resolvedReports?.slice(0, 10).map((report) => (
               <Card key={report.id}>
@@ -76,7 +76,7 @@ export default async function ModPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <CardTitle className="text-base">
-                        {report.contentType === "thread" ? "Thread" : "Reply"} #{report.contentId}
+                        {report.contentType === "thread" ? "Thread" : "Balasan"} #{report.contentId}
                       </CardTitle>
                       <CardDescription>{report.reportedAt.toLocaleString()}</CardDescription>
                     </div>
@@ -92,7 +92,7 @@ export default async function ModPage() {
             {resolvedReports?.length === 0 && (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  <p>No resolved reports yet</p>
+                  <p>Belum ada laporan yang diselesaikan</p>
                 </CardContent>
               </Card>
             )}

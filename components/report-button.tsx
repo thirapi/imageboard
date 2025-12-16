@@ -44,22 +44,22 @@ export function ReportButton({ contentType, contentId }: ReportButtonProps) {
         setIsOpen(false)
         ;(e.target as HTMLFormElement).reset()
         toast({
-          title: "Report Submitted",
-          description: "Thank you for your report. Our moderators will review it shortly.",
+          title: "Laporan Terkirim",
+          description: "Terima kasih atas laporan Anda. Moderator kami akan segera meninjaunya.",
         })
         router.refresh()
       } else {
         toast({
-          title: "Error",
-          description: result.error || "Failed to submit report",
+          title: "Kesalahan",
+          description: result.error || "Gagal mengirim laporan",
           variant: "destructive",
         })
       }
     } catch (error) {
       console.error("Error submitting report:", error)
       toast({
-        title: "Error",
-        description: "An unexpected error occurred",
+        title: "Kesalahan",
+        description: "Terjadi kesalahan tak terduga",
         variant: "destructive",
       })
     } finally {
@@ -72,23 +72,23 @@ export function ReportButton({ contentType, contentId }: ReportButtonProps) {
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
           <Flag className="h-4 w-4 mr-2" />
-          Report
+          Laporkan
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Report Content</DialogTitle>
+          <DialogTitle>Laporkan Konten</DialogTitle>
           <DialogDescription>
-            Please provide a reason for reporting this {contentType}. Reports are reviewed by moderators.
+            Harap berikan alasan untuk melaporkan ini {contentType}. Laporan akan ditinjau oleh moderator.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="reason">Reason</Label>
+            <Label htmlFor="reason">Alasan</Label>
             <Textarea
               id="reason"
               name="reason"
-              placeholder="Describe why you are reporting this content"
+              placeholder="Jelaskan mengapa Anda melaporkan konten ini"
               required
               rows={4}
               className="resize-none"
@@ -97,10 +97,10 @@ export function ReportButton({ contentType, contentId }: ReportButtonProps) {
 
           <div className="flex gap-2">
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Submitting..." : "Submit Report"}
+              {isSubmitting ? "Mengirim..." : "Kirim Laporan"}
             </Button>
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-              Cancel
+              Batal
             </Button>
           </div>
         </form>

@@ -41,14 +41,14 @@ export default async function ThreadPage({ params }: { params: Promise<{ board: 
             <Link href={`/${boardCode}`}>
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to /{boardCode}/
+                Kembali ke /{boardCode}/
               </Button>
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-balance flex items-center gap-2 flex-wrap">
-            {thread.isPinned && <Pin className="h-5 w-5 text-accent shrink-0" aria-label="Pinned" />}
-            {thread.isLocked && <Lock className="h-5 w-5 text-muted-foreground shrink-0" aria-label="Locked" />}
-            {thread.subject || "No Subject"}
+            {thread.isPinned && <Pin className="h-5 w-5 text-accent shrink-0" aria-label="Disematkan" />}
+            {thread.isLocked && <Lock className="h-5 w-5 text-muted-foreground shrink-0" aria-label="Terkunci" />}
+            {thread.subject || "Tanpa Subjek"}
           </h1>
         </div>
       </header>
@@ -59,11 +59,11 @@ export default async function ThreadPage({ params }: { params: Promise<{ board: 
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <CardTitle>
-                  {thread.subject || "No Subject"}{" "}
+                  {thread.subject || "Tanpa Subjek"}{" "}
                   <span className="text-muted-foreground font-normal">#{thread.id}</span>
                 </CardTitle>
                 <CardDescription>
-                  by {thread.author} • {thread.createdAt.toLocaleString()}
+                  oleh {thread.author} • {thread.createdAt.toLocaleString()}
                 </CardDescription>
               </div>
               <ReportButton contentType="thread" contentId={thread.id} />
@@ -72,7 +72,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ board: 
           <CardContent>
             {thread.image && (
               <div className="mb-4">
-                <img src={thread.image || "/placeholder.svg"} alt="Thread image" className="max-w-md rounded border" />
+                <img src={thread.image || "/placeholder.svg"} alt="Gambar thread" className="max-w-md rounded border" />
               </div>
             )}
             <p className="whitespace-pre-wrap text-balance">{thread.content}</p>
@@ -96,7 +96,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ board: 
                   <div className="mb-4">
                     <img
                       src={reply.image || "/placeholder.svg"}
-                      alt="Reply image"
+                      alt="Gambar balasan"
                       className="max-w-md rounded border"
                     />
                   </div>
@@ -109,7 +109,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ board: 
           {replies?.length === 0 && (
             <Card>
               <CardContent className="py-6 text-center text-muted-foreground">
-                <p>No replies yet. Be the first to reply!</p>
+                <p>Belum ada balasan. Jadilah yang pertama membalas!</p>
               </CardContent>
             </Card>
           )}
@@ -121,7 +121,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ board: 
           <Card>
             <CardContent className="py-6 text-center text-muted-foreground">
               <Lock className="h-8 w-8 mx-auto mb-2" />
-              <p>This thread is locked. No new replies can be posted.</p>
+              <p>Thread ini terkunci. Tidak ada balasan baru yang bisa diposting.</p>
             </CardContent>
           </Card>
         )}

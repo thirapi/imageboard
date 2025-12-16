@@ -29,7 +29,7 @@ export function ImageUploader({ onImageSelect, maxSizeMB = 5 }: ImageUploaderPro
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file")
+      setError("Silakan pilih file gambar")
       clearImage()
       return
     }
@@ -37,7 +37,7 @@ export function ImageUploader({ onImageSelect, maxSizeMB = 5 }: ImageUploaderPro
     // Validate file size
     const maxSize = maxSizeMB * 1024 * 1024
     if (file.size > maxSize) {
-      setError(`Image must be less than ${maxSizeMB}MB`)
+      setError(`Ukuran gambar harus kurang dari ${maxSizeMB}MB`)
       clearImage()
       return
     }
@@ -62,8 +62,7 @@ export function ImageUploader({ onImageSelect, maxSizeMB = 5 }: ImageUploaderPro
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="image">Image (optional)</Label>
-      <div className="space-y-2">
+      <Label htmlFor="image">Gambar (opsional)</Label>      <div className="space-y-2">
         {!preview ? (
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 hover:border-muted-foreground/50 transition-colors">
             <input
@@ -82,15 +81,15 @@ export function ImageUploader({ onImageSelect, maxSizeMB = 5 }: ImageUploaderPro
             >
               <Upload className="h-8 w-8" />
               <div className="text-sm text-center">
-                <span className="font-medium">Click to upload</span>
-                <p className="text-xs mt-1">PNG, JPG, GIF up to {maxSizeMB}MB</p>
+                <span className="font-medium">Klik untuk mengunggah</span>
+                <p className="text-xs mt-1">PNG, JPG, GIF hingga {maxSizeMB}MB</p>
               </div>
             </button>
           </div>
         ) : (
           <div className="relative border rounded-lg overflow-hidden">
             <div className="relative aspect-video bg-muted">
-              <Image src={preview || "/placeholder.svg"} alt="Preview" fill className="object-contain" />
+              <Image src={preview || "/placeholder.svg"} alt="Pratinjau" fill className="object-contain" />
             </div>
             <Button
               type="button"

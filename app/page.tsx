@@ -20,16 +20,16 @@ export default async function HomePage() {
     <div className="min-h-screen flex flex-col">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-balance">Imageboard</h1>
+          <h1 className="text-2xl font-bold text-balance">Papan Gambar</h1>
           <p className="text-sm text-muted-foreground">
-            Anonymous discussion board
+            Papan diskusi anonim
           </p>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Boards</h2>
+          <h2 className="text-xl font-semibold mb-4">Papan</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {boards?.map((board) => (
               <Link key={board.id} href={`/${board.code}`}>
@@ -53,10 +53,10 @@ export default async function HomePage() {
         {(latestPosts.length > 0 || recentImages.length > 0) && (
           <div className="border-t pt-8 mt-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* Latest Posts */}
+              {/* Postingan Terbaru */}
               {latestPosts.length > 0 && (
                 <section className="lg:col-span-5">
-                  <h2 className="text-lg font-semibold mb-3">Latest Posts</h2>
+                  <h2 className="text-lg font-semibold mb-3">Postingan Terbaru</h2>
 
                   <div className="space-y-2">
                     {latestPosts.map((post) => (
@@ -71,7 +71,7 @@ export default async function HomePage() {
                               <div className="text-sm font-medium truncate">
                                 {post.title || (
                                   <span className="text-muted-foreground">
-                                    Reply
+                                    Balasan
                                   </span>
                                 )}
                               </div>
@@ -91,10 +91,10 @@ export default async function HomePage() {
                 </section>
               )}
 
-              {/* Recent Images */}
+              {/* Gambar Terbaru */}
               {recentImages.length > 0 && (
                 <section className="lg:col-span-7">
-                  <h2 className="text-lg font-semibold mb-3">Recent Images</h2>
+                  <h2 className="text-lg font-semibold mb-3">Gambar Terbaru</h2>
 
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                     {recentImages.map((image) => (
@@ -105,7 +105,7 @@ export default async function HomePage() {
                         <div className="aspect-square overflow-hidden rounded-md border hover:border-accent transition-colors">
                           <img
                             src={image.imageUrl || "/placeholder.svg"}
-                            alt="Recent upload"
+                            alt="Unggahan terbaru"
                             className="w-full h-full object-cover"
                             loading="lazy"
                           />
@@ -121,9 +121,9 @@ export default async function HomePage() {
       </main>
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Please read the rules before posting</p>
+          <p>Harap baca peraturan sebelum memposting</p>
           <p className="mt-2">
-            All posts are anonymous unless a name is provided
+            Semua postingan bersifat anonim kecuali jika nama diberikan
           </p>
         </div>
       </footer>

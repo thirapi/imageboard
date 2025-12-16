@@ -49,11 +49,11 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
         router.push(`/${boardCode}/thread/${result.threadId}`)
         router.refresh()
       } else {
-        setError(result.error || "Failed to create thread")
+        setError(result.error || "Gagal membuat thread")
       }
     } catch (error) {
       console.error("Error creating thread:", error)
-      setError("An unexpected error occurred")
+      setError("Terjadi kesalahan tak terduga")
     } finally {
       setIsSubmitting(false)
     }
@@ -70,7 +70,7 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
     return (
       <Button onClick={() => setIsOpen(true)} className="w-full">
         <Plus className="h-4 w-4 mr-2" />
-        Start New Thread
+        Mulai Thread Baru
       </Button>
     )
   }
@@ -80,8 +80,8 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Start New Thread</CardTitle>
-            <CardDescription>Create a new discussion on this board</CardDescription>
+            <CardTitle>Mulai Thread Baru</CardTitle>
+            <CardDescription>Buat diskusi baru di papan ini</CardDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={handleClose}>
             <X className="h-4 w-4" />
@@ -93,21 +93,21 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
           {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
           <div className="space-y-2">
-            <Label htmlFor="author">Name (optional)</Label>
-            <Input id="author" name="author" placeholder="Anonymous" maxLength={100} />
+            <Label htmlFor="author">Nama (opsional)</Label>
+            <Input id="author" name="author" placeholder="Anonim" maxLength={100} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="subject">Subject (optional)</Label>
-            <Input id="subject" name="subject" placeholder="Enter subject" maxLength={200} />
+            <Label htmlFor="subject">Subjek (opsional)</Label>
+            <Input id="subject" name="subject" placeholder="Masukkan subjek" maxLength={200} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="content">Content</Label>
+            <Label htmlFor="content">Konten</Label>
             <Textarea
               id="content"
               name="content"
-              placeholder="Enter your message"
+              placeholder="Masukkan pesan Anda"
               required
               rows={6}
               className="resize-none"
@@ -118,10 +118,10 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
 
           <div className="flex gap-2">
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Posting..." : "Post Thread"}
+              {isSubmitting ? "Mengirim..." : "Kirim Thread"}
             </Button>
             <Button type="button" variant="outline" onClick={handleClose}>
-              Cancel
+              Batal
             </Button>
           </div>
         </form>

@@ -32,7 +32,7 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
             <Link href="/">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Boards
+                Kembali ke Papan
               </Button>
             </Link>
           </div>
@@ -56,18 +56,18 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <CardTitle className="flex items-center gap-2 flex-wrap">
-                        {thread.isPinned && <Pin className="h-4 w-4 text-accent shrink-0" aria-label="Pinned" />}
+                        {thread.isPinned && <Pin className="h-4 w-4 text-accent shrink-0" aria-label="Disematkan" />}
                         {thread.isLocked && (
-                          <Lock className="h-4 w-4 text-muted-foreground shrink-0" aria-label="Locked" />
+                          <Lock className="h-4 w-4 text-muted-foreground shrink-0" aria-label="Terkunci" />
                         )}
-                        <span className="text-balance">{thread.subject || "No Subject"}</span>
+                        <span className="text-balance">{thread.subject || "Tanpa Subjek"}</span>
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        by {thread.author} • {thread.createdAt.toLocaleString()}
+                        oleh {thread.author} • {thread.createdAt.toLocaleString()}
                       </CardDescription>
                     </div>
                     <div className="text-sm text-muted-foreground whitespace-nowrap">
-                      {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
+                      {thread.replyCount} {thread.replyCount === 1 ? "balasan" : "balasan"}
                     </div>
                   </div>
                 </CardHeader>
@@ -76,7 +76,7 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
                     <div className="mb-4">
                       <img
                         src={thread.image || "/placeholder.svg"}
-                        alt="Thread image"
+                        alt="Gambar thread"
                         className="max-w-xs rounded border"
                       />
                     </div>
@@ -90,7 +90,7 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
           {threads?.length === 0 && (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                <p>No threads yet. Be the first to start a discussion!</p>
+                <p>Belum ada thread. Jadilah yang pertama memulai diskusi!</p>
               </CardContent>
             </Card>
           )}
