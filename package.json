@@ -12,10 +12,12 @@
     "db:push": "npx drizzle-kit push",
     "db:generate": "npx drizzle-kit generate",
     "dev:setup": "npm run db:reset && npm run db:migrate",
-    "dev:fresh": "npm run dev:setup && npm run dev"
+    "dev:fresh": "npm run dev:setup && npm run dev",
+    "generate-user-seed": "tsx scripts/generate-user-seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@lucia-auth/adapter-drizzle": "^1.1.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -55,9 +57,11 @@
     "drizzle-orm": "^0.45.1",
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
+    "lucia": "^3.2.2",
     "lucide-react": "^0.454.0",
     "next": "16.0.10",
     "next-themes": "^0.4.6",
+    "oslo": "^1.2.1",
     "postgres": "^3.4.7",
     "react": "19.2.0",
     "react-day-picker": "9.8.0",
