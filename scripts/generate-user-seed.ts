@@ -10,7 +10,7 @@ config({ path: resolve(__dirname, "../.env") });
  * Set env: ADMIN_PASSWORD=rahasia-kuat-123 di .env.local.
  */
 async function generateSeed() {
-  const adminEmail = 'thirapi@duck.com';
+  const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
   if (!adminPassword) {

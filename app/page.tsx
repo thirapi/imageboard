@@ -1,3 +1,4 @@
+// app/page.tsx
 import Link from "next/link";
 import {
   Card,
@@ -11,6 +12,7 @@ import {
   getRecentImages,
 } from "@/lib/actions/home.actions";
 
+export const dynamic = 'force-dynamic';
 export default async function HomePage() {
   const boards = await getBoardList();
   const latestPosts = await getLatestPosts(10);
