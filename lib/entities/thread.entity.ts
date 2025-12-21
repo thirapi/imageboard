@@ -27,3 +27,17 @@ export interface CreateThreadInput {
   author?: string
   image?: string | null
 }
+
+export interface ThreadUI {
+  id: number
+  boardId: number
+  subject: string | null
+  content: string
+  author: string
+  createdAt: Date
+  isPinned: boolean
+  isLocked: boolean
+  isDeleted: boolean
+  bumpedAt: Date
+  image?: string | null
+}

@@ -1,16 +1,19 @@
+// app/(boards)/[board]/[id]/page.tsx  (atau path sesuai strukturmu)
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, Lock, Pin } from "lucide-react"
-import { ReplyForm } from "@/components/reply-form"
-import { ReportButton } from "@/components/report-button"
 import { BoardRepository } from "@/lib/repositories/board.repository"
 import { ThreadRepository } from "@/lib/repositories/thread.repository"
 import { ReplyRepository } from "@/lib/repositories/reply.repository"
 import { GetThreadDetailUseCase } from "@/lib/use-cases/get-thread-detail.use-case"
+import { ThreadClient } from "./thread"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Lock, Pin } from "lucide-react"
 
-export default async function ThreadPage({ params }: { params: Promise<{ board: string; id: string }> }) {
+interface ThreadPageProps {
+  params: Promise<{ board: string; id: string }>
+}
+
+export default async function ThreadPage({ params }: ThreadPageProps) {
   const { board: boardCode, id } = await params
   const threadId = Number.parseInt(id)
 
@@ -54,77 +57,12 @@ export default async function ThreadPage({ params }: { params: Promise<{ board: 
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <Card className="mb-6 border-accent">
-          <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <CardTitle>
-                  {thread.subject || "Tanpa Subjek"}{" "}
-                  <span className="text-muted-foreground font-normal">#{thread.id}</span>
-                </CardTitle>
-                <CardDescription>
-                  oleh {thread.author} • {thread.createdAt.toLocaleString()}
-                </CardDescription>
-              </div>
-              <ReportButton contentType="thread" contentId={thread.id} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {thread.image && (
-              <div className="mb-4">
-                <img src={thread.image || "/placeholder.svg"} alt="Gambar thread" className="max-w-md rounded border" />
-              </div>
-            )}
-            <p className="whitespace-pre-wrap text-balance">{thread.content}</p>
-          </CardContent>
-        </Card>
 
-        <div className="space-y-4 mb-8">
-          {replies?.map((reply) => (
-            <Card key={reply.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <CardDescription className="flex-1">
-                    <span className="font-medium text-foreground">{reply.author}</span> •{" "}
-                    {reply.createdAt.toLocaleString()} • #{reply.id}
-                  </CardDescription>
-                  <ReportButton contentType="reply" contentId={reply.id} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                {reply.image && (
-                  <div className="mb-4">
-                    <img
-                      src={reply.image || "/placeholder.svg"}
-                      alt="Gambar balasan"
-                      className="max-w-md rounded border"
-                    />
-                  </div>
-                )}
-                <p className="whitespace-pre-wrap text-balance">{reply.content}</p>
-              </CardContent>
-            </Card>
-          ))}
-
-          {replies?.length === 0 && (
-            <Card>
-              <CardContent className="py-6 text-center text-muted-foreground">
-                <p>Belum ada balasan. Jadilah yang pertama membalas!</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {!thread.isLocked && <ReplyForm threadId={thread.id} boardCode={boardCode} />}
-
-        {thread.isLocked && (
-          <Card>
-            <CardContent className="py-6 text-center text-muted-foreground">
-              <Lock className="h-8 w-8 mx-auto mb-2" />
-              <p>Thread ini terkunci. Tidak ada balasan baru yang bisa diposting.</p>
-            </CardContent>
-          </Card>
-        )}
+        <ThreadClient 
+          thread={thread} 
+          replies={replies || []} 
+          boardCode={boardCode} 
+        />
       </main>
     </div>
   )

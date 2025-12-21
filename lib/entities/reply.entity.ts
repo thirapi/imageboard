@@ -21,3 +21,13 @@ export interface CreateReplyInput {
   author?: string
   image?: string | null
 }
+
+export interface ReplyUI {
+  id: number
+  threadId: number
+  content: string
+  author: string
+  createdAt: Date
+  isDeleted: boolean
+  image?: string
+}
