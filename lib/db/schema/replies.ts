@@ -14,6 +14,7 @@ export const replies = pgTable(
   'replies',
   {
     id: serial('id').primaryKey(),
+    postNumber: integer('post_number').unique(),
 
     threadId: integer('thread_id')
       .notNull()

@@ -41,7 +41,7 @@ export function ThreadClient({ thread, replies, boardCode }: ThreadClientProps) 
             <div className="flex-1">
               <CardTitle>
                 {thread.subject || "Tanpa Subjek"}{" "}
-                <span className="text-muted-foreground font-normal">#{thread.id}</span>
+                <span className="text-muted-foreground font-normal">#{thread.postNumber}</span>
               </CardTitle>
               <CardDescription>
                 oleh {thread.author} • {thread.createdAt.toLocaleString()}
@@ -72,7 +72,7 @@ export function ThreadClient({ thread, replies, boardCode }: ThreadClientProps) 
               <div className="flex items-start justify-between gap-4">
                 <CardDescription className="flex-1">
                   <span className="font-medium text-foreground">{reply.author}</span> •{" "}
-                  {reply.createdAt.toLocaleString()} • #{reply.id}
+                  {reply.createdAt.toLocaleString()} • #{reply.postNumber}
                 </CardDescription>
                 <ReportButton contentType="reply" contentId={reply.id} />
               </div>

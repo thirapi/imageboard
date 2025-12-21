@@ -14,6 +14,7 @@ export const threads = pgTable(
   'threads',
   {
     id: serial('id').primaryKey(),
+    postNumber: integer('post_number').unique(),
 
     boardId: integer('board_id')
       .notNull()

@@ -10,6 +10,7 @@ export interface ThreadEntity {
   isDeleted: boolean
   bumpedAt: Date
   image?: string | null
+  postNumber: number
 }
 
 export interface CreateThreadCommand {
@@ -26,6 +27,7 @@ export interface CreateThreadInput {
   content: string
   author?: string
   image?: string | null
+  postNumber: number
 }
 
 export interface ThreadUI {
@@ -40,4 +42,5 @@ export interface ThreadUI {
   isDeleted: boolean
   bumpedAt: Date
   image?: string | null
+  postNumber: number
 }

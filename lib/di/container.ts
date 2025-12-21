@@ -38,6 +38,7 @@ import { ModerationController } from "@/lib/controllers/moderation.controller"
 import { ReplyController } from "@/lib/controllers/reply.controller"
 import { ReportController } from "@/lib/controllers/report.controller"
 import { ThreadController } from "@/lib/controllers/thread.controller"
+import { SequenceService } from "../services/sequence.service"
 
 // Instantiate Repositories
 const boardRepository = new BoardRepository()
@@ -50,6 +51,7 @@ const threadRepository = new ThreadRepository()
 // Instantiate Services
 const cloudinaryService = new CloudinaryService()
 const contentFilterService = new ContentFilterService()
+const sequenceService = new SequenceService()
 
 // Instantiate Use Cases
 const createReportUseCase = new CreateReportUseCase(reportRepository)
@@ -58,6 +60,7 @@ const createThreadUseCase = new CreateThreadUseCase(
   boardRepository,
   imageRepository,
   cloudinaryService,
+  sequenceService
 )
 const dismissReportUseCase = new DismissReportUseCase(reportRepository)
 const getBoardListUseCase = new GetBoardListUseCase(boardRepository)
@@ -74,6 +77,7 @@ const replyToThreadUseCase = new ReplyToThreadUseCase(
   threadRepository,
   imageRepository,
   cloudinaryService,
+  sequenceService
 )
 const resolveReportUseCase = new ResolveReportUseCase(reportRepository)
 const softDeleteReplyUseCase = new SoftDeleteReplyUseCase(replyRepository)

@@ -63,7 +63,8 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
                         <span className="text-balance">{thread.subject || "Tanpa Subjek"}</span>
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        oleh {thread.author} • {thread.createdAt.toLocaleString()}
+                        oleh {thread.author || "Anonymous"} • {thread.createdAt.toLocaleString()}
+                        <span className="text-accent"> #{thread.postNumber} </span>
                       </CardDescription>
                     </div>
                     <div className="text-sm text-muted-foreground whitespace-nowrap">
@@ -78,10 +79,45 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
                         src={thread.image || "/placeholder.svg"}
                         alt="Gambar thread"
                         className="max-w-xs rounded border"
+                        loading="lazy"
                       />
                     </div>
                   )}
-                  <p className="text-sm line-clamp-3 text-balance">{thread.content}</p>
+
+                  {/* Konten thread utama (OP) */}
+                  <p className="text-sm line-clamp-3 text-balance mb-3">{thread.content}</p>
+
+                  {/* Preview replies: 2-3 terbaru, style imageboard */}
+                  {thread.replies && thread.replies.length > 0 && (
+                    <div className="border-t pt-3 space-y-2 text-sm">
+                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
+                        Balasan terbaru ({Math.min(3, thread.replies.length)}/{thread.replyCount})
+                      </p>
+                      {thread.replies.slice(0, 3).map((reply) => (
+                        <div key={reply.id} className="pl-4 border-l-2 border-muted space-y-1 text-muted-foreground">
+                          {/* Metadata: Timestamp + Post Number */}
+                          <div className="flex items-center gap-2 text-xs font-mono">
+                            <span>{reply.createdAt.toLocaleString("id-ID", { hour: "2-digit", minute: "2-digit" })}</span>
+                            <span className="text-accent">#{reply.postNumber}</span>
+                          </div>
+                          {/* Konten + Thumbnail */}
+                          <div className="flex items-start gap-2">
+                            {reply.image && (
+                              <img
+                                src={reply.image}
+                                alt="Preview balasan"
+                                className="max-w-[60px] max-h-[60px] flex-shrink-0 border rounded-sm object-cover"
+                                loading="lazy"
+                              />
+                            )}
+                            <p className="line-clamp-2 flex-1 font-mono leading-relaxed">
+                              <span className="text-accent">&gt;&gt; </span>{reply.content}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </Link>

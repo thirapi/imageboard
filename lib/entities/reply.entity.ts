@@ -6,6 +6,7 @@ export interface ReplyEntity {
   createdAt: Date
   isDeleted: boolean
   image?: string
+  postNumber: number
 }
 
 export interface CreateReplyCommand {
@@ -20,6 +21,7 @@ export interface CreateReplyInput {
   content: string
   author?: string
   image?: string | null
+  postNumber: number
 }
 
 export interface ReplyUI {
@@ -30,4 +32,5 @@ export interface ReplyUI {
   createdAt: Date
   isDeleted: boolean
   image?: string
+  postNumber: number
 }

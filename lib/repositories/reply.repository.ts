@@ -1,10 +1,11 @@
 import { db } from "@/lib/db"
 import { replies } from "@/lib/db/schema"
-import { asc, eq, and, sql } from "drizzle-orm"
+import { asc, eq, and, sql, desc } from "drizzle-orm"
 import type { ReplyEntity, CreateReplyInput } from "@/lib/entities/reply.entity"
 
 export class ReplyRepository {
   async create(input: CreateReplyInput): Promise<ReplyEntity> {
+
     const rows = await db
       .insert(replies)
       .values({
@@ -12,6 +13,7 @@ export class ReplyRepository {
         content: input.content,
         author: input.author ?? "Awanama",
         image: input.image ?? null,
+        postNumber: input.postNumber,
       })
       .returning()
 
@@ -83,6 +85,24 @@ export class ReplyRepository {
       createdAt: row.createdAt!,
       isDeleted: row.isDeleted ?? false,
       image: row.image ?? undefined,
+      postNumber: row.postNumber!,
     }
   }
+
+  async findPreviewByThreadId(threadId: number, limit: number = 3): Promise<ReplyEntity[]> {
+    const rows = await db
+      .select()
+      .from(replies)
+      .where(
+        and(
+          eq(replies.threadId, threadId),
+          eq(replies.isDeleted, false)
+        )
+      )
+      .orderBy(desc(replies.createdAt))
+      .limit(limit)
+
+    return rows.map((row) => this.mapToEntity(row))
+  }
+
 }

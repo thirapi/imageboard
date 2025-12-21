@@ -3,6 +3,7 @@ import type { BoardRepository } from "@/lib/repositories/board.repository"
 import type { ImageRepository } from "@/lib/repositories/image.repository"
 import type { CloudinaryService } from "@/lib/services/cloudinary.service"
 import type { CreateThreadCommand } from "@/lib/entities/thread.entity"
+import { SequenceService } from "../services/sequence.service"
 
 export class CreateThreadUseCase {
   constructor(
@@ -10,6 +11,7 @@ export class CreateThreadUseCase {
     private boardRepository: BoardRepository,
     private imageRepository: ImageRepository,
     private cloudinaryService: CloudinaryService,
+    private sequenceService: SequenceService,
   ) {}
 
   async execute(input: CreateThreadCommand): Promise<number> {
@@ -36,6 +38,8 @@ export class CreateThreadUseCase {
     // Business rule: Clean author name
     const cleanedAuthor = input.author?.trim() || "Awanama"
 
+    const postNumber = await this.sequenceService.getNextPostNumber();
+
     let imageUrl: string | undefined
     if (input.imageFile && input.imageFile.size > 0) {
       try {
@@ -56,6 +60,7 @@ export class CreateThreadUseCase {
       content: input.content,
       author: cleanedAuthor,
       image: imageUrl,
+      postNumber: postNumber
     })
 
     if (imageUrl && input.imageFile) {

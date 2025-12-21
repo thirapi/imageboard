@@ -3,6 +3,7 @@ import type { ThreadRepository } from "@/lib/repositories/thread.repository"
 import type { ImageRepository } from "@/lib/repositories/image.repository"
 import type { CloudinaryService } from "@/lib/services/cloudinary.service"
 import type { CreateReplyCommand } from "@/lib/entities/reply.entity"
+import { SequenceService } from "../services/sequence.service"
 
 export class ReplyToThreadUseCase {
   constructor(
@@ -10,6 +11,7 @@ export class ReplyToThreadUseCase {
     private threadRepository: ThreadRepository,
     private imageRepository: ImageRepository,
     private cloudinaryService: CloudinaryService,
+    private sequenceService: SequenceService,
   ) {}
 
   async execute(input: CreateReplyCommand): Promise<number> {
@@ -39,6 +41,8 @@ export class ReplyToThreadUseCase {
     // Business rule: Clean author name
     const cleanedAuthor = input.author?.trim() || "Awanama"
 
+    const postNumber = await this.sequenceService.getNextPostNumber();
+
     let imageUrl: string | undefined
     if (input.imageFile && input.imageFile.size > 0) {
       try {
@@ -58,6 +62,7 @@ export class ReplyToThreadUseCase {
       content: input.content,
       author: cleanedAuthor,
       image: imageUrl,
+      postNumber: postNumber
     })
 
     if (imageUrl && input.imageFile) {

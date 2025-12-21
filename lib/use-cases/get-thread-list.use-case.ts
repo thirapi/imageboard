@@ -1,9 +1,11 @@
 import type { ThreadRepository } from "@/lib/repositories/thread.repository"
 import type { ReplyRepository } from "@/lib/repositories/reply.repository"
 import type { ThreadEntity } from "@/lib/entities/thread.entity"
+import { ReplyUI } from "@/lib/entities/reply.entity"
 
 export interface ThreadWithReplyCount extends ThreadEntity {
   replyCount: number
+  replies?: ReplyUI[]
 }
 
 export class GetThreadListUseCase {
@@ -19,9 +21,11 @@ export class GetThreadListUseCase {
     const threadsWithCounts = await Promise.all(
       threads.map(async (thread) => {
         const replyCount = await this.replyRepository.countByThreadId(thread.id)
+        const replies = await this.replyRepository.findPreviewByThreadId(thread.id, 3)
         return {
           ...thread,
           replyCount,
+          replies: replies || [],
         }
       }),
     )

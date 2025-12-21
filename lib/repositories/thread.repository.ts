@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
 import { threads } from "@/lib/db/schema"
-import { eq, desc, and } from "drizzle-orm"
+import { eq, desc, and, sql } from "drizzle-orm"
 import type { ThreadEntity, CreateThreadInput } from "@/lib/entities/thread.entity"
 
 export class ThreadRepository {
@@ -13,6 +13,7 @@ export class ThreadRepository {
         content: input.content,
         author: input.author ?? "Awanama",
         image: input.image ?? null,
+        postNumber: input.postNumber,
       })
       .returning()
 
@@ -85,6 +86,7 @@ export class ThreadRepository {
       isDeleted: row.isDeleted ?? false,
       bumpedAt: row.bumpedAt!,
       image: row.image ?? undefined,
+      postNumber: row.postNumber!,
     }
   }
 }
