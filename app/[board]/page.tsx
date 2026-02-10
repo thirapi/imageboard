@@ -13,6 +13,7 @@ import { BoardViewToggle } from "@/components/board-view-toggle";
 import { BoardSearch } from "@/components/board-search";
 import { CatalogView } from "@/components/catalog-view";
 import { cn } from "@/lib/utils";
+import { footerText } from "@/constants/footer";
 
 export default async function BoardPage({
   params,
@@ -51,7 +52,7 @@ export default async function BoardPage({
   const isCatalog = view === "catalog";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="py-6 text-center border-b mb-8 flex flex-col items-center">
         <h1 className="text-3xl font-bold text-accent mb-1 tracking-tight">
           /{board.code}/ - {board.name}
@@ -68,7 +69,7 @@ export default async function BoardPage({
 
       <main
         className={cn(
-          "container mx-auto px-4 pb-20",
+          "container mx-auto px-4 pb-20 flex-1",
           isCatalog ? "max-w-7xl" : "max-w-5xl",
         )}
       >
@@ -210,7 +211,7 @@ export default async function BoardPage({
 
       <footer className="border-t py-8 bg-muted/20">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          <p>© 2026 Imageboard Culture. All rights anonymous.</p>
+          <p>{footerText}</p>
         </div>
       </footer>
     </div>

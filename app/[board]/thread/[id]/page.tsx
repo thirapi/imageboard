@@ -5,8 +5,7 @@ import { ThreadRepository } from "@/lib/repositories/thread.repository";
 import { ReplyRepository } from "@/lib/repositories/reply.repository";
 import { GetThreadDetailUseCase } from "@/lib/use-cases/get-thread-detail.use-case";
 import { ThreadClient } from "./thread";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Lock, Pin } from "lucide-react";
+import { footerText } from "@/constants/footer";
 
 interface ThreadPageProps {
   params: Promise<{ board: string; id: string }>;
@@ -75,7 +74,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
           >
             /{boardCode}/
           </Link>{" "}
-          ]{`\n\n`}© 2026 Imageboard Culture. All rights anonymous.
+          ]{footerText}
         </div>
       </footer>
     </div>

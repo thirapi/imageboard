@@ -10,9 +10,9 @@ const sql = postgres(process.env.DATABASE_URL!);
 async function main() {
     try {
         console.log("Resetting Supabase database...");
-        
-        await sql`DROP SCHEMA public CASCADE`;
-        await sql`DROP SCHEMA drizzle CASCADE`;
+
+        await sql`DROP SCHEMA IF EXISTS public CASCADE`;
+        await sql`DROP SCHEMA IF EXISTS drizzle CASCADE`;
         await sql`CREATE SCHEMA public`;
 
         console.log("Database reset successfully!");

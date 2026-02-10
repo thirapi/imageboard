@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 };
 
 import { BoardNav } from "@/components/board-nav";
+import { AgeVerificationDialog } from "@/components/age-verification-dialog";
 
 export default function RootLayout({
   children,
@@ -45,6 +46,7 @@ export default function RootLayout({
         {children}
         <Toaster />
         <Analytics />
+        <AgeVerificationDialog />
       </body>
     </html>
   );

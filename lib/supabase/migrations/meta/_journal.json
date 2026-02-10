@@ -50,6 +50,13 @@
       "when": 1770729941146,
       "tag": "0006_large_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1770738135423,
+      "tag": "0007_add_boards",
+      "breakpoints": true
     }
   ]
 }

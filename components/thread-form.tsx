@@ -69,14 +69,13 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
 
   if (!isOpen) {
     return (
-      <div className="flex flex-col items-center">
-        <Button
+      <div className="text-center py-4">
+        <button
           onClick={() => setIsOpen(true)}
-          className="px-12 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all font-bold text-lg"
+          className="text-lg font-bold text-accent hover:underline cursor-pointer inline-flex items-center gap-1"
         >
-          <Plus className="h-5 w-5 mr-2" />
-          Mulai Thread Baru
-        </Button>
+          [ <Plus className="h-5 w-5" /> Mulai Thread Baru ]
+        </button>
       </div>
     );
   }

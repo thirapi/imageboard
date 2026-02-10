@@ -26,8 +26,11 @@ export async function BoardNav() {
         <Link href="/" className="hover:underline">
           Home
         </Link>
-        <Link href="/mod" className="hover:underline">
+        {/* <Link href="/mod" className="hover:underline">
           Mod
+        </Link> */}
+        <Link href="/rules" className="hover:underline">
+          Peraturan
         </Link>
       </div>
     </nav>
