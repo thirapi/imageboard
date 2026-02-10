@@ -124,3 +124,43 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .greentext {
+    color: #789922;
+  }
+
+  .spoiler {
+    @apply bg-foreground text-foreground rounded-xs px-1 hover:text-background transition-colors cursor-help;
+  }
+
+  .quote-link {
+    @apply text-accent hover:underline cursor-pointer font-mono;
+  }
+
+  /* Traditional Imageboard look */
+  .ib-post {
+    @apply border-none shadow-none bg-transparent mb-6;
+  }
+
+  .ib-post-metaline {
+    @apply flex flex-wrap items-center gap-2 text-sm mb-1;
+  }
+
+  .ib-subject {
+    @apply font-bold text-[#0f0c5d] dark:text-[#a9a9ed];
+  }
+
+  .ib-author {
+    @apply font-bold text-[#117743] dark:text-[#5cb85c];
+  }
+
+  .ib-reply {
+    @apply bg-muted/20 border-l-2 border-muted pl-4 py-2 my-2 rounded-r-md max-w-3xl;
+    background-color: color-mix(in oklch, var(--muted), transparent 90%);
+  }
+
+  .ib-post-number {
+    @apply text-accent font-mono text-xs hover:underline cursor-pointer;
+  }
+}

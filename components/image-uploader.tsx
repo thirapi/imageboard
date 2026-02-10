@@ -1,68 +1,85 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Upload, X } from "lucide-react"
-import Image from "next/image"
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Upload, X } from "lucide-react";
+import Image from "next/image";
 
 interface ImageUploaderProps {
-  onImageSelect: (file: File | null) => void
-  maxSizeMB?: number
+  onImageSelect: (file: File | null) => void;
+  maxSizeMB?: number;
+  resetTrigger?: number; // Add this to trigger reset from parent
 }
 
-export function ImageUploader({ onImageSelect, maxSizeMB = 5 }: ImageUploaderProps) {
-  const [preview, setPreview] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+export function ImageUploader({
+  onImageSelect,
+  maxSizeMB = 5,
+  resetTrigger,
+}: ImageUploaderProps) {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset when parent triggers reset
+  useEffect(() => {
+    if (resetTrigger !== undefined) {
+      setPreview(null);
+      setError(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }, [resetTrigger]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    setError(null)
+    const file = e.target.files?.[0];
+    setError(null);
 
     if (!file) {
-      clearImage()
-      return
+      clearImage();
+      return;
     }
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setError("Silakan pilih file gambar")
-      clearImage()
-      return
+      setError("Silakan pilih file gambar");
+      clearImage();
+      return;
     }
 
     // Validate file size
-    const maxSize = maxSizeMB * 1024 * 1024
+    const maxSize = maxSizeMB * 1024 * 1024;
     if (file.size > maxSize) {
-      setError(`Ukuran gambar harus kurang dari ${maxSizeMB}MB`)
-      clearImage()
-      return
+      setError(`Ukuran gambar harus kurang dari ${maxSizeMB}MB`);
+      clearImage();
+      return;
     }
 
     // Create preview
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onloadend = () => {
-      setPreview(reader.result as string)
-    }
-    reader.readAsDataURL(file)
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
 
-    onImageSelect(file)
-  }
+    onImageSelect(file);
+  };
 
   const clearImage = () => {
-    setPreview(null)
-    onImageSelect(null)
+    setPreview(null);
+    onImageSelect(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="image">Gambar (opsional)</Label>      <div className="space-y-2">
+      <Label htmlFor="image">Gambar (opsional)</Label>{" "}
+      <div className="space-y-2">
         {!preview ? (
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 hover:border-muted-foreground/50 transition-colors">
             <input
@@ -82,14 +99,21 @@ export function ImageUploader({ onImageSelect, maxSizeMB = 5 }: ImageUploaderPro
               <Upload className="h-8 w-8" />
               <div className="text-sm text-center">
                 <span className="font-medium">Klik untuk mengunggah</span>
-                <p className="text-xs mt-1">PNG, JPG, GIF hingga {maxSizeMB}MB</p>
+                <p className="text-xs mt-1">
+                  PNG, JPG, GIF hingga {maxSizeMB}MB
+                </p>
               </div>
             </button>
           </div>
         ) : (
           <div className="relative border rounded-lg overflow-hidden">
             <div className="relative aspect-video bg-muted">
-              <Image src={preview || "/placeholder.svg"} alt="Pratinjau" fill className="object-contain" />
+              <Image
+                src={preview || "/placeholder.svg"}
+                alt="Pratinjau"
+                fill
+                className="object-contain"
+              />
             </div>
             <Button
               type="button"
@@ -105,5 +129,5 @@ export function ImageUploader({ onImageSelect, maxSizeMB = 5 }: ImageUploaderPro
         {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
     </div>
-  )
+  );
 }

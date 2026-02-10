@@ -8,6 +8,7 @@ export interface CreateThreadRequest {
   content: string
   author?: string
   imageFile?: File | null
+  deletionPassword?: string
 }
 
 export class ThreadController {
@@ -15,7 +16,7 @@ export class ThreadController {
     private createThreadUseCase: CreateThreadUseCase,
     private getThreadListUseCase: GetThreadListUseCase,
     private getThreadDetailUseCase: GetThreadDetailUseCase,
-  ) {}
+  ) { }
 
   async createThread(request: CreateThreadRequest) {
     // Input validation only
@@ -34,6 +35,7 @@ export class ThreadController {
       content: request.content,
       author: request.author,
       imageFile: request.imageFile,
+      deletionPassword: request.deletionPassword,
     })
 
     return { threadId }

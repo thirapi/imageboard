@@ -1,137 +1,218 @@
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, Pin, Lock } from "lucide-react"
-import { ThreadForm } from "@/components/thread-form"
-import { BoardRepository } from "@/lib/repositories/board.repository"
-import { ThreadRepository } from "@/lib/repositories/thread.repository"
-import { ReplyRepository } from "@/lib/repositories/reply.repository"
-import { GetThreadListUseCase } from "@/lib/use-cases/get-thread-list.use-case"
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Pin, Lock, MessageSquare } from "lucide-react";
+import { ThreadForm } from "@/components/thread-form";
+import { FormattedText } from "@/components/formatted-text";
+import { BoardRepository } from "@/lib/repositories/board.repository";
+import { ThreadRepository } from "@/lib/repositories/thread.repository";
+import { ReplyRepository } from "@/lib/repositories/reply.repository";
+import { GetThreadListUseCase } from "@/lib/use-cases/get-thread-list.use-case";
+import { BoardViewToggle } from "@/components/board-view-toggle";
+import { BoardSearch } from "@/components/board-search";
+import { CatalogView } from "@/components/catalog-view";
+import { cn } from "@/lib/utils";
 
-export default async function BoardPage({ params }: { params: Promise<{ board: string }> }) {
-  const { board: boardCode } = await params
+export default async function BoardPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ board: string }>;
+  searchParams: Promise<{ view?: string; q?: string }>;
+}) {
+  const { board: boardCode } = await params;
+  const { view = "list", q: query = "" } = await searchParams;
 
-  const boardRepository = new BoardRepository()
-  const board = await boardRepository.findByCode(boardCode)
+  const boardRepository = new BoardRepository();
+  const board = await boardRepository.findByCode(boardCode);
 
   if (!board) {
-    notFound()
+    notFound();
   }
 
-  const threadRepository = new ThreadRepository()
-  const replyRepository = new ReplyRepository()
-  const getThreadListUseCase = new GetThreadListUseCase(threadRepository, replyRepository)
-  const threads = await getThreadListUseCase.execute(board.id)
+  const threadRepository = new ThreadRepository();
+  const replyRepository = new ReplyRepository();
+  const getThreadListUseCase = new GetThreadListUseCase(
+    threadRepository,
+    replyRepository,
+  );
+  let threads = await getThreadListUseCase.execute(board.id);
+
+  if (query) {
+    const q = query.toLowerCase();
+    threads = threads.filter(
+      (t) =>
+        t.subject?.toLowerCase().includes(q) ||
+        t.content.toLowerCase().includes(q),
+    );
+  }
+
+  const isCatalog = view === "catalog";
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4 mb-2">
-            <Link href="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Kembali ke Papan
-              </Button>
-            </Link>
-          </div>
-          <h1 className="text-2xl font-bold text-balance">
-            <span className="text-accent font-mono">/{board.code}/</span> - {board.name}
-          </h1>
-          <p className="text-sm text-muted-foreground">{board.description}</p>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="py-6 text-center border-b mb-8 flex flex-col items-center">
+        <h1 className="text-3xl font-bold text-accent mb-1 tracking-tight">
+          /{board.code}/ - {board.name}
+        </h1>
+        <p className="text-sm text-muted-foreground italic mb-4 max-w-xl">
+          {board.description}
+        </p>
+
+        <div className="flex items-center gap-4">
+          <BoardSearch />
+          <BoardViewToggle />
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="mb-8">
-          <ThreadForm boardId={board.id} boardCode={board.code} />
+      <main
+        className={cn(
+          "container mx-auto px-4 pb-20",
+          isCatalog ? "max-w-7xl" : "max-w-5xl",
+        )}
+      >
+        <div className="flex flex-col items-center mb-12">
+          <div className="w-full max-w-2xl">
+            <ThreadForm boardId={board.id} boardCode={board.code} />
+          </div>
         </div>
 
-        <div className="space-y-4">
-          {threads?.map((thread) => (
-            <Link key={thread.id} href={`/${boardCode}/thread/${thread.id}`}>
-              <Card className="hover:border-accent transition-colors cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="flex items-center gap-2 flex-wrap">
-                        {thread.isPinned && <Pin className="h-4 w-4 text-accent shrink-0" aria-label="Disematkan" />}
-                        {thread.isLocked && (
-                          <Lock className="h-4 w-4 text-muted-foreground shrink-0" aria-label="Terkunci" />
-                        )}
-                        <span className="text-balance">{thread.subject || "Tanpa Subjek"}</span>
-                      </CardTitle>
-                      <CardDescription className="mt-1">
-                        oleh {thread.author || "Anonymous"} • {thread.createdAt.toLocaleString()}
-                        <span className="text-accent"> #{thread.postNumber} </span>
-                      </CardDescription>
-                    </div>
-                    <div className="text-sm text-muted-foreground whitespace-nowrap">
-                      {thread.replyCount} {thread.replyCount === 1 ? "balasan" : "balasan"}
+        <div className="border-t pt-8">
+          {isCatalog ? (
+            <CatalogView threads={threads || []} boardCode={boardCode} />
+          ) : (
+            <div className="divide-y divide-muted/30">
+              {threads?.map((thread) => (
+                <div key={thread.id} className="ib-post py-8 first:pt-0">
+                  {/* Meta line */}
+                  <div className="ib-post-metaline">
+                    {thread.isPinned && (
+                      <Pin className="h-3 w-3 text-accent fill-accent" />
+                    )}
+                    {thread.isLocked && (
+                      <Lock className="h-3 w-3 text-muted-foreground" />
+                    )}
+                    {thread.subject && (
+                      <span className="ib-subject">{thread.subject}</span>
+                    )}
+                    <span className="ib-author">
+                      {thread.author || "Anonymous"}
+                    </span>
+                    <span className="text-muted-foreground text-xs">
+                      {thread.createdAt.toLocaleString()}
+                    </span>
+                    <Link
+                      href={`/${boardCode}/thread/${thread.id}`}
+                      className="ib-post-number"
+                    >
+                      No.{thread.postNumber}
+                    </Link>
+                    <Link
+                      href={`/${boardCode}/thread/${thread.id}`}
+                      className="text-[11px] hover:underline flex items-center gap-1 text-muted-foreground ml-2"
+                    >
+                      [Balas]
+                    </Link>
+                  </div>
+
+                  {/* Content area with side-by-side layout for OP */}
+                  <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                    {thread.image && (
+                      <div className="shrink-0">
+                        <Link href={`/${boardCode}/thread/${thread.id}`}>
+                          <img
+                            src={thread.image}
+                            alt="Thumbnail"
+                            className="max-w-[200px] max-h-[200px] object-contain border rounded-sm hover:opacity-90 transition-opacity"
+                            loading="lazy"
+                          />
+                        </Link>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="text-sm leading-relaxed whitespace-pre-wrap break-words max-w-3xl">
+                        <FormattedText content={thread.content} />
+                      </div>
+
+                      {thread.replyCount > (thread.replies?.length || 0) && (
+                        <div className="mt-4 text-xs text-muted-foreground italic">
+                          {thread.replyCount - (thread.replies?.length || 0)}{" "}
+                          balasan diabaikan.
+                          <Link
+                            href={`/${boardCode}/thread/${thread.id}`}
+                            className="text-accent hover:underline ml-1"
+                          >
+                            Klik di sini untuk melihat semua.
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {thread.image && (
-                    <div className="mb-4">
-                      <img
-                        src={thread.image || "/placeholder.svg"}
-                        alt="Gambar thread"
-                        className="max-w-xs rounded border"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
 
-                  {/* Konten thread utama (OP) */}
-                  <p className="text-sm line-clamp-3 text-balance mb-3">{thread.content}</p>
-
-                  {/* Preview replies: 2-3 terbaru, style imageboard */}
+                  {/* Reply Previews */}
                   {thread.replies && thread.replies.length > 0 && (
-                    <div className="border-t pt-3 space-y-2 text-sm">
-                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
-                        Balasan terbaru ({Math.min(3, thread.replies.length)}/{thread.replyCount})
-                      </p>
-                      {thread.replies.slice(0, 3).map((reply) => (
-                        <div key={reply.id} className="pl-4 border-l-2 border-muted space-y-1 text-muted-foreground">
-                          {/* Metadata: Timestamp + Post Number */}
-                          <div className="flex items-center gap-2 text-xs font-mono">
-                            <span>{reply.createdAt.toLocaleString("id-ID", { hour: "2-digit", minute: "2-digit" })}</span>
-                            <span className="text-accent">#{reply.postNumber}</span>
+                    <div className="mt-4 space-y-3 ml-4 sm:ml-12 max-w-4xl">
+                      {thread.replies
+                        .slice()
+                        .reverse()
+                        .slice(0, 3)
+                        .reverse()
+                        .map((reply) => (
+                          <div
+                            key={reply.id}
+                            className="ib-reply shadow-sm border border-muted/20"
+                          >
+                            <div className="ib-post-metaline text-xs px-2 pt-1">
+                              <span className="ib-author">
+                                {reply.author || "Anonymous"}
+                              </span>
+                              <span className="text-muted-foreground opacity-70">
+                                {reply.createdAt.toLocaleString()}
+                              </span>
+                              <span className="ib-post-number opacity-80">
+                                No.{reply.postNumber}
+                              </span>
+                            </div>
+                            <div className="flex gap-3 p-2">
+                              {reply.image && (
+                                <div className="shrink-0">
+                                  <img
+                                    src={reply.image}
+                                    alt="Reply thumbnail"
+                                    className="max-w-[80px] max-h-[80px] object-cover border rounded-xs"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              )}
+                              <div className="text-sm leading-snug flex-1 overflow-hidden">
+                                <FormattedText content={reply.content} />
+                              </div>
+                            </div>
                           </div>
-                          {/* Konten + Thumbnail */}
-                          <div className="flex items-start gap-2">
-                            {reply.image && (
-                              <img
-                                src={reply.image}
-                                alt="Preview balasan"
-                                className="max-w-[60px] max-h-[60px] flex-shrink-0 border rounded-sm object-cover"
-                                loading="lazy"
-                              />
-                            )}
-                            <p className="line-clamp-2 flex-1 font-mono leading-relaxed">
-                              <span className="text-accent">&gt;&gt; </span>{reply.content}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+                </div>
+              ))}
 
-          {threads?.length === 0 && (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <p>Belum ada thread. Jadilah yang pertama memulai diskusi!</p>
-              </CardContent>
-            </Card>
+              {threads?.length === 0 && (
+                <div className="py-20 text-center text-muted-foreground italic">
+                  {query
+                    ? `Tidak ada thread yang cocok dengan pencarian "${query}".`
+                    : "Belum ada thread. Jadilah yang pertama memulai diskusi!"}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </main>
+
+      <footer className="border-t py-8 bg-muted/20">
+        <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
+          <p>© 2026 Imageboard Culture. All rights anonymous.</p>
+        </div>
+      </footer>
     </div>
-  )
+  );
 }

@@ -1,6 +1,10 @@
 interface UploadResult {
   url: string
   publicId: string
+  width: number
+  height: number
+  format: string
+  bytes: number
 }
 
 export class CloudinaryService {
@@ -49,6 +53,10 @@ export class CloudinaryService {
       return {
         url: data.secure_url,
         publicId: data.public_id,
+        width: data.width,
+        height: data.height,
+        format: data.format,
+        bytes: data.bytes,
       }
     } catch (error) {
       throw new Error(`Image upload failed: ${error instanceof Error ? error.message : "Unknown error"}`)

@@ -15,3 +15,15 @@ export interface RecentImageEntity {
   boardCode: string
   threadId: number
 }
+
+export interface PostInfoEntity {
+  id: number
+  postNumber: number
+  type: "thread" | "reply"
+  content: string
+  author: string
+  createdAt: Date
+  image?: string | null
+  threadId: number
+  boardCode: string
+}

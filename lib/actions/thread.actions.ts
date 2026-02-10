@@ -14,6 +14,7 @@ export async function createThread(formData: FormData) {
     const content = formData.get("content") as string
     const author = formData.get("author") as string
     const imageFile = formData.get("image") as File | null
+    const deletionPassword = formData.get("deletionPassword") as string
 
     const result = await threadController.createThread({
       boardId,
@@ -21,6 +22,7 @@ export async function createThread(formData: FormData) {
       content,
       author,
       imageFile,
+      deletionPassword,
     })
 
     revalidatePath(`/${boardCode}`)

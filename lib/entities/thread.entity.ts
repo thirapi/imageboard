@@ -10,6 +10,8 @@ export interface ThreadEntity {
   isDeleted: boolean
   bumpedAt: Date
   image?: string | null
+  imageMetadata?: string | null
+  deletionPassword?: string | null
   postNumber: number
 }
 
@@ -19,6 +21,7 @@ export interface CreateThreadCommand {
   content: string
   author?: string
   imageFile?: File | null
+  deletionPassword?: string
 }
 
 export interface CreateThreadInput {
@@ -27,6 +30,8 @@ export interface CreateThreadInput {
   content: string
   author?: string
   image?: string | null
+  imageMetadata?: string | null
+  deletionPassword?: string | null
   postNumber: number
 }
 
@@ -42,5 +47,6 @@ export interface ThreadUI {
   isDeleted: boolean
   bumpedAt: Date
   image?: string | null
+  imageMetadata?: string | null
   postNumber: number
 }

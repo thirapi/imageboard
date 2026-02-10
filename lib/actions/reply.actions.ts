@@ -13,12 +13,14 @@ export async function createReply(formData: FormData) {
     const content = formData.get("content") as string
     const author = formData.get("author") as string
     const imageFile = formData.get("image") as File | null
+    const deletionPassword = formData.get("deletionPassword") as string
 
     const result = await replyController.createReply({
       threadId,
       content,
       author,
       imageFile,
+      deletionPassword,
     })
 
     revalidatePath(`/${boardCode}/thread/${threadId}`)

@@ -1,125 +1,151 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { MessageSquare, X } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { createReply } from "@/lib/actions/reply.actions"
-import { ImageUploader } from "./image-uploader"
+import type React from "react";
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { MessageSquare, X, Send, Image as ImageIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createReply } from "@/lib/actions/reply.actions";
+import { ImageUploader } from "./image-uploader";
 
 interface ReplyFormProps {
-  threadId: number
-  boardCode: string
+  threadId: number;
+  boardCode: string;
 }
 
 export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const formRef = useRef<HTMLFormElement>(null)
-  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [resetTrigger, setResetTrigger] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
-    const formData = new FormData(e.currentTarget)
-    formData.append("threadId", threadId.toString())
-    formData.append("boardCode", boardCode)
+    const formData = new FormData(e.currentTarget);
+    formData.append("threadId", threadId.toString());
+    formData.append("boardCode", boardCode);
 
     if (imageFile) {
-      formData.append("image", imageFile)
+      formData.append("image", imageFile);
     }
 
     try {
-      const result = await createReply(formData)
+      const result = await createReply(formData);
 
       if (result.success) {
-        formRef.current?.reset()
-        setImageFile(null)
-        setError(null)
-        setIsOpen(false)
-        router.refresh()
+        formRef.current?.reset();
+        setImageFile(null);
+        setError(null);
+        setResetTrigger((prev) => prev + 1); // Trigger image uploader reset
+        router.refresh();
       } else {
-        setError(result.error || "Gagal mengirim balasan")
+        setError(result.error || "Gagal mengirim balasan");
       }
     } catch (error) {
-      console.error("Error posting reply:", error)
-      setError("Terjadi kesalahan tak terduga")
+      console.error("Error posting reply:", error);
+      setError("Terjadi kesalahan tak terduga");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
-  const handleClose = () => {
-    setIsOpen(false)
-    setError(null)
-    setImageFile(null)
-    formRef.current?.reset()
-  }
-
-  if (!isOpen) {
-    return (
-      <Button onClick={() => setIsOpen(true)} className="w-full">
-        <MessageSquare className="h-4 w-4 mr-2" />
-        Kirim Balasan
-      </Button>
-    )
-  }
-
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Kirim Balasan</CardTitle>
-            <CardDescription>Tambahkan tanggapan Anda ke thread ini</CardDescription>
+    <div className="w-full">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/20 mb-4">
+            {error}
           </div>
-          <Button variant="ghost" size="icon" onClick={handleClose}>
-            <X className="h-4 w-4" />
-          </Button>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <Label
+              htmlFor="reply-author"
+              className="text-[10px] font-bold uppercase opacity-60"
+            >
+              Nama
+            </Label>
+            <Input
+              id="reply-author"
+              name="author"
+              placeholder="Anonim"
+              maxLength={100}
+              className="h-8 text-sm bg-muted/20"
+            />
+          </div>
+          <div className="space-y-1 md:col-span-2">
+            <Label
+              htmlFor="reply-deletionPassword"
+              className="text-[10px] font-bold uppercase opacity-60"
+            >
+              Sandi Penghapusan
+            </Label>
+            <Input
+              id="reply-deletionPassword"
+              name="deletionPassword"
+              type="password"
+              placeholder="(Opsional)"
+              maxLength={255}
+              className="h-8 text-sm bg-muted/20"
+            />
+          </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-          {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
-          <div className="space-y-2">
-            <Label htmlFor="reply-author">Nama (opsional)</Label>
-            <Input id="reply-author" name="author" placeholder="Anonim" maxLength={100} />
-          </div>
+        <div className="space-y-1">
+          <Label
+            htmlFor="reply-content"
+            className="text-[10px] font-bold uppercase opacity-60"
+          >
+            Balasan
+          </Label>
+          <Textarea
+            id="reply-content"
+            name="content"
+            placeholder="Ketik balasan Anda..."
+            required
+            rows={5}
+            className="text-sm bg-muted/20 focus-visible:ring-accent resize-y"
+          />
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="reply-content">Konten</Label>
-            <Textarea
-              id="reply-content"
-              name="content"
-              placeholder="Masukkan balasan Anda"
-              required
-              rows={5}
-              className="resize-none"
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+          <div className="w-full sm:w-auto">
+            <ImageUploader
+              onImageSelect={setImageFile}
+              maxSizeMB={5}
+              resetTrigger={resetTrigger}
             />
           </div>
 
-          <ImageUploader onImageSelect={setImageFile} maxSizeMB={5} />
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full sm:w-48 h-10 font-bold group"
+          >
+            {isSubmitting ? (
+              "Mengirim..."
+            ) : (
+              <>
+                Kirim Balasan
+                <Send className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
+          </Button>
+        </div>
 
-          <div className="flex gap-2">
-            <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Mengirim..." : "Kirim Balasan"}
-            </Button>
-            <Button type="button" variant="outline" onClick={handleClose}>
-              Batal
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
-  )
+        <p className="text-[10px] text-muted-foreground italic opacity-50 text-center">
+          Tip: Gunakan {`>>NomorPost`} untuk membalas post tertentu.
+        </p>
+      </form>
+    </div>
+  );
 }

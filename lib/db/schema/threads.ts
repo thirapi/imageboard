@@ -25,6 +25,9 @@ export const threads = pgTable(
     author: varchar('author', { length: 100 }).default('Awanama'),
 
     image: text('image'),
+    imageMetadata: text('image_metadata'), // Store as JSON string or plain text for now if JSONB is not imported
+    deletionPassword: varchar('deletion_password', { length: 255 }),
+
     isDeleted: boolean('is_deleted').default(false),
 
     isPinned: boolean('is_pinned').default(false),

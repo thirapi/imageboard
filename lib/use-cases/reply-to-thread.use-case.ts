@@ -12,7 +12,7 @@ export class ReplyToThreadUseCase {
     private imageRepository: ImageRepository,
     private cloudinaryService: CloudinaryService,
     private sequenceService: SequenceService,
-  ) {}
+  ) { }
 
   async execute(input: CreateReplyCommand): Promise<number> {
     // Business rule: Validate content length
@@ -44,10 +44,18 @@ export class ReplyToThreadUseCase {
     const postNumber = await this.sequenceService.getNextPostNumber();
 
     let imageUrl: string | undefined
+    let imageMetadata: string | undefined
     if (input.imageFile && input.imageFile.size > 0) {
       try {
         const uploadResult = await this.cloudinaryService.uploadImage(input.imageFile)
         imageUrl = uploadResult.url
+        imageMetadata = JSON.stringify({
+          width: uploadResult.width,
+          height: uploadResult.height,
+          format: uploadResult.format,
+          bytes: uploadResult.bytes,
+          originalName: input.imageFile.name
+        })
 
         console.log("[inzm] Image uploaded successfully:", uploadResult.url)
       } catch (error) {
@@ -62,6 +70,8 @@ export class ReplyToThreadUseCase {
       content: input.content,
       author: cleanedAuthor,
       image: imageUrl,
+      imageMetadata: imageMetadata,
+      deletionPassword: input.deletionPassword || null,
       postNumber: postNumber
     })
 

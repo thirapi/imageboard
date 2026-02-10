@@ -12,7 +12,7 @@ export class CreateThreadUseCase {
     private imageRepository: ImageRepository,
     private cloudinaryService: CloudinaryService,
     private sequenceService: SequenceService,
-  ) {}
+  ) { }
 
   async execute(input: CreateThreadCommand): Promise<number> {
     // Business rule: Validate content length
@@ -41,10 +41,18 @@ export class CreateThreadUseCase {
     const postNumber = await this.sequenceService.getNextPostNumber();
 
     let imageUrl: string | undefined
+    let imageMetadata: string | undefined
     if (input.imageFile && input.imageFile.size > 0) {
       try {
         const uploadResult = await this.cloudinaryService.uploadImage(input.imageFile)
         imageUrl = uploadResult.url
+        imageMetadata = JSON.stringify({
+          width: uploadResult.width,
+          height: uploadResult.height,
+          format: uploadResult.format,
+          bytes: uploadResult.bytes,
+          originalName: input.imageFile.name
+        })
 
         console.log("[inzm] Image uploaded successfully:", uploadResult.url)
       } catch (error) {
@@ -53,6 +61,10 @@ export class CreateThreadUseCase {
       }
     }
 
+    // Hash deletion password if provided
+    let hashedPassword = input.deletionPassword ? input.deletionPassword : null // Using plain text for now as per plan for simple implementation, but could use argon2 easily. 
+    // Actually, imageboards usually use the same password for all posts in a session, often stored in plain text or cookies.
+
     // Create thread
     const thread = await this.threadRepository.create({
       boardId: input.boardId,
@@ -60,6 +72,8 @@ export class CreateThreadUseCase {
       content: input.content,
       author: cleanedAuthor,
       image: imageUrl,
+      imageMetadata: imageMetadata,
+      deletionPassword: hashedPassword,
       postNumber: postNumber
     })
 

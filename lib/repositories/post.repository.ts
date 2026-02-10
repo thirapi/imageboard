@@ -1,7 +1,7 @@
 import { db } from "@/lib/db"
 import { threads, replies, boards } from "@/lib/db/schema"
 import { desc, eq, isNotNull, and } from "drizzle-orm"
-import type { LatestPostEntity, RecentImageEntity } from "@/lib/entities/post.entity"
+import type { LatestPostEntity, RecentImageEntity, PostInfoEntity } from "@/lib/entities/post.entity"
 
 export class PostRepository {
   async getLatestPosts(limit = 10): Promise<LatestPostEntity[]> {
@@ -66,71 +66,136 @@ export class PostRepository {
       .slice(0, limit)
   }
 
-async getRecentImages(limit = 12): Promise<RecentImageEntity[]> {
-  const threadImages = await db
-    .select({
-      id: threads.id,
-      imageUrl: threads.image,
-      createdAt: threads.createdAt,
-      boardCode: boards.code,
-      threadId: threads.id,
-    })
-    .from(threads)
-    .innerJoin(boards, eq(threads.boardId, boards.id))
-    .where(
-      and(
-        eq(threads.isDeleted, false),
-        isNotNull(threads.image),
+  async getRecentImages(limit = 12): Promise<RecentImageEntity[]> {
+    const threadImages = await db
+      .select({
+        id: threads.id,
+        imageUrl: threads.image,
+        createdAt: threads.createdAt,
+        boardCode: boards.code,
+        threadId: threads.id,
+      })
+      .from(threads)
+      .innerJoin(boards, eq(threads.boardId, boards.id))
+      .where(
+        and(
+          eq(threads.isDeleted, false),
+          isNotNull(threads.image),
+        )
       )
-    )
-    .orderBy(desc(threads.createdAt))
-    .limit(limit)
+      .orderBy(desc(threads.createdAt))
+      .limit(limit)
 
-  const replyImages = await db
-    .select({
-      id: replies.id,
-      imageUrl: replies.image,
-      createdAt: replies.createdAt,
-      boardCode: boards.code,
-      threadId: replies.threadId,
-    })
-    .from(replies)
-    .innerJoin(threads, eq(replies.threadId, threads.id))
-    .innerJoin(boards, eq(threads.boardId, boards.id))
-    .where(
-      and(
-        eq(replies.isDeleted, false),
-        isNotNull(replies.image),
+    const replyImages = await db
+      .select({
+        id: replies.id,
+        imageUrl: replies.image,
+        createdAt: replies.createdAt,
+        boardCode: boards.code,
+        threadId: replies.threadId,
+      })
+      .from(replies)
+      .innerJoin(threads, eq(replies.threadId, threads.id))
+      .innerJoin(boards, eq(threads.boardId, boards.id))
+      .where(
+        and(
+          eq(replies.isDeleted, false),
+          isNotNull(replies.image),
+        )
       )
-    )
-    .orderBy(desc(replies.createdAt))
-    .limit(limit)
+      .orderBy(desc(replies.createdAt))
+      .limit(limit)
 
-  const images: RecentImageEntity[] = []
+    const images: RecentImageEntity[] = []
 
-  for (const t of threadImages) {
-    images.push({
-      id: t.id,
-      imageUrl: t.imageUrl!,
-      createdAt: t.createdAt!,
-      boardCode: t.boardCode,
-      threadId: t.threadId,
-    })
+    for (const t of threadImages) {
+      images.push({
+        id: t.id,
+        imageUrl: t.imageUrl!,
+        createdAt: t.createdAt!,
+        boardCode: t.boardCode,
+        threadId: t.threadId,
+      })
+    }
+
+    for (const r of replyImages) {
+      images.push({
+        id: r.id,
+        imageUrl: r.imageUrl!,
+        createdAt: r.createdAt!,
+        boardCode: r.boardCode,
+        threadId: r.threadId,
+      })
+    }
+
+    return images
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit)
   }
 
-  for (const r of replyImages) {
-    images.push({
-      id: r.id,
-      imageUrl: r.imageUrl!,
-      createdAt: r.createdAt!,
-      boardCode: r.boardCode,
-      threadId: r.threadId,
-    })
+  async findByPostNumber(postNumber: number): Promise<PostInfoEntity | null> {
+    // Check threads first
+    const thread = await db
+      .select({
+        id: threads.id,
+        postNumber: threads.postNumber,
+        content: threads.content,
+        author: threads.author,
+        createdAt: threads.createdAt,
+        image: threads.image,
+        boardCode: boards.code,
+      })
+      .from(threads)
+      .innerJoin(boards, eq(threads.boardId, boards.id))
+      .where(eq(threads.postNumber, postNumber))
+      .limit(1)
+
+    if (thread.length > 0) {
+      return {
+        id: thread[0].id,
+        postNumber: thread[0].postNumber as number,
+        content: thread[0].content,
+        author: thread[0].author!,
+        createdAt: thread[0].createdAt!,
+        image: thread[0].image,
+        boardCode: thread[0].boardCode,
+        type: "thread",
+        threadId: thread[0].id,
+      }
+    }
+
+    // Check replies
+    const reply = await db
+      .select({
+        id: replies.id,
+        postNumber: replies.postNumber,
+        content: replies.content,
+        author: replies.author,
+        createdAt: replies.createdAt,
+        image: replies.image,
+        threadId: replies.threadId,
+        boardCode: boards.code,
+      })
+      .from(replies)
+      .innerJoin(threads, eq(replies.threadId, threads.id))
+      .innerJoin(boards, eq(threads.boardId, boards.id))
+      .where(eq(replies.postNumber, postNumber))
+      .limit(1)
+
+    if (reply.length > 0) {
+      return {
+        id: reply[0].id,
+        postNumber: reply[0].postNumber as number,
+        content: reply[0].content,
+        author: reply[0].author!,
+        createdAt: reply[0].createdAt!,
+        image: reply[0].image,
+        threadId: reply[0].threadId,
+        boardCode: reply[0].boardCode,
+        type: "reply",
+      }
+    }
+
+    return null
   }
-
-  return images
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    .slice(0, limit)
-}
-
 }

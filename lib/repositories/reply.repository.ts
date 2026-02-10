@@ -13,6 +13,8 @@ export class ReplyRepository {
         content: input.content,
         author: input.author ?? "Awanama",
         image: input.image ?? null,
+        imageMetadata: input.imageMetadata ?? null,
+        deletionPassword: input.deletionPassword ?? null,
         postNumber: input.postNumber,
       })
       .returning()
@@ -84,7 +86,9 @@ export class ReplyRepository {
       author: row.author ?? "Awanama",
       createdAt: row.createdAt!,
       isDeleted: row.isDeleted ?? false,
-      image: row.image ?? undefined,
+      image: row.image,
+      imageMetadata: row.imageMetadata,
+      deletionPassword: row.deletionPassword,
       postNumber: row.postNumber!,
     }
   }

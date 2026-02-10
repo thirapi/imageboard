@@ -5,10 +5,11 @@ export interface CreateReplyRequest {
   content: string
   author?: string
   imageFile?: File | null
+  deletionPassword?: string
 }
 
 export class ReplyController {
-  constructor(private replyToThreadUseCase: ReplyToThreadUseCase) {}
+  constructor(private replyToThreadUseCase: ReplyToThreadUseCase) { }
 
   async createReply(request: CreateReplyRequest) {
     // Input validation only
@@ -26,6 +27,7 @@ export class ReplyController {
       content: request.content,
       author: request.author,
       imageFile: request.imageFile,
+      deletionPassword: request.deletionPassword,
     })
 
     return { replyId }

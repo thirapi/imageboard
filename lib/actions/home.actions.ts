@@ -30,3 +30,12 @@ export async function getRecentImages(limit?: number) {
     return []
   }
 }
+
+export async function getPostByNumber(postNumber: number) {
+  try {
+    return await homeController.getPostByNumber(postNumber)
+  } catch (error) {
+    console.error(`Error fetching post by number ${postNumber}:`, error)
+    return null
+  }
+}

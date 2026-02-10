@@ -13,6 +13,8 @@ export class ThreadRepository {
         content: input.content,
         author: input.author ?? "Awanama",
         image: input.image ?? null,
+        imageMetadata: input.imageMetadata ?? null,
+        deletionPassword: input.deletionPassword ?? null,
         postNumber: input.postNumber,
       })
       .returning()
@@ -86,6 +88,8 @@ export class ThreadRepository {
       isDeleted: row.isDeleted ?? false,
       bumpedAt: row.bumpedAt!,
       image: row.image ?? undefined,
+      imageMetadata: row.imageMetadata,
+      deletionPassword: row.deletionPassword,
       postNumber: row.postNumber!,
     }
   }
