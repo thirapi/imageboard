@@ -14,6 +14,7 @@ import { BoardSearch } from "@/components/board-search";
 import { CatalogView } from "@/components/catalog-view";
 import { cn } from "@/lib/utils";
 import { footerText } from "@/constants/footer";
+import { FormattedDate } from "@/components/formatted-date";
 
 export default async function BoardPage({
   params,
@@ -101,7 +102,7 @@ export default async function BoardPage({
                       {thread.author || "Anonymous"}
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      {thread.createdAt.toLocaleString()}
+                      <FormattedDate date={thread.createdAt} />
                     </span>
                     <Link
                       href={`/${boardCode}/thread/${thread.id}`}
@@ -169,7 +170,7 @@ export default async function BoardPage({
                                 {reply.author || "Anonymous"}
                               </span>
                               <span className="text-muted-foreground opacity-70">
-                                {reply.createdAt.toLocaleString()}
+                                <FormattedDate date={reply.createdAt} />
                               </span>
                               <span className="ib-post-number opacity-80">
                                 No.{reply.postNumber}

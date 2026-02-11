@@ -5,6 +5,7 @@ import {
   getRecentImages,
 } from "@/lib/actions/home.actions";
 import { footerLinks, footerText } from "@/constants/footer";
+import { FormattedText } from "@/components/formatted-text";
 
 export const dynamic = "force-dynamic";
 
@@ -160,9 +161,9 @@ export default async function HomePage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                              {post.excerpt}
-                            </p>
+                            <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                              <FormattedText content={post.excerpt} />
+                            </div>
                           </div>
                           <span className="text-[10px] font-mono text-accent font-bold whitespace-nowrap">
                             /{post.boardCode}/

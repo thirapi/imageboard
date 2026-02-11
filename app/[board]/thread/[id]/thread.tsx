@@ -13,6 +13,7 @@ import { ThreadUI } from "@/lib/entities/thread.entity";
 import { ReplyUI } from "@/lib/entities/reply.entity";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { FormattedDate } from "@/components/formatted-date";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -138,7 +139,7 @@ export function ThreadClient({
             </span>
           )}
           <span className="text-muted-foreground text-xs">
-            {thread.createdAt.toLocaleString()}
+            <FormattedDate date={thread.createdAt} />
           </span>
           <span
             className="ib-post-number font-bold ml-1 cursor-pointer hover:underline"
@@ -194,7 +195,7 @@ export function ThreadClient({
                 </span>
               )}
               <span className="text-muted-foreground opacity-70 text-xs">
-                {reply.createdAt.toLocaleString()}
+                <FormattedDate date={reply.createdAt} />
               </span>
               <span
                 className="ib-post-number font-bold cursor-pointer hover:underline"
