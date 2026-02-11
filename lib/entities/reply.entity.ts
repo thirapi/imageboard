@@ -9,6 +9,7 @@ export interface ReplyEntity {
   imageMetadata?: string | null
   deletionPassword?: string | null
   postNumber: number
+  ipAddress?: string | null
 }
 
 export interface CreateReplyCommand {
@@ -17,6 +18,7 @@ export interface CreateReplyCommand {
   author?: string
   imageFile?: File | null
   deletionPassword?: string
+  ipAddress?: string
 }
 
 export interface CreateReplyInput {
@@ -27,6 +29,7 @@ export interface CreateReplyInput {
   imageMetadata?: string | null
   deletionPassword?: string | null
   postNumber: number
+  ipAddress?: string
 }
 
 export interface ReplyUI {
@@ -39,4 +42,5 @@ export interface ReplyUI {
   image?: string | null
   imageMetadata?: string | null
   postNumber: number
+  ipAddress?: string | null
 }

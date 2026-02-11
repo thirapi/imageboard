@@ -13,6 +13,7 @@ export interface ThreadEntity {
   imageMetadata?: string | null
   deletionPassword?: string | null
   postNumber: number
+  ipAddress?: string | null
 }
 
 export interface CreateThreadCommand {
@@ -22,6 +23,7 @@ export interface CreateThreadCommand {
   author?: string
   imageFile?: File | null
   deletionPassword?: string
+  ipAddress?: string
 }
 
 export interface CreateThreadInput {
@@ -33,6 +35,7 @@ export interface CreateThreadInput {
   imageMetadata?: string | null
   deletionPassword?: string | null
   postNumber: number
+  ipAddress?: string
 }
 
 export interface ThreadUI {
@@ -49,4 +52,5 @@ export interface ThreadUI {
   image?: string | null
   imageMetadata?: string | null
   postNumber: number
+  ipAddress?: string | null
 }

@@ -72,7 +72,8 @@ export class ReplyToThreadUseCase {
       image: imageUrl,
       imageMetadata: imageMetadata,
       deletionPassword: input.deletionPassword || null,
-      postNumber: postNumber
+      postNumber: postNumber,
+      ipAddress: input.ipAddress
     })
 
     if (imageUrl && input.imageFile) {

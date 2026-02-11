@@ -30,6 +30,7 @@ export const replies = pgTable(
     isDeleted: boolean('is_deleted').default(false),
 
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    ipAddress: varchar('ip_address', { length: 45 }),
   },
   (t) => ({
     threadIdx: index('idx_replies_thread_id').on(t.threadId),

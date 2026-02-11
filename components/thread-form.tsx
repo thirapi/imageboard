@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, X, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createThread } from "@/lib/actions/thread.actions";
+import { createThread, getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
+import { useEffect } from "react";
 
 interface ThreadFormProps {
   boardId: number;
@@ -22,8 +23,20 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+
+  const refreshCaptcha = async () => {
+    const data = await getCaptcha();
+    setCaptchaQuestion(data.question);
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      refreshCaptcha();
+    }
+  }, [isOpen, resetTrigger]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -50,6 +63,7 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
         router.refresh();
       } else {
         setError(result.error || "Gagal membuat thread");
+        refreshCaptcha(); // Refresh captcha on error
       }
     } catch (error) {
       console.error("Error creating thread:", error);
@@ -176,6 +190,22 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
                 placeholder="Untuk menghapus nanti"
                 maxLength={255}
                 className="bg-muted/30 focus-visible:ring-accent h-8 text-sm"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="captcha"
+                className="text-xs font-bold uppercase opacity-70"
+              >
+                Verifikasi: {captchaQuestion}
+              </Label>
+              <Input
+                id="captcha"
+                name="captcha"
+                placeholder="Jawaban..."
+                required
+                className="bg-muted/30 focus-visible:ring-accent h-8 text-sm w-32"
               />
             </div>
           </div>

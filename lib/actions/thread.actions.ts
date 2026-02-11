@@ -3,10 +3,21 @@
 import { container } from "@/lib/di/container"
 import { revalidatePath } from "next/cache"
 
+import { getClientIp } from "@/lib/utils/get-ip"
+import { CaptchaService } from "@/lib/services/captcha.service"
+
 const { threadController } = container
 
 export async function createThread(formData: FormData) {
   try {
+    const ipAddress = await getClientIp()
+    const captchaAnswer = formData.get("captcha") as string
+
+    const isValidCaptcha = await CaptchaService.verify(captchaAnswer)
+    if (!isValidCaptcha) {
+      throw new Error("Jawaban CAPTCHA salah atau sudah kadaluarsa.")
+    }
+
     // Extract and forward request
     const boardId = Number.parseInt(formData.get("boardId") as string)
     const boardCode = formData.get("boardCode") as string
@@ -23,6 +34,7 @@ export async function createThread(formData: FormData) {
       author,
       imageFile,
       deletionPassword,
+      ipAddress,
     })
 
     revalidatePath(`/${boardCode}`)
@@ -48,4 +60,8 @@ export async function getThreadDetail(threadId: number) {
     console.error(`Error fetching thread detail for thread ${threadId}:`, error)
     return null
   }
+}
+
+export async function getCaptcha() {
+  return await CaptchaService.generate()
 }

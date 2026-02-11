@@ -16,6 +16,7 @@ export class ThreadRepository {
         imageMetadata: input.imageMetadata ?? null,
         deletionPassword: input.deletionPassword ?? null,
         postNumber: input.postNumber,
+        ipAddress: input.ipAddress ?? null,
       })
       .returning()
 
@@ -91,6 +92,7 @@ export class ThreadRepository {
       imageMetadata: row.imageMetadata,
       deletionPassword: row.deletionPassword,
       postNumber: row.postNumber!,
+      ipAddress: row.ipAddress,
     }
   }
 }

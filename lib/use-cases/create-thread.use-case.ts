@@ -74,7 +74,8 @@ export class CreateThreadUseCase {
       image: imageUrl,
       imageMetadata: imageMetadata,
       deletionPassword: hashedPassword,
-      postNumber: postNumber
+      postNumber: postNumber,
+      ipAddress: input.ipAddress
     })
 
     if (imageUrl && input.imageFile) {

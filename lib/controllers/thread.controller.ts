@@ -9,6 +9,7 @@ export interface CreateThreadRequest {
   author?: string
   imageFile?: File | null
   deletionPassword?: string
+  ipAddress?: string
 }
 
 export class ThreadController {
@@ -36,6 +37,7 @@ export class ThreadController {
       author: request.author,
       imageFile: request.imageFile,
       deletionPassword: request.deletionPassword,
+      ipAddress: request.ipAddress,
     })
 
     return { threadId }

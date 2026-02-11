@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, X, Send, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createReply } from "@/lib/actions/reply.actions";
+import { getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
+import { useEffect } from "react";
 
 interface ReplyFormProps {
   threadId: number;
@@ -21,8 +23,18 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+
+  const refreshCaptcha = async () => {
+    const data = await getCaptcha();
+    setCaptchaQuestion(data.question);
+  };
+
+  useEffect(() => {
+    refreshCaptcha();
+  }, [resetTrigger]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,6 +60,7 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
         router.refresh();
       } else {
         setError(result.error || "Gagal mengirim balasan");
+        refreshCaptcha(); // Refresh captcha on error
       }
     } catch (error) {
       console.error("Error posting reply:", error);
@@ -114,6 +127,22 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
             required
             rows={5}
             className="text-sm bg-muted/20 focus-visible:ring-accent resize-y"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label
+            htmlFor="reply-captcha"
+            className="text-[10px] font-bold uppercase opacity-60"
+          >
+            Verifikasi: {captchaQuestion}
+          </Label>
+          <Input
+            id="reply-captcha"
+            name="captcha"
+            placeholder="Jawaban..."
+            required
+            className="h-8 text-sm bg-muted/20 w-32"
           />
         </div>
 

@@ -57,6 +57,13 @@
       "when": 1770738135423,
       "tag": "0007_add_boards",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1770829705880,
+      "tag": "0008_redundant_famine",
+      "breakpoints": true
     }
   ]
 }

@@ -3,10 +3,21 @@
 import { container } from "@/lib/di/container"
 import { revalidatePath } from "next/cache"
 
+import { getClientIp } from "@/lib/utils/get-ip"
+import { CaptchaService } from "@/lib/services/captcha.service"
+
 const { replyController } = container
 
 export async function createReply(formData: FormData) {
   try {
+    const ipAddress = await getClientIp()
+    const captchaAnswer = formData.get("captcha") as string
+
+    const isValidCaptcha = await CaptchaService.verify(captchaAnswer)
+    if (!isValidCaptcha) {
+      throw new Error("Jawaban CAPTCHA salah atau sudah kadaluarsa.")
+    }
+
     // Extract and forward request
     const threadId = Number.parseInt(formData.get("threadId") as string)
     const boardCode = formData.get("boardCode") as string
@@ -21,6 +32,7 @@ export async function createReply(formData: FormData) {
       author,
       imageFile,
       deletionPassword,
+      ipAddress,
     })
 
     revalidatePath(`/${boardCode}/thread/${threadId}`)

@@ -20,6 +20,22 @@ interface ThreadClientProps {
   boardCode: string;
 }
 
+function generatePosterId(
+  ip: string | null | undefined,
+  threadId: number,
+): string {
+  if (!ip) return "";
+  let hash = 0;
+  // Use a simple but consistent shift-and-add hash
+  const combined = ip + "salt" + threadId.toString();
+  for (let i = 0; i < combined.length; i++) {
+    const char = combined.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+}
+
 export function ThreadClient({
   thread,
   replies,
@@ -116,6 +132,11 @@ export function ThreadClient({
           <span className="ib-author text-base">
             {thread.author || "Anonymous"}
           </span>
+          {generatePosterId(thread.ipAddress, thread.id) && (
+            <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
+              ID: {generatePosterId(thread.ipAddress, thread.id)}
+            </span>
+          )}
           <span className="text-muted-foreground text-xs">
             {thread.createdAt.toLocaleString()}
           </span>
@@ -167,6 +188,11 @@ export function ThreadClient({
           >
             <div className="ib-post-metaline px-2 pt-1 border-b border-muted/5 bg-muted/5">
               <span className="ib-author">{reply.author || "Anonymous"}</span>
+              {generatePosterId(reply.ipAddress, thread.id) && (
+                <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
+                  ID: {generatePosterId(reply.ipAddress, thread.id)}
+                </span>
+              )}
               <span className="text-muted-foreground opacity-70 text-xs">
                 {reply.createdAt.toLocaleString()}
               </span>

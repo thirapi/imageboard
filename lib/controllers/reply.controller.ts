@@ -6,6 +6,7 @@ export interface CreateReplyRequest {
   author?: string
   imageFile?: File | null
   deletionPassword?: string
+  ipAddress?: string
 }
 
 export class ReplyController {
@@ -28,6 +29,7 @@ export class ReplyController {
       author: request.author,
       imageFile: request.imageFile,
       deletionPassword: request.deletionPassword,
+      ipAddress: request.ipAddress,
     })
 
     return { replyId }
