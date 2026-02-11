@@ -1,8 +1,16 @@
 import Link from "next/link";
 import { getBoardList } from "@/lib/actions/home.actions";
+import { cookies } from "next/headers";
+import { lucia } from "@/lib/auth";
+import { logout } from "@/lib/actions/auth.actions";
 
 export async function BoardNav() {
   const boards = await getBoardList();
+  const sessionId =
+    (await cookies()).get(lucia.sessionCookieName)?.value ?? null;
+  const { user } = sessionId
+    ? await lucia.validateSession(sessionId)
+    : { user: null };
 
   return (
     <nav className="border-b bg-muted/30 py-1 px-4 text-[11px] font-mono flex items-center justify-between">
@@ -26,12 +34,21 @@ export async function BoardNav() {
         <Link href="/" className="hover:underline">
           Home
         </Link>
-        {/* <Link href="/mod" className="hover:underline">
-          Mod
-        </Link> */}
         <Link href="/rules" className="hover:underline">
           Peraturan
         </Link>
+        {user && (
+          <>
+            <Link href="/mod" className="hover:underline font-bold text-accent">
+              Mod
+            </Link>
+            <form action={logout} className="inline">
+              <button type="submit" className="hover:underline cursor-pointer">
+                Sign-out
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </nav>
   );

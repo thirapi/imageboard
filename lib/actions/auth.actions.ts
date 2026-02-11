@@ -45,3 +45,31 @@ export async function login(prevState: any, formData: FormData) {
   // Panggil redirect di luar blok try-catch
   return redirect('/mod');
 }
+
+/**
+ * Server Action untuk logout.
+ */
+export async function logout() {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get(lucia.sessionCookieName)?.value || null;
+
+  if (!sessionId) {
+    return redirect('/mod/login');
+  }
+
+  const { session } = await lucia.validateSession(sessionId);
+  if (!session) {
+    return redirect('/mod/login');
+  }
+
+  await lucia.invalidateSession(session.id);
+
+  const sessionCookie = lucia.createBlankSessionCookie();
+  cookieStore.set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes
+  );
+
+  return redirect('/mod/login');
+}
