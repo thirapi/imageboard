@@ -156,7 +156,7 @@ export default async function HomePage() {
                             <div className="font-medium truncate text-xs">
                               {post.title || (
                                 <span className="text-muted-foreground italic">
-                                  Balasan
+                                  {post.type === "thread" ? "Utas" : "Balasan"}
                                 </span>
                               )}
                             </div>
