@@ -15,6 +15,10 @@ export function BoardSearch() {
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
+    const queryInUrl = params.get("q") || "";
+
+    if (debouncedValue === queryInUrl) return;
+
     if (debouncedValue) {
       params.set("q", debouncedValue);
     } else {
@@ -27,7 +31,7 @@ export function BoardSearch() {
     <div className="relative w-full max-w-sm">
       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
       <Input
-        type="search"
+        type="text"
         placeholder="Cari thread..."
         className="pl-8 pr-8 h-9"
         value={value}

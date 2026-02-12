@@ -36,7 +36,7 @@ function groupBoards(boards: any[]) {
 export default async function HomePage() {
   const boards = await getBoardList();
   const latestPosts = await getLatestPosts(10);
-  const recentImages = await getRecentImages(12);
+  const recentImages = await getRecentImages(24);
 
   const groupedBoards = groupBoards(boards);
 
