@@ -19,22 +19,16 @@ export function ThemeToggle() {
   }
 
   return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      className="h-6 w-6"
+    <button
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      className="hover:underline cursor-pointer opacity-80 hover:opacity-100"
       title={
         resolvedTheme === "dark"
           ? "Switch to Light Mode"
           : "Switch to Dark Mode"
       }
     >
-      {resolvedTheme === "dark" ? (
-        <Sun className="h-3 w-3 text-yellow-400" />
-      ) : (
-        <Moon className="h-3 w-3" />
-      )}
-    </Button>
+      [ {resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"} ]
+    </button>
   );
 }

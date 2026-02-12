@@ -18,6 +18,10 @@ export async function BoardNav() {
     <nav className="border-b bg-muted/30 py-1 px-4 text-[11px] font-mono flex items-center justify-between">
       <div className="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap">
         <span>[</span>
+        <Link href="/" className="px-0.5 hover:underline font-bold">
+          Home
+        </Link>
+        <span className="mx-0.5">/</span>
         {boards.map((board, index) => (
           <span key={board.code}>
             <Link
@@ -34,20 +38,20 @@ export async function BoardNav() {
       </div>
       <div className="flex items-center gap-3">
         <ThemeToggle />
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>
         <Link href="/rules" className="hover:underline">
-          Peraturan
+          [ Peraturan ]
         </Link>
         {user && (
           <>
             <Link href="/mod" className="hover:underline font-bold text-accent">
-              Mod
+              [ Mod ]
             </Link>
             <form action={logout} className="inline">
-              <button type="submit" className="hover:underline cursor-pointer">
-                Sign-out
+              <button
+                type="submit"
+                className="hover:underline cursor-pointer text-inherit font-inherit"
+              >
+                [ Sign-out ]
               </button>
             </form>
           </>
