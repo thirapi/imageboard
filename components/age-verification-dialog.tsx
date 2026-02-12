@@ -104,8 +104,9 @@ export function AgeVerificationDialog() {
 
           {/* Warning */}
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-xs text-amber-700 dark:text-amber-400">
-            <strong>Peringatan:</strong> Operator tidak bertanggung jawab atas
-            konten yang diposting pengguna.
+            <strong>Peringatan:</strong> Konten dipublikasikan oleh pengguna.
+            Operator berhak menghapus konten yang melanggar peraturan atau hukum
+            yang berlaku.
           </div>
         </div>
 
