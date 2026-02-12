@@ -16,9 +16,15 @@ import { useEffect } from "react";
 interface ReplyFormProps {
   threadId: number;
   boardCode: string;
+  idPrefix?: string;
 }
 
-export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
+export function ReplyForm({
+  threadId,
+  boardCode,
+  idPrefix = "",
+}: ReplyFormProps) {
+  const prefix = idPrefix ? `${idPrefix}-` : "";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -82,13 +88,13 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="space-y-1">
             <Label
-              htmlFor="reply-author"
+              htmlFor={`${prefix}reply-author`}
               className="text-[10px] font-bold uppercase opacity-60"
             >
               Nama
             </Label>
             <Input
-              id="reply-author"
+              id={`${prefix}reply-author`}
               name="author"
               placeholder="Anonim"
               maxLength={100}
@@ -97,13 +103,13 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
           </div>
           <div className="space-y-1 md:col-span-2">
             <Label
-              htmlFor="reply-deletionPassword"
+              htmlFor={`${prefix}reply-deletionPassword`}
               className="text-[10px] font-bold uppercase opacity-60"
             >
               Sandi Penghapusan
             </Label>
             <Input
-              id="reply-deletionPassword"
+              id={`${prefix}reply-deletionPassword`}
               name="deletionPassword"
               type="password"
               placeholder="(Opsional)"
@@ -115,13 +121,13 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
 
         <div className="space-y-1">
           <Label
-            htmlFor="reply-content"
+            htmlFor={`${prefix}reply-content`}
             className="text-[10px] font-bold uppercase opacity-60"
           >
             Balasan
           </Label>
           <Textarea
-            id="reply-content"
+            id={`${prefix}reply-content`}
             name="content"
             placeholder="Ketik balasan Anda..."
             required
@@ -132,13 +138,13 @@ export function ReplyForm({ threadId, boardCode }: ReplyFormProps) {
 
         <div className="space-y-1">
           <Label
-            htmlFor="reply-captcha"
+            htmlFor={`${prefix}reply-captcha`}
             className="text-[10px] font-bold uppercase opacity-60"
           >
             Verifikasi: {captchaQuestion}
           </Label>
           <Input
-            id="reply-captcha"
+            id={`${prefix}reply-captcha`}
             name="captcha"
             placeholder="Jawaban..."
             required

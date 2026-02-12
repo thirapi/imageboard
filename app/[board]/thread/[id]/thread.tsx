@@ -14,6 +14,7 @@ import { ReplyUI } from "@/lib/entities/reply.entity";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { FormattedDate } from "@/components/formatted-date";
+import { QuickReply } from "@/components/quick-reply";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -44,6 +45,7 @@ export function ThreadClient({
 }: ThreadClientProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+  const [qrOpen, setQrOpen] = useState(false);
   const router = useRouter();
 
   const handleImageClick = (src: string) => {
@@ -59,20 +61,24 @@ export function ThreadClient({
   };
 
   const handleQuote = (postNumber: number) => {
-    const textarea = document.getElementById(
-      "reply-content",
-    ) as HTMLTextAreaElement;
-    if (textarea) {
-      const currentText = textarea.value;
-      const quoteText = `>>${postNumber}\n`;
+    setQrOpen(true);
 
-      // Update value and trigger change for potential state listeners
-      textarea.value = currentText + quoteText;
+    // Wait for QR to be in DOM
+    setTimeout(() => {
+      const textarea = document.getElementById(
+        "qr-reply-content",
+      ) as HTMLTextAreaElement;
+      if (textarea) {
+        const currentText = textarea.value;
+        const quoteText = `>>${postNumber}\n`;
 
-      // Focus and scroll
-      textarea.focus();
-      textarea.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+        // Update value
+        textarea.value = currentText + quoteText;
+
+        // Focus
+        textarea.focus();
+      }
+    }, 50);
   };
 
   // Backlink calculation
@@ -271,6 +277,13 @@ export function ThreadClient({
         alt="Image lightbox"
         open={lightboxOpen}
         onOpenChange={handleLightboxOpenChange}
+      />
+
+      <QuickReply
+        threadId={thread.id}
+        boardCode={boardCode}
+        isOpen={qrOpen}
+        onClose={() => setQrOpen(false)}
       />
     </>
   );
