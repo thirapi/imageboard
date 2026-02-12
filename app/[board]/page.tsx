@@ -70,8 +70,10 @@ export default async function BoardPage({
 
       <main
         className={cn(
-          "container mx-auto px-4 pb-20 flex-1",
-          isCatalog ? "max-w-7xl" : "max-w-5xl",
+          "mx-auto pb-20 flex-1 w-full",
+          isCatalog
+            ? "px-6 md:px-12 lg:px-20 max-w-none"
+            : "px-4 md:px-8 max-w-6xl",
         )}
       >
         <div className="flex flex-col items-center mb-12">
@@ -133,7 +135,7 @@ export default async function BoardPage({
                       </div>
                     )}
                     <div className="flex-1">
-                      <div className="text-sm leading-relaxed whitespace-pre-wrap break-words max-w-3xl">
+                      <div className="text-sm leading-relaxed whitespace-pre-wrap break-words max-w-4xl">
                         <FormattedText content={thread.content} />
                       </div>
 
@@ -154,7 +156,7 @@ export default async function BoardPage({
 
                   {/* Reply Previews */}
                   {thread.replies && thread.replies.length > 0 && (
-                    <div className="mt-4 space-y-3 ml-4 sm:ml-12 max-w-4xl">
+                    <div className="mt-4 space-y-3 ml-4 sm:ml-12 max-w-5xl">
                       {thread.replies
                         .slice()
                         .reverse()

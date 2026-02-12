@@ -53,7 +53,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-5xl">
+      <main className="mx-auto px-4 md:px-8 py-8 w-full max-w-6xl">
         <ThreadClient
           thread={thread}
           replies={replies || []}
