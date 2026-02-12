@@ -157,7 +157,7 @@
 
   .ib-reply {
     @apply bg-muted/20 border-l-2 border-muted pl-4 py-2 my-2 rounded-r-md max-w-3xl;
-    background-color: color-mix(in oklch, var(--muted), transparent 65%);
+    background-color: color-mix(in oklch, var(--muted), transparent 40%);
   }
 
   .ib-post-number {
