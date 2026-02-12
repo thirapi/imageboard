@@ -31,6 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
 import { BoardNav } from "@/components/board-nav";
 import { AgeVerificationDialog } from "@/components/age-verification-dialog";
 
@@ -40,13 +41,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <BoardNav />
-        {children}
-        <Toaster />
-        <Analytics />
-        <AgeVerificationDialog />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <BoardNav />
+          {children}
+          <Toaster />
+          <Analytics />
+          <AgeVerificationDialog />
+        </ThemeProvider>
       </body>
     </html>
   );

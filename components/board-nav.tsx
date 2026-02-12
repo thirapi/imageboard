@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import { lucia } from "@/lib/auth";
 import { logout } from "@/lib/actions/auth.actions";
 
+import { ThemeToggle } from "./theme-toggle";
+
 export async function BoardNav() {
   const boards = await getBoardList();
   const sessionId =
@@ -30,7 +32,8 @@ export async function BoardNav() {
         ))}
         <span>]</span>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
         <Link href="/" className="hover:underline">
           Home
         </Link>
