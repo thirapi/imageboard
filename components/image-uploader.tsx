@@ -10,18 +10,36 @@ import Image from "next/image";
 
 interface ImageUploaderProps {
   onImageSelect: (file: File | null) => void;
+  selectedFile?: File | null;
   maxSizeMB?: number;
   resetTrigger?: number; // Add this to trigger reset from parent
 }
 
 export function ImageUploader({
   onImageSelect,
+  selectedFile,
   maxSizeMB = 5,
   resetTrigger,
 }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync preview when selectedFile changes from parent
+  useEffect(() => {
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    } else {
+      setPreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }, [selectedFile]);
 
   // Reset when parent triggers reset
   useEffect(() => {

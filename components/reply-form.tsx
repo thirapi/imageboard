@@ -14,6 +14,7 @@ import { ImageUploader } from "./image-uploader";
 import { useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShieldAlert } from "lucide-react";
+import { useReply } from "./reply-context";
 
 interface ReplyFormProps {
   threadId: number;
@@ -29,11 +30,21 @@ export function ReplyForm({
   const prefix = idPrefix ? `${idPrefix}-` : "";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
   const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captcha, setLocalCaptcha] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+
+  const {
+    state,
+    setAuthor,
+    setDeletionPassword,
+    setContent,
+    setImageFile,
+    setIsNsfw,
+    resetForm,
+  } = useReply();
 
   const refreshCaptcha = async () => {
     const data = await getCaptcha();
@@ -53,8 +64,8 @@ export function ReplyForm({
     formData.append("threadId", threadId.toString());
     formData.append("boardCode", boardCode);
 
-    if (imageFile) {
-      formData.append("image", imageFile);
+    if (state.imageFile) {
+      formData.append("image", state.imageFile);
     }
 
     try {
@@ -62,7 +73,8 @@ export function ReplyForm({
 
       if (result.success) {
         formRef.current?.reset();
-        setImageFile(null);
+        setLocalCaptcha("");
+        resetForm();
         setError(null);
         setResetTrigger((prev) => prev + 1); // Trigger image uploader reset
         router.refresh();
@@ -98,9 +110,11 @@ export function ReplyForm({
             <Input
               id={`${prefix}reply-author`}
               name="author"
-              placeholder="Anonim"
+              placeholder="Awanama"
               maxLength={100}
               className="h-8 text-sm bg-muted/20"
+              value={state.author}
+              onChange={(e) => setAuthor(e.target.value)}
             />
           </div>
           <div className="space-y-1 md:col-span-2">
@@ -117,6 +131,8 @@ export function ReplyForm({
               placeholder="(Opsional)"
               maxLength={255}
               className="h-8 text-sm bg-muted/20"
+              value={state.deletionPassword}
+              onChange={(e) => setDeletionPassword(e.target.value)}
             />
           </div>
         </div>
@@ -135,6 +151,8 @@ export function ReplyForm({
             required
             rows={5}
             className="text-sm bg-muted/20 focus-visible:ring-accent resize-y"
+            value={state.content}
+            onChange={(e) => setContent(e.target.value)}
           />
         </div>
 
@@ -151,6 +169,8 @@ export function ReplyForm({
             placeholder="Jawaban..."
             required
             className="h-8 text-sm bg-muted/20 w-32"
+            value={captcha}
+            onChange={(e) => setLocalCaptcha(e.target.value)}
           />
         </div>
 
@@ -158,12 +178,18 @@ export function ReplyForm({
           <div className="w-full sm:w-auto">
             <ImageUploader
               onImageSelect={setImageFile}
+              selectedFile={state.imageFile}
               maxSizeMB={5}
               resetTrigger={resetTrigger}
             />
 
             <div className="flex items-center space-x-2 bg-destructive/5 p-2 rounded border border-destructive/10 mt-2">
-              <Checkbox id={`${prefix}isNsfw`} name="isNsfw" />
+              <Checkbox
+                id={`${prefix}isNsfw`}
+                name="isNsfw"
+                checked={state.isNsfw}
+                onCheckedChange={(val) => setIsNsfw(!!val)}
+              />
               <Label
                 htmlFor={`${prefix}isNsfw`}
                 className="text-[10px] font-bold text-destructive flex items-center gap-1 cursor-pointer"

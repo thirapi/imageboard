@@ -16,6 +16,7 @@ import { FormattedDate } from "@/components/formatted-date";
 import { QuickReply } from "@/components/quick-reply";
 import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
+import { ReplyProvider, useReply } from "@/components/reply-context";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -48,6 +49,7 @@ export function ThreadClient({
   const [selectedImage, setSelectedImage] = useState("");
   const [qrOpen, setQrOpen] = useState(false);
   const router = useRouter();
+  const { state, setContent } = useReply();
 
   const handleImageClick = (src: string) => {
     setSelectedImage(src);
@@ -63,22 +65,15 @@ export function ThreadClient({
 
   const handleQuote = (postNumber: number) => {
     setQrOpen(true);
+    const quoteText = `>>${postNumber}\n`;
+    setContent((prev: string) => prev + quoteText);
 
-    // Wait for QR to be in DOM
+    // Suggest focus after a short delay to allow QR to render if it wasn't
     setTimeout(() => {
-      const textarea = document.getElementById(
-        "qr-reply-content",
-      ) as HTMLTextAreaElement;
-      if (textarea) {
-        const currentText = textarea.value;
-        const quoteText = `>>${postNumber}\n`;
-
-        // Update value
-        textarea.value = currentText + quoteText;
-
-        // Focus
-        textarea.focus();
-      }
+      const textarea =
+        document.getElementById("qr-reply-content") ||
+        document.getElementById("reply-content");
+      if (textarea) (textarea as HTMLTextAreaElement).focus();
     }, 50);
   };
 
@@ -292,5 +287,13 @@ export function ThreadClient({
         onClose={() => setQrOpen(false)}
       />
     </>
+  );
+}
+
+export default function ThreadPageWrapper(props: ThreadClientProps) {
+  return (
+    <ReplyProvider>
+      <ThreadClient {...props} />
+    </ReplyProvider>
   );
 }

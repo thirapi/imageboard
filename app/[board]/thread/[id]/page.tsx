@@ -4,7 +4,7 @@ import { BoardRepository } from "@/lib/repositories/board.repository";
 import { ThreadRepository } from "@/lib/repositories/thread.repository";
 import { ReplyRepository } from "@/lib/repositories/reply.repository";
 import { GetThreadDetailUseCase } from "@/lib/use-cases/get-thread-detail.use-case";
-import { ThreadClient } from "./thread";
+import ThreadPageWrapper from "./thread";
 import { footerText } from "@/constants/footer";
 
 interface ThreadPageProps {
@@ -54,7 +54,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
       </header>
 
       <main className="mx-auto px-4 md:px-8 py-8 w-full max-w-6xl">
-        <ThreadClient
+        <ThreadPageWrapper
           thread={thread}
           replies={replies || []}
           boardCode={boardCode}
