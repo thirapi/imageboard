@@ -30,11 +30,32 @@ export function QuickReply({
   // Set initial position on mount (right side of screen)
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const initialX = Math.max(10, window.innerWidth - 450);
+      const initialY = 150;
       setPosition({
-        x: window.innerWidth - 450,
-        y: 150,
+        x: initialX,
+        y: initialY,
       });
     }
+  }, []);
+
+  // Handle window resize to keep QR in bounds
+  useEffect(() => {
+    const handleResize = () => {
+      if (qrRef.current) {
+        setPosition((prev) => {
+          const maxX = window.innerWidth - qrRef.current!.offsetWidth;
+          const maxY = window.innerHeight - qrRef.current!.offsetHeight;
+          return {
+            x: Math.max(0, Math.min(prev.x, maxX)),
+            y: Math.max(0, Math.min(prev.y, maxY)),
+          };
+        });
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Handle dragging
@@ -51,10 +72,19 @@ export function QuickReply({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
+      if (isDragging && qrRef.current) {
+        const newX = e.clientX - dragOffset.x;
+        const newY = e.clientY - dragOffset.y;
+
+        // Boundary checks
+        const minX = 0;
+        const maxX = window.innerWidth - qrRef.current.offsetWidth;
+        const minY = 0;
+        const maxY = window.innerHeight - qrRef.current.offsetHeight;
+
         setPosition({
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y,
+          x: Math.max(minX, Math.min(newX, maxX)),
+          y: Math.max(minY, Math.min(newY, maxY)),
         });
       }
     };
