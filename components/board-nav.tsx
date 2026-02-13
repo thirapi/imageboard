@@ -5,6 +5,8 @@ import { lucia } from "@/lib/auth";
 import { logout } from "@/lib/actions/auth.actions";
 
 import { ThemeToggle } from "./theme-toggle";
+import { NavToggle } from "./nav-toggle";
+import { NavWrapper } from "./nav-wrapper";
 
 export async function BoardNav() {
   const boards = await getBoardList();
@@ -15,7 +17,7 @@ export async function BoardNav() {
     : { user: null };
 
   return (
-    <nav className="border-b bg-muted/30 py-1 px-4 text-[11px] font-mono flex items-center justify-between">
+    <NavWrapper>
       <div className="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap">
         <span>[</span>
         <Link href="/" className="px-0.5 hover:underline font-bold">
@@ -37,6 +39,7 @@ export async function BoardNav() {
         <span>]</span>
       </div>
       <div className="flex items-center gap-3">
+        <NavToggle />
         <ThemeToggle />
         <Link href="/rules" className="hover:underline">
           [ Peraturan ]
@@ -57,6 +60,6 @@ export async function BoardNav() {
           </>
         )}
       </div>
-    </nav>
+    </NavWrapper>
   );
 }

@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { NavProvider } from "@/components/nav-provider";
 import { BoardNav } from "@/components/board-nav";
 import { AgeVerificationDialog } from "@/components/age-verification-dialog";
 
@@ -49,11 +50,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <BoardNav />
-          {children}
-          <Toaster />
-          <Analytics />
-          <AgeVerificationDialog />
+          <NavProvider>
+            <BoardNav />
+            {children}
+            <Toaster />
+            <Analytics />
+            <AgeVerificationDialog />
+          </NavProvider>
         </ThemeProvider>
       </body>
     </html>
