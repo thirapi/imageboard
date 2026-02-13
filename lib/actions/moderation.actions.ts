@@ -83,3 +83,38 @@ export async function getPendingReports() {
   }
 }
 
+export async function getResolvedReports() {
+  try {
+    checkModeratorAuth()
+    return await moderationController.getResolvedReports()
+  } catch (error) {
+    console.error("Error fetching resolved reports:", error)
+    return []
+  }
+}
+
+export async function banUser(ipAddress: string, reason?: string, durationHours?: number) {
+  return handleModerationAction(moderationController.banUser(ipAddress, reason, durationHours))
+}
+
+export async function unbanUser(ipAddress: string) {
+  return handleModerationAction(moderationController.unbanUser(ipAddress))
+}
+
+export async function markAsNsfw(contentType: "thread" | "reply", contentId: number) {
+  return handleModerationAction(moderationController.markAsNsfw(contentType, contentId))
+}
+
+export async function getBans() {
+  try {
+    checkModeratorAuth()
+    return await moderationController.getBans()
+  } catch (error) {
+    console.error("Error fetching bans:", error)
+    return []
+  }
+}
+
+export async function updateBan(id: number, reason?: string, durationHours?: number | null) {
+  return handleModerationAction(moderationController.updateBan(id, reason, durationHours))
+}

@@ -3,7 +3,9 @@ import type { ThreadRepository } from "@/lib/repositories/thread.repository"
 import type { ImageRepository } from "@/lib/repositories/image.repository"
 import type { CloudinaryService } from "@/lib/services/cloudinary.service"
 import type { CreateReplyCommand } from "@/lib/entities/reply.entity"
+import type { BanRepository } from "@/lib/repositories/ban.repository"
 import { SequenceService } from "../services/sequence.service"
+import { generateTripcode } from "../utils/tripcode"
 
 export class ReplyToThreadUseCase {
   constructor(
@@ -12,9 +14,18 @@ export class ReplyToThreadUseCase {
     private imageRepository: ImageRepository,
     private cloudinaryService: CloudinaryService,
     private sequenceService: SequenceService,
+    private banRepository: BanRepository,
   ) { }
 
   async execute(input: CreateReplyCommand): Promise<number> {
+    // Business rule: Check for IP ban
+    if (input.ipAddress) {
+      const ban = await this.banRepository.findByIp(input.ipAddress)
+      if (ban) {
+        throw new Error(`IP Anda sedang diblokir. Alasan: ${ban.reason || "Tidak disebutkan"}. Berakhir pada: ${ban.expiresAt ? ban.expiresAt.toLocaleString() : "Selamanya"}`)
+      }
+    }
+
     // Business rule: Validate content length
     if (input.content.trim().length < 1) {
       throw new Error("Reply content cannot be empty")
@@ -38,8 +49,9 @@ export class ReplyToThreadUseCase {
       throw new Error("Cannot reply to deleted thread")
     }
 
-    // Business rule: Clean author name
-    const cleanedAuthor = input.author?.trim() || "Awanama"
+    // Business rule: Clean author name and generate tripcode
+    const rawAuthor = input.author?.trim() || "Awanama"
+    const cleanedAuthor = generateTripcode(rawAuthor)
 
     const postNumber = await this.sequenceService.getNextPostNumber();
 
@@ -72,6 +84,7 @@ export class ReplyToThreadUseCase {
       image: imageUrl,
       imageMetadata: imageMetadata,
       deletionPassword: input.deletionPassword || null,
+      isNsfw: input.isNsfw ?? false,
       postNumber: postNumber,
       ipAddress: input.ipAddress
     })

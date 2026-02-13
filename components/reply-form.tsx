@@ -12,6 +12,8 @@ import { createReply } from "@/lib/actions/reply.actions";
 import { getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
 import { useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ShieldAlert } from "lucide-react";
 
 interface ReplyFormProps {
   threadId: number;
@@ -159,6 +161,17 @@ export function ReplyForm({
               maxSizeMB={5}
               resetTrigger={resetTrigger}
             />
+
+            <div className="flex items-center space-x-2 bg-destructive/5 p-2 rounded border border-destructive/10 mt-2">
+              <Checkbox id={`${prefix}isNsfw`} name="isNsfw" />
+              <Label
+                htmlFor={`${prefix}isNsfw`}
+                className="text-[10px] font-bold text-destructive flex items-center gap-1 cursor-pointer"
+              >
+                <ShieldAlert className="h-3 w-3" />
+                NSFW
+              </Label>
+            </div>
           </div>
 
           <Button

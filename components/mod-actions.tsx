@@ -1,84 +1,133 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Trash2, Lock, Pin, CheckCircle, XCircle } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Trash2, Lock, Pin, CheckCircle, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   lockThread,
+  unlockThread,
   pinThread,
+  unpinThread,
   deleteThread,
   deleteReply,
   resolveReport,
   dismissReport,
-} from "@/lib/actions/moderation.actions"
-import { useToast } from "@/hooks/use-toast"
+  banUser,
+  unbanUser,
+  markAsNsfw,
+} from "@/lib/actions/moderation.actions";
+import { Ban, ShieldAlert, LockKeyholeOpen, PinOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { BanDialog } from "@/components/ban-dialog";
 
 interface ModActionsProps {
-  reportId: number
-  contentType: string
-  contentId: number
+  reportId: number;
+  contentType: string;
+  contentId: number;
+  ipAddress?: string | null;
+  isLocked?: boolean;
+  isPinned?: boolean;
+  isBanned?: boolean;
 }
 
-export function ModActions({ reportId, contentType, contentId }: ModActionsProps) {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const router = useRouter()
-  const { toast } = useToast()
+export function ModActions({
+  reportId,
+  contentType,
+  contentId,
+  ipAddress,
+  isLocked,
+  isPinned,
+  isBanned,
+}: ModActionsProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   async function handleAction(action: string) {
-    setIsProcessing(true)
+    if (action === "ban") {
+      if (ipAddress) {
+        if (isBanned) {
+          toast({
+            title: "Informasi",
+            description: "IP ini sudah dalam daftar blokir",
+          });
+          return;
+        }
+        setIsBanDialogOpen(true);
+      } else {
+        toast({
+          title: "Kesalahan",
+          description: "IP Address tidak ditemukan",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
 
+    setIsProcessing(true);
     try {
-      let result
+      let result;
 
       switch (action) {
         case "lock":
           if (contentType === "thread") {
-            result = await lockThread(contentId)
+            result = isLocked
+              ? await unlockThread(contentId)
+              : await lockThread(contentId);
           }
-          break
+          break;
         case "pin":
           if (contentType === "thread") {
-            result = await pinThread(contentId)
+            result = isPinned
+              ? await unpinThread(contentId)
+              : await pinThread(contentId);
           }
-          break
+          break;
         case "delete":
           if (contentType === "thread") {
-            result = await deleteThread(contentId)
+            result = await deleteThread(contentId);
           } else {
-            result = await deleteReply(contentId)
+            result = await deleteReply(contentId);
           }
-          break
+          break;
         case "resolve":
-          result = await resolveReport(reportId)
-          break
+          result = await resolveReport(reportId);
+          break;
         case "dismiss":
-          result = await dismissReport(reportId)
-          break
+          result = await dismissReport(reportId);
+          break;
+        case "markNsfw":
+          result = await markAsNsfw(
+            contentType as "thread" | "reply",
+            contentId,
+          );
+          break;
       }
 
       if (result?.success) {
         toast({
           title: "Sukses",
           description: "Tindakan berhasil diselesaikan",
-        })
-        router.refresh()
+        });
+        router.refresh();
       } else {
         toast({
           title: "Kesalahan",
           description: result?.error || "Gagal melakukan tindakan",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
-      console.error("Error performing action:", error)
+      console.error("Error performing action:", error);
       toast({
         title: "Kesalahan",
         description: "Terjadi kesalahan tak terduga",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
   }
 
@@ -93,8 +142,17 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
             disabled={isProcessing}
             className="flex-1"
           >
-            <Lock className="h-4 w-4 mr-2" />
-            Kunci Thread
+            {isLocked ? (
+              <>
+                <LockKeyholeOpen className="h-4 w-4 mr-2" />
+                Buka Kunci
+              </>
+            ) : (
+              <>
+                <Lock className="h-4 w-4 mr-2" />
+                Kunci Thread
+              </>
+            )}
           </Button>
           <Button
             variant="outline"
@@ -103,8 +161,17 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
             disabled={isProcessing}
             className="flex-1"
           >
-            <Pin className="h-4 w-4 mr-2" />
-            Sematkan Thread
+            {isPinned ? (
+              <>
+                <PinOff className="h-4 w-4 mr-2" />
+                Lepas Sematan
+              </>
+            ) : (
+              <>
+                <Pin className="h-4 w-4 mr-2" />
+                Sematkan Thread
+              </>
+            )}
           </Button>
         </>
       )}
@@ -138,6 +205,36 @@ export function ModActions({ reportId, contentType, contentId }: ModActionsProps
         <XCircle className="h-4 w-4 mr-2" />
         Abaikan
       </Button>
+      {ipAddress && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => handleAction("ban")}
+          disabled={isProcessing || isBanned}
+          className="flex-1"
+        >
+          <Ban className="h-4 w-4 mr-2" />
+          {isBanned ? "Sudah Diblokir" : "Blokir IP"}
+        </Button>
+      )}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handleAction("markNsfw")}
+        disabled={isProcessing}
+        className="flex-1"
+      >
+        <ShieldAlert className="h-4 w-4 mr-2 text-destructive" />
+        Tandai NSFW
+      </Button>
+
+      {ipAddress && (
+        <BanDialog
+          ipAddress={ipAddress}
+          isOpen={isBanDialogOpen}
+          onOpenChange={setIsBanDialogOpen}
+        />
+      )}
     </div>
-  )
+  );
 }

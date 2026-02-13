@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { createThread, getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
 import { useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ShieldAlert } from "lucide-react";
 
 interface ThreadFormProps {
   boardId: number;
@@ -175,6 +177,17 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
               maxSizeMB={5}
               resetTrigger={resetTrigger}
             />
+
+            <div className="flex items-center space-x-2 bg-destructive/5 p-2 rounded border border-destructive/10">
+              <Checkbox id="isNsfw" name="isNsfw" />
+              <Label
+                htmlFor="isNsfw"
+                className="text-xs font-bold text-destructive flex items-center gap-1 cursor-pointer"
+              >
+                <ShieldAlert className="h-3 w-3" />
+                KONTEN NSFW / NSFL
+              </Label>
+            </div>
 
             <div className="space-y-1.5">
               <Label

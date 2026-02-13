@@ -7,6 +7,7 @@ import { PostRepository } from "@/lib/repositories/post.repository"
 import { ReplyRepository } from "@/lib/repositories/reply.repository"
 import { ReportRepository } from "@/lib/repositories/report.repository"
 import { ThreadRepository } from "@/lib/repositories/thread.repository"
+import { BanRepository } from "@/lib/repositories/ban.repository"
 
 // Services
 import { CloudinaryService } from "@/lib/services/cloudinary.service"
@@ -15,10 +16,16 @@ import { ContentFilterService } from "@/lib/services/content-filter.service"
 // Use Cases
 import { CreateReportUseCase } from "@/lib/use-cases/create-report.use-case"
 import { CreateThreadUseCase } from "@/lib/use-cases/create-thread.use-case"
+import { BanUserUseCase } from "@/lib/use-cases/ban-user.use-case"
+import { UnbanUserUseCase } from "@/lib/use-cases/unban-user.use-case"
+import { MarkNsfwUseCase } from "@/lib/use-cases/mark-nsfw.use-case"
+import { GetBansUseCase } from "@/lib/use-cases/get-bans.use-case"
+import { UpdateBanUseCase } from "@/lib/use-cases/update-ban.use-case"
 import { DismissReportUseCase } from "@/lib/use-cases/dismiss-report.use-case"
 import { GetBoardListUseCase } from "@/lib/use-cases/get-board-list.use-case"
 import { GetLatestPostsUseCase } from "@/lib/use-cases/get-latest-posts.use-case"
 import { GetPendingReportsUseCase } from "@/lib/use-cases/get-pending-reports.use-case"
+import { GetResolvedReportsUseCase } from "@/lib/use-cases/get-resolved-reports.use-case"
 import { GetPostByNumberUseCase } from "@/lib/use-cases/get-post-by-number.use-case"
 import { GetRecentImagesUseCase } from "@/lib/use-cases/get-recent-images.use-case"
 import { GetReportsUseCase } from "@/lib/use-cases/get-reports.use-case"
@@ -48,6 +55,7 @@ const postRepository = new PostRepository()
 const replyRepository = new ReplyRepository()
 const reportRepository = new ReportRepository()
 const threadRepository = new ThreadRepository()
+const banRepository = new BanRepository()
 
 // Instantiate Services
 const cloudinaryService = new CloudinaryService()
@@ -61,12 +69,14 @@ const createThreadUseCase = new CreateThreadUseCase(
   boardRepository,
   imageRepository,
   cloudinaryService,
-  sequenceService
+  sequenceService,
+  banRepository
 )
 const dismissReportUseCase = new DismissReportUseCase(reportRepository)
 const getBoardListUseCase = new GetBoardListUseCase(boardRepository)
 const getLatestPostsUseCase = new GetLatestPostsUseCase(postRepository)
-const getPendingReportsUseCase = new GetPendingReportsUseCase(reportRepository, threadRepository, replyRepository)
+const getPendingReportsUseCase = new GetPendingReportsUseCase(reportRepository, threadRepository, replyRepository, banRepository)
+const getResolvedReportsUseCase = new GetResolvedReportsUseCase(reportRepository, threadRepository, replyRepository, banRepository)
 const getRecentImagesUseCase = new GetRecentImagesUseCase(postRepository)
 const getPostByNumberUseCase = new GetPostByNumberUseCase(postRepository)
 const getReportsUseCase = new GetReportsUseCase(reportRepository)
@@ -79,13 +89,19 @@ const replyToThreadUseCase = new ReplyToThreadUseCase(
   threadRepository,
   imageRepository,
   cloudinaryService,
-  sequenceService
+  sequenceService,
+  banRepository
 )
 const resolveReportUseCase = new ResolveReportUseCase(reportRepository)
 const softDeleteReplyUseCase = new SoftDeleteReplyUseCase(replyRepository)
 const softDeleteThreadUseCase = new SoftDeleteThreadUseCase(threadRepository)
 const unlockThreadUseCase = new UnlockThreadUseCase(threadRepository)
 const unpinThreadUseCase = new UnpinThreadUseCase(threadRepository)
+const banUserUseCase = new BanUserUseCase(banRepository)
+const unbanUserUseCase = new UnbanUserUseCase(banRepository)
+const markNsfwUseCase = new MarkNsfwUseCase(threadRepository, replyRepository)
+const getBansUseCase = new GetBansUseCase(banRepository)
+const updateBanUseCase = new UpdateBanUseCase(banRepository)
 
 // Instantiate Controllers
 const homeController = new HomeController(
@@ -104,6 +120,12 @@ const moderationController = new ModerationController(
   resolveReportUseCase,
   dismissReportUseCase,
   getPendingReportsUseCase,
+  getResolvedReportsUseCase,
+  banUserUseCase,
+  unbanUserUseCase,
+  markNsfwUseCase,
+  getBansUseCase,
+  updateBanUseCase,
 )
 const replyController = new ReplyController(replyToThreadUseCase)
 const reportController = new ReportController(reportRepository, getReportsUseCase)

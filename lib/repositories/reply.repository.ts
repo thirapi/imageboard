@@ -15,6 +15,7 @@ export class ReplyRepository {
         image: input.image ?? null,
         imageMetadata: input.imageMetadata ?? null,
         deletionPassword: input.deletionPassword ?? null,
+        isNsfw: input.isNsfw ?? false,
         postNumber: input.postNumber,
         ipAddress: input.ipAddress ?? null,
       })
@@ -65,6 +66,13 @@ export class ReplyRepository {
       .where(eq(replies.id, id))
   }
 
+  async updateNsfwStatus(id: number, isNsfw: boolean): Promise<void> {
+    await db
+      .update(replies)
+      .set({ isNsfw })
+      .where(eq(replies.id, id))
+  }
+
   async findById(id: number): Promise<ReplyEntity | null> {
     const rows = await db
       .select()
@@ -87,6 +95,7 @@ export class ReplyRepository {
       author: row.author ?? "Awanama",
       createdAt: row.createdAt!,
       isDeleted: row.isDeleted ?? false,
+      isNsfw: row.isNsfw ?? false,
       image: row.image,
       imageMetadata: row.imageMetadata,
       deletionPassword: row.deletionPassword,

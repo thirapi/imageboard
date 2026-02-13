@@ -6,6 +6,7 @@ export interface CreateReplyRequest {
   author?: string
   imageFile?: File | null
   deletionPassword?: string
+  isNsfw?: boolean
   ipAddress?: string
 }
 
@@ -29,6 +30,7 @@ export class ReplyController {
       author: request.author,
       imageFile: request.imageFile,
       deletionPassword: request.deletionPassword,
+      isNsfw: request.isNsfw,
       ipAddress: request.ipAddress,
     })
 

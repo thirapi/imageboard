@@ -22,9 +22,9 @@ export class CloudinaryService {
 
   async uploadImage(file: File): Promise<UploadResult> {
     // Business rule: Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"]
     if (!allowedTypes.includes(file.type)) {
-      throw new Error("Invalid file type. Allowed: jpg, jpeg, png, webp")
+      throw new Error("Invalid file type. Allowed: jpg, jpeg, png, webp, gif")
     }
 
     // Business rule: Validate file size (5MB max)

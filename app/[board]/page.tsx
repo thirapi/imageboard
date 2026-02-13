@@ -15,6 +15,8 @@ import { CatalogView } from "@/components/catalog-view";
 import { cn } from "@/lib/utils";
 import { footerText } from "@/constants/footer";
 import { FormattedDate } from "@/components/formatted-date";
+import { ExpandableImage } from "@/components/expandable-image";
+import { TripcodeDisplay } from "@/components/tripcode-display";
 
 export default async function BoardPage({
   params,
@@ -100,9 +102,10 @@ export default async function BoardPage({
                     {thread.subject && (
                       <span className="ib-subject">{thread.subject}</span>
                     )}
-                    <span className="ib-author">
-                      {thread.author || "Anonymous"}
-                    </span>
+                    <TripcodeDisplay
+                      author={thread.author || "Awanama"}
+                      className="ib-author"
+                    />
                     <span className="text-muted-foreground text-xs">
                       <FormattedDate date={thread.createdAt} />
                     </span>
@@ -124,14 +127,12 @@ export default async function BoardPage({
                   <div className="flex flex-col sm:flex-row gap-4 mt-2">
                     {thread.image && (
                       <div className="shrink-0">
-                        <Link href={`/${boardCode}/thread/${thread.id}`}>
-                          <img
-                            src={thread.image}
-                            alt="Thumbnail"
-                            className="max-w-[200px] max-h-[200px] object-contain border rounded-sm hover:opacity-90 transition-opacity"
-                            loading="lazy"
-                          />
-                        </Link>
+                        <ExpandableImage
+                          src={thread.image}
+                          alt="Thumbnail"
+                          isNsfw={thread.isNsfw}
+                          isOP={true}
+                        />
                       </div>
                     )}
                     <div className="flex-1">
@@ -168,9 +169,10 @@ export default async function BoardPage({
                             className="ib-reply shadow-sm border border-muted/20"
                           >
                             <div className="ib-post-metaline text-xs px-2 pt-1">
-                              <span className="ib-author">
-                                {reply.author || "Anonymous"}
-                              </span>
+                              <TripcodeDisplay
+                                author={reply.author || "Awanama"}
+                                className="ib-author"
+                              />
                               <span className="text-muted-foreground opacity-70">
                                 <FormattedDate date={reply.createdAt} />
                               </span>
@@ -181,11 +183,10 @@ export default async function BoardPage({
                             <div className="flex gap-3 p-2">
                               {reply.image && (
                                 <div className="shrink-0">
-                                  <img
+                                  <ExpandableImage
                                     src={reply.image}
                                     alt="Reply thumbnail"
-                                    className="max-w-[80px] max-h-[80px] object-cover border rounded-xs"
-                                    loading="lazy"
+                                    isNsfw={reply.isNsfw}
                                   />
                                 </div>
                               )}

@@ -2,8 +2,10 @@ import type { ThreadRepository } from "@/lib/repositories/thread.repository"
 import type { BoardRepository } from "@/lib/repositories/board.repository"
 import type { ImageRepository } from "@/lib/repositories/image.repository"
 import type { CloudinaryService } from "@/lib/services/cloudinary.service"
-import type { CreateThreadCommand } from "@/lib/entities/thread.entity"
+import type { BanRepository } from "@/lib/repositories/ban.repository"
+import { CreateThreadCommand } from "@/lib/entities/thread.entity"
 import { SequenceService } from "../services/sequence.service"
+import { generateTripcode } from "../utils/tripcode"
 
 export class CreateThreadUseCase {
   constructor(
@@ -12,9 +14,18 @@ export class CreateThreadUseCase {
     private imageRepository: ImageRepository,
     private cloudinaryService: CloudinaryService,
     private sequenceService: SequenceService,
+    private banRepository: BanRepository,
   ) { }
 
   async execute(input: CreateThreadCommand): Promise<number> {
+    // Business rule: Check for IP ban
+    if (input.ipAddress) {
+      const ban = await this.banRepository.findByIp(input.ipAddress)
+      if (ban) {
+        throw new Error(`IP Anda sedang diblokir. Alasan: ${ban.reason || "Tidak disebutkan"}. Berakhir pada: ${ban.expiresAt ? ban.expiresAt.toLocaleString() : "Selamanya"}`)
+      }
+    }
+
     // Business rule: Validate content length
     if (input.content.trim().length < 1) {
       throw new Error("Thread content cannot be empty")
@@ -35,8 +46,9 @@ export class CreateThreadUseCase {
       throw new Error("Subject is too long (max 200 characters)")
     }
 
-    // Business rule: Clean author name
-    const cleanedAuthor = input.author?.trim() || "Awanama"
+    // Business rule: Clean author name and generate tripcode
+    const rawAuthor = input.author?.trim() || "Awanama"
+    const cleanedAuthor = generateTripcode(rawAuthor)
 
     const postNumber = await this.sequenceService.getNextPostNumber();
 
@@ -74,6 +86,7 @@ export class CreateThreadUseCase {
       image: imageUrl,
       imageMetadata: imageMetadata,
       deletionPassword: hashedPassword,
+      isNsfw: input.isNsfw ?? false,
       postNumber: postNumber,
       ipAddress: input.ipAddress
     })

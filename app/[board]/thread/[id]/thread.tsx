@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { FormattedDate } from "@/components/formatted-date";
 import { QuickReply } from "@/components/quick-reply";
 import { ExpandableImage } from "@/components/expandable-image";
+import { TripcodeDisplay } from "@/components/tripcode-display";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -136,9 +137,10 @@ export function ThreadClient({
           {thread.subject && (
             <span className="ib-subject text-lg mr-2">{thread.subject}</span>
           )}
-          <span className="ib-author text-base">
-            {thread.author || "Anonymous"}
-          </span>
+          <TripcodeDisplay
+            author={thread.author || "Awanama"}
+            className="ib-author text-base"
+          />
           {generatePosterId(thread.ipAddress, thread.id) && (
             <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
               ID: {generatePosterId(thread.ipAddress, thread.id)}
@@ -172,6 +174,7 @@ export function ThreadClient({
                 alt="Thread image"
                 metadata={thread.imageMetadata || undefined}
                 isOP={true}
+                isNsfw={thread.isNsfw}
                 onFullScreen={() => handleImageClick(thread.image!)}
               />
             </div>
@@ -194,7 +197,10 @@ export function ThreadClient({
             className="ib-reply border border-muted/20 shadow-sm relative group"
           >
             <div className="ib-post-metaline px-2 pt-1 border-b border-muted/5 bg-muted/5">
-              <span className="ib-author">{reply.author || "Anonymous"}</span>
+              <TripcodeDisplay
+                author={reply.author || "Awanama"}
+                className="ib-author"
+              />
               {generatePosterId(reply.ipAddress, thread.id) && (
                 <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
                   ID: {generatePosterId(reply.ipAddress, thread.id)}
@@ -227,6 +233,7 @@ export function ThreadClient({
                     src={reply.image}
                     alt="Reply image"
                     metadata={reply.imageMetadata || undefined}
+                    isNsfw={reply.isNsfw}
                     onFullScreen={() => handleImageClick(reply.image!)}
                   />
                 </div>

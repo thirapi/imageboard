@@ -15,6 +15,7 @@ export class ThreadRepository {
         image: input.image ?? null,
         imageMetadata: input.imageMetadata ?? null,
         deletionPassword: input.deletionPassword ?? null,
+        isNsfw: input.isNsfw ?? false,
         postNumber: input.postNumber,
         ipAddress: input.ipAddress ?? null,
       })
@@ -76,6 +77,13 @@ export class ThreadRepository {
       .where(eq(threads.id, id))
   }
 
+  async updateNsfwStatus(id: number, isNsfw: boolean): Promise<void> {
+    await db
+      .update(threads)
+      .set({ isNsfw })
+      .where(eq(threads.id, id))
+  }
+
   private mapToEntity(row: typeof threads.$inferSelect): ThreadEntity {
     return {
       id: row.id,
@@ -87,6 +95,7 @@ export class ThreadRepository {
       isPinned: row.isPinned ?? false,
       isLocked: row.isLocked ?? false,
       isDeleted: row.isDeleted ?? false,
+      isNsfw: row.isNsfw ?? false,
       bumpedAt: row.bumpedAt!,
       image: row.image ?? undefined,
       imageMetadata: row.imageMetadata,

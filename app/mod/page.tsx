@@ -9,17 +9,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ModActions } from "@/components/mod-actions";
-import { getReports } from "@/lib/actions/report.actions";
+import {
+  getPendingReports,
+  getResolvedReports,
+} from "@/lib/actions/moderation.actions";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { logout } from "@/lib/actions/auth.actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function ModPage() {
-  const result = await getReports();
-  const reports = result.success ? result.data : [];
-
-  const pendingReports = reports?.filter((r) => r.status === "pending");
-  const resolvedReports = reports?.filter((r) => r.status !== "pending");
+  const pendingReports = await getPendingReports();
+  const resolvedReports = await getResolvedReports();
 
   return (
     <div className="min-h-screen">
@@ -29,6 +37,13 @@ export default async function ModPage() {
           <p className="text-sm text-muted-foreground">
             Tinjau dan kelola konten yang dilaporkan
           </p>
+          <div className="mt-4 flex gap-2">
+            <Link href="/mod/bans">
+              <Button variant="secondary" size="sm">
+                Manajemen Cekal IP
+              </Button>
+            </Link>
+          </div>
         </header>
 
         <div className="mb-8">
@@ -64,6 +79,10 @@ export default async function ModPage() {
                     reportId={report.id}
                     contentType={report.contentType}
                     contentId={report.contentId}
+                    ipAddress={report.ipAddress}
+                    isLocked={report.isLocked}
+                    isPinned={report.isPinned}
+                    isBanned={report.isBanned}
                   />
                 </CardContent>
               </Card>
@@ -81,40 +100,76 @@ export default async function ModPage() {
 
         <div>
           <h2 className="text-xl font-semibold mb-4">
-            Laporan yang Diselesaikan
+            Riwayat Penanganan Laporan
           </h2>
-          <div className="space-y-4">
-            {resolvedReports?.slice(0, 10).map((report) => (
-              <Card key={report.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <CardTitle className="text-base">
-                        {report.contentType === "thread" ? "Thread" : "Balasan"}{" "}
-                        #{report.contentId}
-                      </CardTitle>
-                      <CardDescription>
-                        {report.reportedAt.toLocaleString()}
-                      </CardDescription>
-                    </div>
-                    <Badge variant="secondary">{report.status}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground text-balance">
-                    {report.reason}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-
-            {resolvedReports?.length === 0 && (
-              <Card>
-                <CardContent className="py-8 text-center text-muted-foreground">
-                  <p>Belum ada laporan yang diselesaikan</p>
-                </CardContent>
-              </Card>
-            )}
+          <div className="rounded-md border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[120px]">Konten</TableHead>
+                  <TableHead>Alasan / Laporan</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Waktu Selesai</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {resolvedReports?.slice(0, 15).map((report: any) => (
+                  <TableRow key={report.id}>
+                    <TableCell className="font-medium text-xs">
+                      <div className="flex flex-col">
+                        <span>
+                          {report.contentType === "thread"
+                            ? "Thread"
+                            : "Balasan"}
+                        </span>
+                        <span className="text-muted-foreground">
+                          #{report.contentId}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-[250px] space-y-1">
+                        <p className="text-sm font-semibold truncate">
+                          {report.reason}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground line-clamp-1 italic">
+                          "{report.content}"
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        className={
+                          report.status === "resolved"
+                            ? "bg-green-500/10 text-green-500 border-green-500/20 text-[10px]"
+                            : "text-[10px]"
+                        }
+                      >
+                        {report.status === "resolved"
+                          ? "Diselesaikan"
+                          : "Diabaikan"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-[11px] text-muted-foreground">
+                      {report.resolvedAt
+                        ? new Date(report.resolvedAt).toLocaleString()
+                        : "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {resolvedReports?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="h-24 text-center text-muted-foreground italic"
+                    >
+                      Belum ada laporan yang diselesaikan
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </main>

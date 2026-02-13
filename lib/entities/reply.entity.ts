@@ -5,6 +5,7 @@ export interface ReplyEntity {
   author: string
   createdAt: Date
   isDeleted: boolean
+  isNsfw: boolean
   image?: string | null
   imageMetadata?: string | null
   deletionPassword?: string | null
@@ -18,6 +19,7 @@ export interface CreateReplyCommand {
   author?: string
   imageFile?: File | null
   deletionPassword?: string
+  isNsfw?: boolean
   ipAddress?: string
 }
 
@@ -28,6 +30,7 @@ export interface CreateReplyInput {
   image?: string | null
   imageMetadata?: string | null
   deletionPassword?: string | null
+  isNsfw?: boolean
   postNumber: number
   ipAddress?: string
 }
@@ -39,6 +42,7 @@ export interface ReplyUI {
   author: string
   createdAt: Date
   isDeleted: boolean
+  isNsfw: boolean
   image?: string | null
   imageMetadata?: string | null
   postNumber: number

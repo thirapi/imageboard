@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
 import { reports } from "@/lib/db/schema"
-import { desc, eq } from "drizzle-orm"
+import { desc, eq, or } from "drizzle-orm"
 import type { ReportEntity, CreateReportInput } from "@/lib/entities/report.entity"
 
 export class ReportRepository {
@@ -35,6 +35,16 @@ export class ReportRepository {
       .select()
       .from(reports)
       .where(eq(reports.status, "pending"))
+      .orderBy(desc(reports.reportedAt))
+
+    return rows.map((row) => this.mapToEntity(row))
+  }
+
+  async findResolved(): Promise<ReportEntity[]> {
+    const rows = await db
+      .select()
+      .from(reports)
+      .where(or(eq(reports.status, "resolved"), eq(reports.status, "dismissed")))
       .orderBy(desc(reports.reportedAt))
 
     return rows.map((row) => this.mapToEntity(row))
