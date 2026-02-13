@@ -1,5 +1,5 @@
 {
-  "id": "412df0a8-40bf-45c2-aef8-2258bf900a0a",
+  "id": "e821569a-5442-418d-8245-14abb72c59fe",
   "prevId": "f26ba2e7-5a58-4001-9f1d-8d9d2a517103",
   "version": "7",
   "dialect": "postgresql",
@@ -341,6 +341,13 @@
           "notNull": false,
           "default": false
         },
+        "is_spoiler": {
+          "name": "is_spoiler",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -500,6 +507,13 @@
         },
         "is_nsfw": {
           "name": "is_nsfw",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "is_spoiler": {
+          "name": "is_spoiler",
           "type": "boolean",
           "primaryKey": false,
           "notNull": false,
