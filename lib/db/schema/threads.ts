@@ -33,6 +33,7 @@ export const threads = pgTable(
     isPinned: boolean('is_pinned').default(false),
     isLocked: boolean('is_locked').default(false),
     isNsfw: boolean('is_nsfw').default(false),
+    isSpoiler: boolean('is_spoiler').default(false),
 
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
     bumpedAt: timestamp('bumped_at', { withTimezone: true }).defaultNow(),

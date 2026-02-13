@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MessageSquare, ImageIcon, Pin, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CatalogViewProps {
   threads: any[];
@@ -20,12 +21,24 @@ export function CatalogView({ threads, boardCode }: CatalogViewProps) {
           {/* Thumbnail Container */}
           <div className="relative w-full aspect-square bg-muted/20 border border-muted/40 rounded shadow-sm overflow-hidden transition-all duration-200 group-hover:scale-[1.02] group-hover:border-accent group-hover:shadow-md">
             {thread.image ? (
-              <img
-                src={thread.image}
-                alt={thread.subject || "Thread image"}
-                className="w-full h-full object-cover transition-all duration-500"
-                loading="lazy"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={thread.image}
+                  alt={thread.subject || "Thread image"}
+                  className={cn(
+                    "w-full h-full object-cover transition-all duration-500",
+                    (thread.isNsfw || thread.isSpoiler) && "blur-xl scale-110",
+                  )}
+                  loading="lazy"
+                />
+                {(thread.isNsfw || thread.isSpoiler) && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                    <span className="bg-black/80 border border-white/20 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-tighter">
+                      {thread.isNsfw ? "NSFW" : "Spoiler"}
+                    </span>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground/20 bg-muted/5 font-mono">
                 <ImageIcon className="h-10 w-10 stroke-[1px]" />

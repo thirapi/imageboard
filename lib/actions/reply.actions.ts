@@ -26,6 +26,7 @@ export async function createReply(formData: FormData) {
     const imageFile = formData.get("image") as File | null
     const deletionPassword = formData.get("deletionPassword") as string
     const isNsfw = formData.get("isNsfw") === "on"
+    const isSpoiler = formData.get("isSpoiler") === "on"
 
     const result = await replyController.createReply({
       threadId,
@@ -34,6 +35,7 @@ export async function createReply(formData: FormData) {
       imageFile,
       deletionPassword,
       isNsfw,
+      isSpoiler,
       ipAddress,
     })
 

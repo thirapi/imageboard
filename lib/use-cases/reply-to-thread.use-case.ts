@@ -85,6 +85,7 @@ export class ReplyToThreadUseCase {
       imageMetadata: imageMetadata,
       deletionPassword: input.deletionPassword || null,
       isNsfw: input.isNsfw ?? false,
+      isSpoiler: input.isSpoiler ?? false,
       postNumber: postNumber,
       ipAddress: input.ipAddress
     })

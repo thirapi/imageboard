@@ -12,6 +12,7 @@ interface ExpandableImageProps {
   className?: string;
   isOP?: boolean;
   isNsfw?: boolean;
+  isSpoiler?: boolean;
 }
 
 export function ExpandableImage({
@@ -22,9 +23,13 @@ export function ExpandableImage({
   className,
   isOP = false,
   isNsfw = false,
+  isSpoiler = false,
 }: ExpandableImageProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showNsfw, setShowNsfw] = useState(!isNsfw);
+  const [showSpoiler, setShowSpoiler] = useState(!isSpoiler);
+
+  const isHidden = !showNsfw || !showSpoiler;
 
   // Helper to parse metadata (taking the filename part)
   const filename = metadata ? metadata.split(" (")[0] : "image";
@@ -43,12 +48,13 @@ export function ExpandableImage({
           className={cn(
             "truncate max-w-[150px] sm:max-w-[300px] font-mono opacity-70 hover:opacity-100 transition-opacity cursor-default",
             isNsfw && "text-destructive font-bold",
+            isSpoiler && "text-yellow-600 dark:text-yellow-500 font-bold",
           )}
           title={metadata}
         >
-          {isNsfw
-            ? `[NSFW] ${metadata || "image.png"}`
-            : metadata || "image.png"}
+          {isNsfw && `[NSFW] `}
+          {isSpoiler && `[SPOILER] `}
+          {metadata || "image.png"}
         </span>
         <div className="flex items-center gap-1.5">
           <button
@@ -84,7 +90,7 @@ export function ExpandableImage({
           alt={alt}
           className={cn(
             "transition-all duration-300",
-            !showNsfw && "blur-2xl scale-110",
+            isHidden && "blur-2xl scale-110",
             isExpanded
               ? "w-full h-auto object-contain max-h-[85vh]"
               : cn(
@@ -96,21 +102,25 @@ export function ExpandableImage({
           )}
         />
 
-        {/* NSFW Overlay - Classic Imageboard Style */}
-        {!showNsfw && (
+        {/* Overlay - Classic Imageboard Style */}
+        {isHidden && (
           <div
             className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 transition-opacity hover:bg-black/40 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               setShowNsfw(true);
+              setShowSpoiler(true);
             }}
           >
-            <div className="border border-destructive bg-black px-4 py-2 text-destructive font-mono text-[12px] font-bold tracking-tight uppercase">
-              [ NSFW CONTENT ]
-              {/* <div className="text-[9px] text-white/70 mt-1 font-normal normal-case">
-                Klik untuk melihat
-              </div> */}
-            </div>
+            {!showNsfw ? (
+              <div className="border border-destructive bg-black px-4 py-2 text-destructive font-mono text-[12px] font-bold tracking-tight uppercase">
+                [ NSFW CONTENT ]
+              </div>
+            ) : (
+              <div className="border border-yellow-500 bg-black px-4 py-2 text-yellow-500 font-mono text-[12px] font-bold tracking-tight uppercase">
+                [ SPOILER ]
+              </div>
+            )}
           </div>
         )}
 

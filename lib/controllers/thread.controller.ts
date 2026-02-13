@@ -10,6 +10,7 @@ export interface CreateThreadRequest {
   imageFile?: File | null
   deletionPassword?: string
   isNsfw?: boolean
+  isSpoiler?: boolean
   ipAddress?: string
 }
 
@@ -39,6 +40,7 @@ export class ThreadController {
       imageFile: request.imageFile,
       deletionPassword: request.deletionPassword,
       isNsfw: request.isNsfw,
+      isSpoiler: request.isSpoiler,
       ipAddress: request.ipAddress,
     })
 

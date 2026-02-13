@@ -29,6 +29,7 @@ export const replies = pgTable(
 
     isDeleted: boolean('is_deleted').default(false),
     isNsfw: boolean('is_nsfw').default(false),
+    isSpoiler: boolean('is_spoiler').default(false),
 
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
     ipAddress: varchar('ip_address', { length: 45 }),

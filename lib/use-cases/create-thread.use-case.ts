@@ -87,6 +87,7 @@ export class CreateThreadUseCase {
       imageMetadata: imageMetadata,
       deletionPassword: hashedPassword,
       isNsfw: input.isNsfw ?? false,
+      isSpoiler: input.isSpoiler ?? false,
       postNumber: postNumber,
       ipAddress: input.ipAddress
     })

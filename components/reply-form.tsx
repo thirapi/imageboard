@@ -13,7 +13,7 @@ import { getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
 import { useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, AlertTriangle } from "lucide-react";
 import { useReply } from "./reply-context";
 
 interface ReplyFormProps {
@@ -43,6 +43,7 @@ export function ReplyForm({
     setContent,
     setImageFile,
     setIsNsfw,
+    setIsSpoiler,
     resetForm,
   } = useReply();
 
@@ -196,6 +197,22 @@ export function ReplyForm({
               >
                 <ShieldAlert className="h-3 w-3" />
                 NSFW
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2 bg-yellow-500/5 p-2 rounded border border-yellow-500/10 mt-2">
+              <Checkbox
+                id={`${prefix}isSpoiler`}
+                name="isSpoiler"
+                checked={state.isSpoiler}
+                onCheckedChange={(val) => setIsSpoiler(!!val)}
+              />
+              <Label
+                htmlFor={`${prefix}isSpoiler`}
+                className="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer"
+              >
+                <AlertTriangle className="h-3 w-3" />
+                SPOILER
               </Label>
             </div>
           </div>

@@ -16,6 +16,7 @@ export class ReplyRepository {
         imageMetadata: input.imageMetadata ?? null,
         deletionPassword: input.deletionPassword ?? null,
         isNsfw: input.isNsfw ?? false,
+        isSpoiler: input.isSpoiler ?? false,
         postNumber: input.postNumber,
         ipAddress: input.ipAddress ?? null,
       })
@@ -96,6 +97,7 @@ export class ReplyRepository {
       createdAt: row.createdAt!,
       isDeleted: row.isDeleted ?? false,
       isNsfw: row.isNsfw ?? false,
+      isSpoiler: row.isSpoiler ?? false,
       image: row.image,
       imageMetadata: row.imageMetadata,
       deletionPassword: row.deletionPassword,

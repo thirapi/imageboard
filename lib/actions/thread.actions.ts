@@ -27,6 +27,7 @@ export async function createThread(formData: FormData) {
     const imageFile = formData.get("image") as File | null
     const deletionPassword = formData.get("deletionPassword") as string
     const isNsfw = formData.get("isNsfw") === "on"
+    const isSpoiler = formData.get("isSpoiler") === "on"
 
     const result = await threadController.createThread({
       boardId,
@@ -36,6 +37,7 @@ export async function createThread(formData: FormData) {
       imageFile,
       deletionPassword,
       isNsfw,
+      isSpoiler,
       ipAddress,
     })
 

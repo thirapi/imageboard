@@ -8,6 +8,7 @@ interface ReplyState {
   content: string;
   imageFile: File | null;
   isNsfw: boolean;
+  isSpoiler: boolean;
 }
 
 interface ReplyContextType {
@@ -17,6 +18,7 @@ interface ReplyContextType {
   setContent: React.Dispatch<React.SetStateAction<string>>;
   setImageFile: React.Dispatch<React.SetStateAction<File | null>>;
   setIsNsfw: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSpoiler: React.Dispatch<React.SetStateAction<boolean>>;
   resetForm: () => void;
 }
 
@@ -28,6 +30,7 @@ export function ReplyProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isNsfw, setIsNsfw] = useState(false);
+  const [isSpoiler, setIsSpoiler] = useState(false);
 
   // Load persistent fields from localStorage
   useEffect(() => {
@@ -59,17 +62,26 @@ export function ReplyProvider({ children }: { children: React.ReactNode }) {
     setContent("");
     setImageFile(null);
     setIsNsfw(false);
+    setIsSpoiler(false);
   };
 
   return (
     <ReplyContext.Provider
       value={{
-        state: { author, deletionPassword, content, imageFile, isNsfw },
+        state: {
+          author,
+          deletionPassword,
+          content,
+          imageFile,
+          isNsfw,
+          isSpoiler,
+        },
         setAuthor,
         setDeletionPassword,
         setContent,
         setImageFile,
         setIsNsfw,
+        setIsSpoiler,
         resetForm,
       }}
     >

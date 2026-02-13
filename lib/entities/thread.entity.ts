@@ -9,6 +9,7 @@ export interface ThreadEntity {
   isLocked: boolean
   isDeleted: boolean
   isNsfw: boolean
+  isSpoiler: boolean
   bumpedAt: Date
   image?: string | null
   imageMetadata?: string | null
@@ -25,6 +26,7 @@ export interface CreateThreadCommand {
   imageFile?: File | null
   deletionPassword?: string
   isNsfw?: boolean
+  isSpoiler?: boolean
   ipAddress?: string
 }
 
@@ -37,6 +39,7 @@ export interface CreateThreadInput {
   imageMetadata?: string | null
   deletionPassword?: string | null
   isNsfw?: boolean
+  isSpoiler?: boolean
   postNumber: number
   ipAddress?: string
 }
@@ -52,6 +55,7 @@ export interface ThreadUI {
   isLocked: boolean
   isDeleted: boolean
   isNsfw: boolean
+  isSpoiler: boolean
   bumpedAt: Date
   image?: string | null
   imageMetadata?: string | null

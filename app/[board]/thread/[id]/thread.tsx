@@ -170,6 +170,7 @@ export function ThreadClient({
                 metadata={thread.imageMetadata || undefined}
                 isOP={true}
                 isNsfw={thread.isNsfw}
+                isSpoiler={thread.isSpoiler}
                 onFullScreen={() => handleImageClick(thread.image!)}
               />
             </div>
@@ -229,6 +230,7 @@ export function ThreadClient({
                     alt="Reply image"
                     metadata={reply.imageMetadata || undefined}
                     isNsfw={reply.isNsfw}
+                    isSpoiler={reply.isSpoiler}
                     onFullScreen={() => handleImageClick(reply.image!)}
                   />
                 </div>

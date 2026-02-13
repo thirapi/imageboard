@@ -16,6 +16,7 @@ export class ThreadRepository {
         imageMetadata: input.imageMetadata ?? null,
         deletionPassword: input.deletionPassword ?? null,
         isNsfw: input.isNsfw ?? false,
+        isSpoiler: input.isSpoiler ?? false,
         postNumber: input.postNumber,
         ipAddress: input.ipAddress ?? null,
       })
@@ -96,6 +97,7 @@ export class ThreadRepository {
       isLocked: row.isLocked ?? false,
       isDeleted: row.isDeleted ?? false,
       isNsfw: row.isNsfw ?? false,
+      isSpoiler: row.isSpoiler ?? false,
       bumpedAt: row.bumpedAt!,
       image: row.image ?? undefined,
       imageMetadata: row.imageMetadata,

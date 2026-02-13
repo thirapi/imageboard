@@ -12,7 +12,7 @@ import { createThread, getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
 import { useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, AlertTriangle } from "lucide-react";
 
 interface ThreadFormProps {
   boardId: number;
@@ -186,6 +186,17 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
               >
                 <ShieldAlert className="h-3 w-3" />
                 KONTEN NSFW / NSFL
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2 bg-yellow-500/5 p-2 rounded border border-yellow-500/10">
+              <Checkbox id="isSpoiler" name="isSpoiler" />
+              <Label
+                htmlFor="isSpoiler"
+                className="text-xs font-bold text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer"
+              >
+                <AlertTriangle className="h-3 w-3" />
+                GAMBAR SPOILER
               </Label>
             </div>
 

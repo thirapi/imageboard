@@ -131,6 +131,7 @@ export default async function BoardPage({
                           src={thread.image}
                           alt="Thumbnail"
                           isNsfw={thread.isNsfw}
+                          isSpoiler={thread.isSpoiler}
                           isOP={true}
                         />
                       </div>
@@ -187,6 +188,7 @@ export default async function BoardPage({
                                     src={reply.image}
                                     alt="Reply thumbnail"
                                     isNsfw={reply.isNsfw}
+                                    isSpoiler={reply.isSpoiler}
                                   />
                                 </div>
                               )}
