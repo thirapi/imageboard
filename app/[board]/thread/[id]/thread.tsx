@@ -6,7 +6,6 @@ import { ReplyForm } from "@/components/reply-form";
 import { ReportButton } from "@/components/report-button";
 import { ImageLightbox } from "@/components/image-lightbox";
 import { FormattedText } from "@/components/formatted-text";
-import { ImageMetadataDisplay } from "@/components/image-metadata-display";
 import { Backlinks } from "@/components/backlinks";
 import { DeletePostButton } from "@/components/delete-post-button";
 import { ThreadUI } from "@/lib/entities/thread.entity";
@@ -15,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { FormattedDate } from "@/components/formatted-date";
 import { QuickReply } from "@/components/quick-reply";
+import { ExpandableImage } from "@/components/expandable-image";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -167,12 +167,12 @@ export function ThreadClient({
         <div className="flex flex-col sm:flex-row gap-6 mt-4">
           {thread.image && (
             <div className="shrink-0 max-w-sm">
-              <ImageMetadataDisplay metadataString={thread.imageMetadata} />
-              <img
+              <ExpandableImage
                 src={thread.image}
                 alt="Thread image"
-                className="max-w-full rounded-sm border cursor-pointer hover:opacity-95 transition-all shadow-sm"
-                onClick={() => handleImageClick(thread.image!)}
+                metadata={thread.imageMetadata || undefined}
+                isOP={true}
+                onFullScreen={() => handleImageClick(thread.image!)}
               />
             </div>
           )}
@@ -223,12 +223,11 @@ export function ThreadClient({
             <div className="p-3">
               {reply.image && (
                 <div className="mb-3">
-                  <ImageMetadataDisplay metadataString={reply.imageMetadata} />
-                  <img
+                  <ExpandableImage
                     src={reply.image}
                     alt="Reply image"
-                    className="max-w-[250px] max-h-[250px] object-contain rounded-sm border cursor-pointer hover:scale-[1.01] transition-transform"
-                    onClick={() => handleImageClick(reply.image!)}
+                    metadata={reply.imageMetadata || undefined}
+                    onFullScreen={() => handleImageClick(reply.image!)}
                   />
                 </div>
               )}
