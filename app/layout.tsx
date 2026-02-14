@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "62chan - Papan Gambar Anonim Indonesia",
+    default: "62chan",
     template: "%s | 62chan",
   },
   description:
@@ -37,13 +37,13 @@ export const metadata: Metadata = {
     locale: "id_ID",
     url: "https://boards.slug.my.id",
     siteName: "62chan",
-    title: "62chan - Papan Gambar Anonim Indonesia",
+    title: "62chan",
     description:
       "Forum papan gambar anonim Indonesia untuk berbagi ide, hobi, dan diskusi bebas.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "62chan - Papan Gambar Anonim Indonesia",
+    title: "62chan",
     description:
       "Forum papan gambar anonim Indonesia untuk berbagi ide, hobi, dan diskusi bebas.",
   },

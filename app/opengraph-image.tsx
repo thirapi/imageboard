@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 // Route segment config
 export const runtime = "edge";
 
-export const alt = "62chan - Papan Gambar Anonim Indonesia";
+export const alt = "62chan";
 export const size = {
   width: 1200,
   height: 630,
