@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 // Group boards by category based on fscchan structure
 function groupBoards(boards: any[]) {
-  const popkultur = ["wibu", "gim", "sass", "oc", "toku", "cb", "med", "rj"];
+  const popkultur = ["wibu", "gim", "sass", "oc", "cb", "med", "rj"];
   const kekinian = [
     "pol",
     "mipa",
@@ -31,7 +31,7 @@ function groupBoards(boards: any[]) {
     "ac",
     "tre",
   ];
-  const bebas = ["b", "n", "dio", "mis", "sjrh", "tlg", "his"];
+  const bebas = ["b", "dio", "mis", "sjrh", "tlg"];
 
   return {
     popkultur: boards.filter((b) => popkultur.includes(b.code)),

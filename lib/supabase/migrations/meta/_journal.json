@@ -71,6 +71,13 @@
       "when": 1771013327707,
       "tag": "0009_rapid_harry_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1771047442861,
+      "tag": "0010_remove_redundant_boards",
+      "breakpoints": true
     }
   ]
 }
