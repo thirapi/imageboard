@@ -6,12 +6,49 @@ import { ReplyRepository } from "@/lib/repositories/reply.repository";
 import { GetThreadDetailUseCase } from "@/lib/use-cases/get-thread-detail.use-case";
 import ThreadPageWrapper from "./thread";
 import { footerText } from "@/constants/footer";
+import type { Metadata } from "next";
 
-interface ThreadPageProps {
+export async function generateMetadata({
+  params,
+}: {
   params: Promise<{ board: string; id: string }>;
+}): Promise<Metadata> {
+  const { board: boardCode, id } = await params;
+  const threadId = Number.parseInt(id);
+
+  const threadRepository = new ThreadRepository();
+  const getThreadDetailUseCase = new GetThreadDetailUseCase(
+    threadRepository,
+    new ReplyRepository(),
+  );
+
+  const result = await getThreadDetailUseCase.execute(threadId);
+
+  if (!result) {
+    return {
+      title: "Thread Not Found",
+    };
+  }
+
+  const { thread } = result;
+  const title = thread.subject || thread.content.substring(0, 50) + "...";
+
+  return {
+    title: `${title} - /${boardCode}/`,
+    description: thread.content.substring(0, 160),
+    openGraph: {
+      title: `${title} | /${boardCode}/ | 62chan`,
+      description: thread.content.substring(0, 160),
+      images: thread.image ? [thread.image] : [],
+    },
+  };
 }
 
-export default async function ThreadPage({ params }: ThreadPageProps) {
+export default async function ThreadPage({
+  params,
+}: {
+  params: Promise<{ board: string; id: string }>;
+}) {
   const { board: boardCode, id } = await params;
   const threadId = Number.parseInt(id);
 

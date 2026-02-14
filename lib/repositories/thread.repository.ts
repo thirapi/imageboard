@@ -50,6 +50,16 @@ export class ThreadRepository {
     return rows.map((row) => this.mapToEntity(row))
   }
 
+  async findLatest(limit: number): Promise<ThreadEntity[]> {
+    const rows = await db.query.threads.findMany({
+      where: eq(threads.isDeleted, false),
+      orderBy: [desc(threads.createdAt)],
+      limit,
+    })
+
+    return rows.map((row) => this.mapToEntity(row))
+  }
+
   async softDelete(id: number): Promise<void> {
     await db
       .update(threads)

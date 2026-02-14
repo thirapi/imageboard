@@ -6,6 +6,13 @@ import {
 } from "@/lib/actions/home.actions";
 import { footerLinks, footerText } from "@/constants/footer";
 import { FormattedText } from "@/components/formatted-text";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "62chan - Papan Gambar Anonim Indonesia",
+  description:
+    "62chan adalah imageboard Indonesia tempat diskusi bebas tentang berbagai topik mulai dari popkultur, hobi, teknologi, hingga gaya hidup. Berbagi ide dan gambar secara anonim.",
+};
 
 export const dynamic = "force-dynamic";
 

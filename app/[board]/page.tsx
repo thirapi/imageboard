@@ -17,6 +17,34 @@ import { footerText } from "@/constants/footer";
 import { FormattedDate } from "@/components/formatted-date";
 import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ board: string }>;
+}): Promise<Metadata> {
+  const { board: boardCode } = await params;
+  const boardRepository = new BoardRepository();
+  const board = await boardRepository.findByCode(boardCode);
+
+  if (!board) {
+    return {
+      title: "Board Not Found",
+    };
+  }
+
+  return {
+    title: `/${board.code}/ - ${board.name}`,
+    description:
+      board.description || `Diskusi di papan /${board.code}/ 62chan.`,
+    openGraph: {
+      title: `/${board.code}/ - ${board.name} | 62chan`,
+      description:
+        board.description || `Diskusi di papan /${board.code}/ 62chan.`,
+    },
+  };
+}
 
 export default async function BoardPage({
   params,

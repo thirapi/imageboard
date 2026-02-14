@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Peraturan & Ketentuan",
+  description: "Daftar peraturan dan ketentuan penggunaan layanan 62chan.",
+};
+
 export default function RulesPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">

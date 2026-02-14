@@ -9,25 +9,43 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "62chan",
-  description: "Anonymous discussion boards for various topics",
+  title: {
+    default: "62chan - Papan Gambar Anonim Indonesia",
+    template: "%s | 62chan",
+  },
+  description:
+    "62chan (boards.slug.my.id) adalah forum papan gambar anonim (imageboard) Indonesia untuk berbagi ide, hobi, dan diskusi bebas. Tempat berkumpulnya komunitas popkultur, teknologi, otomotif, dan lainnya.",
+  keywords: [
+    "62chan",
+    "imageboard Indonesia",
+    "forum anonim",
+    "4chan indonesia",
+    "papan gambar",
+    "diskusi bebas",
+    "komunitas indonesia",
+    "wibu indonesia",
+    "teknologi",
+    "otomotif",
+  ],
+  authors: [{ name: "62chan" }],
   generator: "62chan",
-  icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "https://boards.slug.my.id",
+  ),
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://boards.slug.my.id",
+    siteName: "62chan",
+    title: "62chan - Papan Gambar Anonim Indonesia",
+    description:
+      "Forum papan gambar anonim Indonesia untuk berbagi ide, hobi, dan diskusi bebas.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "62chan - Papan Gambar Anonim Indonesia",
+    description:
+      "Forum papan gambar anonim Indonesia untuk berbagi ide, hobi, dan diskusi bebas.",
   },
 };
 
