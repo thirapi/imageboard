@@ -53,7 +53,7 @@ export default async function HomePage() {
       <header className="py-8 text-center border-b">
         <div className="container mx-auto px-4">
           <p className="text-xs text-muted-foreground mb-1">62チャンネル</p>
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-3xl sm:text-4xl font-bold">
             62<span className="text-accent">chan</span>
           </h1>
 

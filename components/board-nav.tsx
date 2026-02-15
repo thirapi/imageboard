@@ -18,47 +18,54 @@ export async function BoardNav() {
 
   return (
     <NavWrapper>
-      <div className="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap">
-        <span>[</span>
-        <Link href="/" className="px-0.5 hover:underline font-bold">
-          Home
-        </Link>
-        <span className="mx-0.5">/</span>
-        {boards.map((board, index) => (
-          <span key={board.code}>
-            <Link
-              href={`/${board.code}`}
-              className="px-0.5 hover:underline text-accent"
-              title={board.name}
-            >
-              {board.code}
-            </Link>
-            {index < boards.length - 1 && <span className="mx-0.5">/</span>}
-          </span>
-        ))}
-        <span>]</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <NavToggle />
-        <ThemeToggle />
-        <Link href="/rules" className="hover:underline">
-          [ Peraturan ]
-        </Link>
-        {user && (
-          <>
-            <Link href="/mod" className="hover:underline font-bold text-accent">
-              [ Mod ]
-            </Link>
-            <form action={logout} className="inline">
-              <button
-                type="submit"
-                className="hover:underline cursor-pointer text-inherit font-inherit"
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-2 py-1 sm:py-0">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap pb-1 sm:pb-0 border-b sm:border-0 border-muted/20">
+          <span>[</span>
+          <Link href="/" className="px-0.5 hover:underline font-bold">
+            Home
+          </Link>
+          <span className="mx-0.5">/</span>
+          {boards.map((board, index) => (
+            <span key={board.code}>
+              <Link
+                href={`/${board.code}`}
+                className="px-0.5 hover:underline text-accent"
+                title={board.name}
               >
-                [ Sign-out ]
-              </button>
-            </form>
-          </>
-        )}
+                {board.code}
+              </Link>
+              {index < boards.length - 1 && <span className="mx-0.5">/</span>}
+            </span>
+          ))}
+          <span>]</span>
+        </div>
+        <div className="flex items-center justify-end gap-3 px-1">
+          <NavToggle />
+          <ThemeToggle />
+          <Link href="/rules" className="hover:underline">
+            <span className="hidden sm:inline">[ Peraturan ]</span>
+            <span className="sm:hidden">[ Rules ]</span>
+          </Link>
+          {user && (
+            <>
+              <Link
+                href="/mod"
+                className="hover:underline font-bold text-accent"
+              >
+                [ Mod ]
+              </Link>
+              <form action={logout} className="inline">
+                <button
+                  type="submit"
+                  className="hover:underline cursor-pointer text-inherit font-inherit"
+                >
+                  <span className="hidden sm:inline">[ Sign-out ]</span>
+                  <span className="sm:hidden">[ Out ]</span>
+                </button>
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </NavWrapper>
   );

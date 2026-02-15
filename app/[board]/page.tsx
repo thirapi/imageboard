@@ -84,15 +84,15 @@ export default async function BoardPage({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="py-6 text-center border-b mb-8 flex flex-col items-center">
-        <h1 className="text-3xl font-bold text-accent mb-1 tracking-tight">
+      <header className="py-6 px-4 text-center border-b mb-8 flex flex-col items-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-accent mb-1 tracking-tight truncate max-w-full">
           /{board.code}/ - {board.name}
         </h1>
-        <p className="text-sm text-muted-foreground italic mb-4 max-w-xl">
+        <p className="text-xs sm:text-sm text-muted-foreground italic mb-4 max-w-xl line-clamp-2">
           {board.description}
         </p>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-md sm:max-w-none justify-center">
           <BoardSearch />
           <BoardViewToggle />
         </div>
