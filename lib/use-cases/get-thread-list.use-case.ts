@@ -13,7 +13,19 @@ export class GetThreadListUseCase {
     private threadRepository: ThreadRepository,
   ) { }
 
-  async execute(boardId: number, limit: number = 50, offset: number = 0): Promise<ThreadWithReplyCount[]> {
-    return await this.threadRepository.getThreadsWithPreviews(boardId, limit, offset)
+  async execute(
+    boardId: number,
+    limit: number = 50,
+    offset: number = 0,
+  ): Promise<{ threads: ThreadWithReplyCount[]; totalPages: number }> {
+    const [threads, totalCount] = await Promise.all([
+      this.threadRepository.getThreadsWithPreviews(boardId, limit, offset),
+      this.threadRepository.countByBoardId(boardId),
+    ])
+
+    return {
+      threads,
+      totalPages: Math.ceil(totalCount / limit),
+    }
   }
 }

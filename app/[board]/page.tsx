@@ -17,6 +17,7 @@ import { footerText } from "@/constants/footer";
 import { FormattedDate } from "@/components/formatted-date";
 import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
+import { Pagination } from "@/components/pagination";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -51,10 +52,14 @@ export default async function BoardPage({
   searchParams,
 }: {
   params: Promise<{ board: string }>;
-  searchParams: Promise<{ view?: string; q?: string }>;
+  searchParams: Promise<{ view?: string; q?: string; page?: string }>;
 }) {
   const { board: boardCode } = await params;
-  const { view = "list", q: query = "" } = await searchParams;
+  const { view = "list", q: query = "", page = "1" } = await searchParams;
+
+  const currentPage = Math.max(1, Number.parseInt(page) || 1);
+  const limit = 50;
+  const offset = (currentPage - 1) * limit;
 
   const boardRepository = new BoardRepository();
   const board = await boardRepository.findByCode(boardCode);
@@ -64,12 +69,19 @@ export default async function BoardPage({
   }
 
   const threadRepository = new ThreadRepository();
-  const replyRepository = new ReplyRepository();
   const getThreadListUseCase = new GetThreadListUseCase(threadRepository);
-  let threads = await getThreadListUseCase.execute(board.id);
+
+  let { threads, totalPages } = await getThreadListUseCase.execute(
+    board.id,
+    limit,
+    offset,
+  );
 
   if (query) {
     const q = query.toLowerCase();
+    // Note: Search filtering is currently done in memory.
+    // Ideally this should be pushed to the repository level for proper pagination with search.
+    // For now, we filter the fetched page, which might result in fewer than 'limit' items.
     threads = threads.filter(
       (t) =>
         t.subject?.toLowerCase().includes(q) ||
@@ -236,6 +248,15 @@ export default async function BoardPage({
                 </div>
               )}
             </div>
+          )}
+
+          {/* Pagination */}
+          {!query && (
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              baseUrl={`/${boardCode}`}
+            />
           )}
         </div>
       </main>

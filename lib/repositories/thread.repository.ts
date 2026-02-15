@@ -206,6 +206,22 @@ export class ThreadRepository {
     }))
   }
 
+  async countByBoardId(boardId: number): Promise<number> {
+    const result = await db
+      .select({
+        count: sql<number>`count(*)`,
+      })
+      .from(threads)
+      .where(
+        and(
+          eq(threads.boardId, boardId),
+          eq(threads.isDeleted, false),
+        ),
+      )
+
+    return result[0]?.count ?? 0
+  }
+
   private mapToEntity(row: typeof threads.$inferSelect): ThreadEntity {
     return {
       id: row.id,
