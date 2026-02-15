@@ -11,25 +11,9 @@ export interface ThreadWithReplyCount extends ThreadEntity {
 export class GetThreadListUseCase {
   constructor(
     private threadRepository: ThreadRepository,
-    private replyRepository: ReplyRepository,
-  ) {}
+  ) { }
 
-  async execute(boardId: number): Promise<ThreadWithReplyCount[]> {
-    const threads = await this.threadRepository.findByBoardId(boardId)
-
-    // Business logic: Attach reply counts to each thread
-    const threadsWithCounts = await Promise.all(
-      threads.map(async (thread) => {
-        const replyCount = await this.replyRepository.countByThreadId(thread.id)
-        const replies = await this.replyRepository.findPreviewByThreadId(thread.id, 3)
-        return {
-          ...thread,
-          replyCount,
-          replies: replies || [],
-        }
-      }),
-    )
-
-    return threadsWithCounts
+  async execute(boardId: number, limit: number = 50, offset: number = 0): Promise<ThreadWithReplyCount[]> {
+    return await this.threadRepository.getThreadsWithPreviews(boardId, limit, offset)
   }
 }

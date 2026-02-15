@@ -43,5 +43,6 @@ export const threads = pgTable(
     boardIdx: index('idx_threads_board_id').on(t.boardId),
     bumpedIdx: index('idx_threads_bumped_at').on(t.bumpedAt),
     deletedIdx: index('idx_threads_is_deleted').on(t.isDeleted),
+    createdIdx: index('idx_threads_created_at').on(t.createdAt),
   })
 )

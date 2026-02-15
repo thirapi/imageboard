@@ -65,10 +65,7 @@ export default async function BoardPage({
 
   const threadRepository = new ThreadRepository();
   const replyRepository = new ReplyRepository();
-  const getThreadListUseCase = new GetThreadListUseCase(
-    threadRepository,
-    replyRepository,
-  );
+  const getThreadListUseCase = new GetThreadListUseCase(threadRepository);
   let threads = await getThreadListUseCase.execute(board.id);
 
   if (query) {
