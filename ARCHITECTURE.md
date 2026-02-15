@@ -5,19 +5,22 @@ This imageboard follows strict Clean Architecture principles with clear separati
 ## Layer Structure
 
 ### 1. Entity Layer (`lib/entities/`)
+
 **Responsibility:** Pure data structures only
 
 - `thread.entity.ts` - Thread data structure and input types
-- `reply.entity.ts` - Reply data structure and input types  
+- `reply.entity.ts` - Reply data structure and input types
 - `board.entity.ts` - Board data structure
 - `post.entity.ts` - Latest posts and recent images data structures
 
 **Rules:**
+
 - No business logic
 - No external dependencies
 - Pure TypeScript interfaces
 
 ### 2. Repository Layer (`lib/repositories/`)
+
 **Responsibility:** Database access only
 
 - `thread.repository.ts` - Thread CRUD operations
@@ -26,22 +29,26 @@ This imageboard follows strict Clean Architecture principles with clear separati
 - `post.repository.ts` - Cross-entity queries for homepage
 
 **Rules:**
+
 - Contains ONLY data access logic
 - No business rules
 - Maps database records to entities
 - Uses Supabase client for database operations
 
 ### 3. Service Layer (`lib/services/`)
+
 **Responsibility:** Non-core reusable logic
 
 - `content-filter.service.ts` - Content moderation and filtering
 
 **Rules:**
+
 - Handles cross-cutting concerns
 - No business rules specific to use cases
 - Reusable across multiple use cases
 
 ### 4. Use Case Layer (`lib/use-cases/`)
+
 **Responsibility:** ALL business logic and application rules
 
 - `create-thread.use-case.ts` - Thread creation with validation
@@ -54,6 +61,7 @@ This imageboard follows strict Clean Architecture principles with clear separati
 - `soft-delete-post.use-case.ts` - Moderation deletion
 
 **Rules:**
+
 - Class-based implementation
 - Constructor dependency injection
 - Contains ALL business rules
@@ -61,6 +69,7 @@ This imageboard follows strict Clean Architecture principles with clear separati
 - No direct database access
 
 ### 5. Controller Layer (`lib/controllers/`)
+
 **Responsibility:** Input validation and request mapping
 
 - `thread.controller.ts` - Thread operations controller
@@ -69,12 +78,14 @@ This imageboard follows strict Clean Architecture principles with clear separati
 - `moderation.controller.ts` - Moderation operations controller
 
 **Rules:**
+
 - Validates input data
 - Maps requests to use case calls
 - No business logic
 - Returns formatted responses
 
 ### 6. Action Layer (`lib/actions/`)
+
 **Responsibility:** Server Action entry points
 
 - `thread.actions.ts` - Thread server actions
@@ -83,6 +94,7 @@ This imageboard follows strict Clean Architecture principles with clear separati
 - `moderation.actions.ts` - Moderation actions
 
 **Rules:**
+
 - Server Actions only
 - Handles dependency injection
 - Forwards requests to controllers
@@ -94,11 +106,12 @@ This imageboard follows strict Clean Architecture principles with clear separati
 ### Creating a Thread
 
 \`\`\`
-User Form → createThread(formData) → ThreadController.createThread() 
-  → CreateThreadUseCase.execute() → ThreadRepository.create() → Database
+User Form → createThread(formData) → ThreadController.createThread()
+→ CreateThreadUseCase.execute() → ThreadRepository.create() → Database
 \`\`\`
 
 **Layer responsibilities:**
+
 - **Action:** Extract FormData, inject dependencies
 - **Controller:** Validate required fields
 - **Use Case:** Business rules (length limits, board validation, author cleaning)
@@ -107,11 +120,12 @@ User Form → createThread(formData) → ThreadController.createThread()
 ### Fetching Latest Posts
 
 \`\`\`
-Homepage → getLatestPosts() → HomeController.getLatestPosts() 
-  → GetLatestPostsUseCase.execute() → PostRepository.getLatestPosts() → Database
+Homepage → getLatestPosts() → HomeController.getLatestPosts()
+→ GetLatestPostsUseCase.execute() → PostRepository.getLatestPosts() → Database
 \`\`\`
 
 **Layer responsibilities:**
+
 - **Action:** Call controller with limit parameter
 - **Controller:** Validate limit parameter
 - **Use Case:** Business rule (limit between 1-50)
@@ -120,13 +134,14 @@ Homepage → getLatestPosts() → HomeController.getLatestPosts()
 ### Replying to Thread
 
 \`\`\`
-Reply Form → createReply(formData) → ReplyController.createReply() 
-  → ReplyToThreadUseCase.execute() → ReplyRepository.create() + ThreadRepository.updateBumpTime() → Database
+Reply Form → createReply(formData) → ReplyController.createReply()
+→ ReplyToThreadUseCase.execute() → ReplyRepository.create() + ThreadRepository.updateBumpTime() → Database
 \`\`\`
 
 **Layer responsibilities:**
+
 - **Action:** Extract FormData, inject dependencies, revalidate cache
-- **Controller:** Validate required fields  
+- **Controller:** Validate required fields
 - **Use Case:** Business rules (thread locked check, bump thread logic)
 - **Repository:** Insert reply and update thread bump time
 
@@ -169,3 +184,8 @@ Reply Form → createReply(formData) → ReplyController.createReply()
 - **Flexibility:** Can swap implementations (e.g., different databases)
 - **Clarity:** Clear separation of concerns
 - **Scalability:** Easy to add new features following same patterns
+
+## Development Load Testing
+
+- `npm run seed-load-test`: Seed load test data
+- `npm run seed-load-test -- --boardId=1 --threadCount=2000 --replyCount=50 --monthsBack=6`

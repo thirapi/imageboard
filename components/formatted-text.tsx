@@ -25,6 +25,21 @@ export function FormattedText({
   disableEmbeds,
   preview,
 }: FormattedTextProps) {
+  if (preview) {
+    // For previews, we want a continuous string to play nice with line-clamp.
+    // Replace newlines with spaces and trim.
+    const cleanContent = content.replace(/\n+/g, " ").trim();
+    return (
+      <span className={cn("break-words font-sans", className)}>
+        <TextLine
+          text={cleanContent}
+          disableEmbeds={disableEmbeds}
+          preview={preview}
+        />
+      </span>
+    );
+  }
+
   const lines = content.split("\n");
 
   return (
@@ -84,16 +99,14 @@ function TextLine({
     if (match[1]) {
       // It's a quote >>(\d+)
       const postNumber = parseInt(match[1]);
-      if (preview) {
-        parts.push(
-          <span key={match.index} className="quote-link opacity-70">
-            {" "}
-            &gt;&gt;{postNumber}
-          </span>,
-        );
-      } else {
-        parts.push(<PostQuote key={match.index} postNumber={postNumber} />);
-      }
+      parts.push(
+        <PostQuote
+          key={match.index}
+          postNumber={postNumber}
+          noLink={preview}
+          className={preview ? "opacity-70" : ""}
+        />,
+      );
     } else if (match[2]) {
       // It's a spoiler
       if (preview) {
@@ -175,7 +188,15 @@ function TextLine({
   return <>{parts.length > 0 ? parts : text}</>;
 }
 
-function PostQuote({ postNumber }: { postNumber: number }) {
+function PostQuote({
+  postNumber,
+  noLink,
+  className,
+}: {
+  postNumber: number;
+  noLink?: boolean;
+  className?: string;
+}) {
   const [post, setPost] = useState<PostInfoEntity | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -215,12 +236,24 @@ function PostQuote({ postNumber }: { postNumber: number }) {
     }
   };
 
+  const content = <>&gt;&gt;{postNumber}</>;
+
   return (
     <HoverCard openDelay={200} closeDelay={100} onOpenChange={handleOpenChange}>
       <HoverCardTrigger asChild>
-        <Link href={href} className="quote-link" onClick={handleClick}>
-          &gt;&gt;{postNumber}
-        </Link>
+        {noLink ? (
+          <span className={cn("quote-link cursor-help", className)}>
+            {content}
+          </span>
+        ) : (
+          <Link
+            href={href}
+            className={cn("quote-link", className)}
+            onClick={handleClick}
+          >
+            {content}
+          </Link>
+        )}
       </HoverCardTrigger>
       <HoverCardContent className="w-80 p-0 overflow-hidden border-accent/20 bg-card shadow-xl">
         {isLoading ? (
