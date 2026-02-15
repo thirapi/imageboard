@@ -10,20 +10,32 @@ import {
 import { getPostByNumber } from "@/lib/actions/home.actions";
 import type { PostInfoEntity } from "@/lib/entities/post.entity";
 import { cn } from "@/lib/utils";
+import { YouTubeEmbed } from "@/components/youtube-embed";
 
 interface FormattedTextProps {
   content: string;
   className?: string;
+  disableEmbeds?: boolean;
+  preview?: boolean;
 }
 
-export function FormattedText({ content, className }: FormattedTextProps) {
+export function FormattedText({
+  content,
+  className,
+  disableEmbeds,
+  preview,
+}: FormattedTextProps) {
   const lines = content.split("\n");
 
   return (
     <div className={cn("whitespace-pre-wrap break-words font-sans", className)}>
       {lines.map((line, i) => (
         <React.Fragment key={i}>
-          <TextLine text={line} />
+          <TextLine
+            text={line}
+            disableEmbeds={disableEmbeds}
+            preview={preview}
+          />
           {i < lines.length - 1 && <br />}
         </React.Fragment>
       ))}
@@ -31,7 +43,21 @@ export function FormattedText({ content, className }: FormattedTextProps) {
   );
 }
 
-function TextLine({ text }: { text: string }) {
+function getYouTubeId(url: string) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+}
+
+function TextLine({
+  text,
+  disableEmbeds,
+  preview,
+}: {
+  text: string;
+  disableEmbeds?: boolean;
+  preview?: boolean;
+}) {
   // Check for greentext
   if (text.startsWith(">") && !text.startsWith(">>")) {
     return <span className="greentext">{text}</span>;
@@ -58,42 +84,84 @@ function TextLine({ text }: { text: string }) {
     if (match[1]) {
       // It's a quote >>(\d+)
       const postNumber = parseInt(match[1]);
-      parts.push(<PostQuote key={match.index} postNumber={postNumber} />);
+      if (preview) {
+        parts.push(
+          <span key={match.index} className="quote-link opacity-70">
+            {" "}
+            &gt;&gt;{postNumber}
+          </span>,
+        );
+      } else {
+        parts.push(<PostQuote key={match.index} postNumber={postNumber} />);
+      }
     } else if (match[2]) {
       // It's a spoiler
-      parts.push(
-        <span key={match.index} className="spoiler">
-          {match[2]}
-        </span>,
-      );
+      if (preview) {
+        parts.push(
+          <span key={match.index} className="opacity-50 italic">
+            [spoiler]
+          </span>,
+        );
+      } else {
+        parts.push(
+          <span key={match.index} className="spoiler">
+            {match[2]}
+          </span>,
+        );
+      }
     } else if (match[3]) {
       // It's a URL with http:// or https://
       const url = match[3];
-      parts.push(
-        <a
-          key={match.index}
-          href={url}
-          className="url-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {url}
-        </a>,
-      );
+      const videoId = getYouTubeId(url);
+
+      if (videoId && !disableEmbeds && !preview) {
+        parts.push(<YouTubeEmbed key={match.index} videoId={videoId} />);
+      } else if (preview) {
+        parts.push(
+          <span key={match.index} className="text-accent/70">
+            {url}
+          </span>,
+        );
+      } else {
+        parts.push(
+          <a
+            key={match.index}
+            href={url}
+            className="url-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {url}
+          </a>,
+        );
+      }
     } else if (match[4]) {
       // It's a URL starting with www.
       const url = match[4];
-      parts.push(
-        <a
-          key={match.index}
-          href={`https://${url}`}
-          className="url-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {url}
-        </a>,
-      );
+      const fullUrl = `https://${url}`;
+      const videoId = getYouTubeId(fullUrl);
+
+      if (videoId && !disableEmbeds && !preview) {
+        parts.push(<YouTubeEmbed key={match.index} videoId={videoId} />);
+      } else if (preview) {
+        parts.push(
+          <span key={match.index} className="text-accent/70">
+            {url}
+          </span>,
+        );
+      } else {
+        parts.push(
+          <a
+            key={match.index}
+            href={fullUrl}
+            className="url-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {url}
+          </a>,
+        );
+      }
     }
 
     lastIndex = regex.lastIndex;
@@ -184,7 +252,7 @@ function PostQuote({ postNumber }: { postNumber: number }) {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold truncate mb-1">{post.author}</p>
                 <p className="text-[11px] line-clamp-4 leading-relaxed opacity-90">
-                  {post.content}
+                  <FormattedText content={post.content} preview />
                 </p>
               </div>
             </div>

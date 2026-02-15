@@ -169,7 +169,7 @@ export default async function HomePage() {
                               )}
                             </div>
                             <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                              <FormattedText content={post.excerpt} />
+                              <FormattedText content={post.excerpt} preview />
                             </div>
                           </div>
                           <span className="text-[10px] font-mono text-accent font-bold whitespace-nowrap">
