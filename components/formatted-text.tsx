@@ -37,12 +37,16 @@ function TextLine({ text }: { text: string }) {
     return <span className="greentext">{text}</span>;
   }
 
-  // Parse for quotes and spoilers
+  // Parse for quotes, spoilers, and URLs
   const parts = [];
   let lastIndex = 0;
 
-  // Regex for >>123 and [spoiler]...[/spoiler]
-  const regex = />>(\d+)|\[spoiler\](.*?)\[\/spoiler\]/g;
+  // Regex for >>123, [spoiler]...[/spoiler], and URLs
+  // URL regex matches:
+  // - http:// or https:// followed by domain and path
+  // - www. followed by domain and path (without protocol)
+  const regex =
+    />>(\d+)|\[spoiler\](.*?)\[\/spoiler\]|(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
   let match;
 
   while ((match = regex.exec(text)) !== null) {
@@ -61,6 +65,34 @@ function TextLine({ text }: { text: string }) {
         <span key={match.index} className="spoiler">
           {match[2]}
         </span>,
+      );
+    } else if (match[3]) {
+      // It's a URL with http:// or https://
+      const url = match[3];
+      parts.push(
+        <a
+          key={match.index}
+          href={url}
+          className="url-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {url}
+        </a>,
+      );
+    } else if (match[4]) {
+      // It's a URL starting with www.
+      const url = match[4];
+      parts.push(
+        <a
+          key={match.index}
+          href={`https://${url}`}
+          className="url-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {url}
+        </a>,
       );
     }
 

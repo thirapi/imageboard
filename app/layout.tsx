@@ -29,6 +29,13 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "62chan" }],
   generator: "62chan",
+  robots: {
+    index: true,
+    follow: true,
+    nosnippet: true,
+    noarchive: true,
+    noimageindex: true,
+  },
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || "https://boards.slug.my.id",
   ),
