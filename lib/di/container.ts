@@ -39,6 +39,7 @@ import { SoftDeleteReplyUseCase } from "@/lib/use-cases/soft-delete-reply.use-ca
 import { SoftDeleteThreadUseCase } from "@/lib/use-cases/soft-delete-thread.use-case"
 import { UnlockThreadUseCase } from "@/lib/use-cases/unlock-thread.use-case"
 import { UnpinThreadUseCase } from "@/lib/use-cases/unpin-thread.use-case"
+import { SeedBoardLoadTestUseCase } from "@/lib/use-cases/seed-board.use-case"
 
 // Controllers
 import { HomeController } from "@/lib/controllers/home.controller"
@@ -46,6 +47,7 @@ import { ModerationController } from "@/lib/controllers/moderation.controller"
 import { ReplyController } from "@/lib/controllers/reply.controller"
 import { ReportController } from "@/lib/controllers/report.controller"
 import { ThreadController } from "@/lib/controllers/thread.controller"
+import { SeedController } from "@/lib/controllers/seed.controller"
 import { SequenceService } from "../services/sequence.service"
 
 // Instantiate Repositories
@@ -103,6 +105,12 @@ const markNsfwUseCase = new MarkNsfwUseCase(threadRepository, replyRepository)
 const getBansUseCase = new GetBansUseCase(banRepository)
 const updateBanUseCase = new UpdateBanUseCase(banRepository)
 
+const seedBoardLoadTestUseCase = new SeedBoardLoadTestUseCase(
+  threadRepository,
+  replyRepository,
+  sequenceService
+)
+
 // Instantiate Controllers
 const homeController = new HomeController(
   getLatestPostsUseCase,
@@ -130,6 +138,7 @@ const moderationController = new ModerationController(
 const replyController = new ReplyController(replyToThreadUseCase)
 const reportController = new ReportController(reportRepository, getReportsUseCase)
 const threadController = new ThreadController(createThreadUseCase, getThreadListUseCase, getThreadDetailUseCase)
+const seedController = new SeedController(seedBoardLoadTestUseCase)
 
 // Export container
 export const container = {
@@ -138,5 +147,6 @@ export const container = {
   replyController,
   reportController,
   threadController,
+  seedController,
   createReportUseCase, // Export use case directly for actions that don't use a controller
 }

@@ -42,6 +42,8 @@ export interface CreateThreadInput {
   isSpoiler?: boolean
   postNumber: number
   ipAddress?: string
+  createdAt?: Date
+  bumpedAt?: Date
 }
 
 export interface ThreadUI {

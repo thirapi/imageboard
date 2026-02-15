@@ -36,6 +36,7 @@ export interface CreateReplyInput {
   isSpoiler?: boolean
   postNumber: number
   ipAddress?: string
+  createdAt?: Date
 }
 
 export interface ReplyUI {

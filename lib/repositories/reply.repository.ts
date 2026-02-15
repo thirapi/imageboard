@@ -29,6 +29,27 @@ export class ReplyRepository {
     return this.mapToEntity(rows[0])
   }
 
+  async bulkCreate(inputs: CreateReplyInput[]): Promise<{ id: number }[]> {
+    if (inputs.length === 0) return []
+
+    // Map input to schema format
+    const values = inputs.map((input) => ({
+      threadId: input.threadId,
+      content: input.content,
+      author: input.author ?? "Awanama",
+      image: input.image ?? null,
+      imageMetadata: input.imageMetadata ?? null,
+      deletionPassword: input.deletionPassword ?? null,
+      isNsfw: input.isNsfw ?? false,
+      isSpoiler: input.isSpoiler ?? false,
+      postNumber: input.postNumber,
+      ipAddress: input.ipAddress ?? null,
+      createdAt: input.createdAt, // Optional overwrite
+    }))
+
+    return await db.insert(replies).values(values).returning({ id: replies.id })
+  }
+
   async findByThreadId(threadId: number): Promise<ReplyEntity[]> {
     const rows = await db
       .select()

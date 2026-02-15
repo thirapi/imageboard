@@ -27,6 +27,29 @@ export class ThreadRepository {
     return this.mapToEntity(row)
   }
 
+  async bulkCreate(inputs: CreateThreadInput[]): Promise<{ id: number }[]> {
+    if (inputs.length === 0) return []
+
+    // Map input to schema format
+    const values = inputs.map((input) => ({
+      boardId: input.boardId,
+      subject: input.subject ?? null,
+      content: input.content,
+      author: input.author ?? "Awanama",
+      image: input.image ?? null,
+      imageMetadata: input.imageMetadata ?? null,
+      deletionPassword: input.deletionPassword ?? null,
+      isNsfw: input.isNsfw ?? false,
+      isSpoiler: input.isSpoiler ?? false,
+      postNumber: input.postNumber,
+      ipAddress: input.ipAddress ?? null,
+      createdAt: input.createdAt, // Optional overwrite if provided in entity input, else defaultNow
+      bumpedAt: input.bumpedAt, // Optional overwrite
+    }))
+
+    return await db.insert(threads).values(values).returning({ id: threads.id })
+  }
+
   async findById(id: number): Promise<ThreadEntity | null> {
     const row = await db.query.threads.findFirst({
       where: eq(threads.id, id),
