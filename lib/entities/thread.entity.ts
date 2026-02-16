@@ -62,5 +62,5 @@ export interface ThreadUI {
   image?: string | null
   imageMetadata?: string | null
   postNumber: number
-  ipAddress?: string | null
+  posterId?: string
 }

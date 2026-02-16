@@ -5,19 +5,30 @@ import { revalidatePath } from "next/cache"
 
 const { moderationController, createReportUseCase } = container
 
-function checkModeratorAuth() {
-  const modToken = process.env.MODERATOR_TOKEN
-  if (!modToken) {
-    throw new Error("Moderator authentication not configured")
+import { lucia } from "@/lib/auth"
+import { cookies } from "next/headers"
+
+async function checkModeratorAuth() {
+  const cookieStore = await cookies()
+  const sessionId = cookieStore.get(lucia.sessionCookieName)?.value || null
+
+  if (!sessionId) {
+    throw new Error("Unauthorized: No session found")
   }
-  // In production, this would check against a session or JWT
-  // For now, we rely on environment variable
+
+  const { session, user } = await lucia.validateSession(sessionId)
+
+  if (!session || (user.role !== "admin" && user.role !== "moderator")) {
+    throw new Error("Unauthorized: Invalid session or insufficient permissions")
+  }
+
   return true
 }
 
+
 async function handleModerationAction(action: Promise<any>, revalidate: string | null = "/mod") {
   try {
-    checkModeratorAuth()
+    await checkModeratorAuth()
     await action
     if (revalidate) {
       revalidatePath(revalidate)
@@ -75,7 +86,7 @@ export async function createReport(contentType: "thread" | "reply", contentId: n
 
 export async function getPendingReports() {
   try {
-    checkModeratorAuth()
+    await checkModeratorAuth()
     return await moderationController.getPendingReports()
   } catch (error) {
     console.error("Error fetching pending reports:", error)
@@ -85,7 +96,7 @@ export async function getPendingReports() {
 
 export async function getResolvedReports() {
   try {
-    checkModeratorAuth()
+    await checkModeratorAuth()
     return await moderationController.getResolvedReports()
   } catch (error) {
     console.error("Error fetching resolved reports:", error)
@@ -107,7 +118,7 @@ export async function markAsNsfw(contentType: "thread" | "reply", contentId: num
 
 export async function getBans() {
   try {
-    checkModeratorAuth()
+    await checkModeratorAuth()
     return await moderationController.getBans()
   } catch (error) {
     console.error("Error fetching bans:", error)

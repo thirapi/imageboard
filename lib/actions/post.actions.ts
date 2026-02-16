@@ -41,7 +41,10 @@ export async function deletePost(postId: number, postType: "thread" | "reply", p
     }
 }
 
-export async function searchThreads(boardId: number, query: string) {
+import { ThreadUI } from "@/lib/entities/thread.entity"
+import { generatePosterId } from "../utils/poster-id"
+
+export async function searchThreads(boardId: number, query: string): Promise<ThreadUI[]> {
     // Basic search functionality
     try {
         const results = await db.query.threads.findMany({
@@ -51,13 +54,33 @@ export async function searchThreads(boardId: number, query: string) {
             )
         })
 
-        // Filter by query (could do this in SQL but manual filter for simple content search)
+        // Filter by query and map to safe UI model
         const q = query.toLowerCase()
-        return results.filter(t =>
-            (t.subject?.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
-        )
+        return results
+            .filter(t =>
+                (t.subject?.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
+            )
+            .map(t => ({
+                id: t.id,
+                boardId: t.boardId,
+                subject: t.subject,
+                content: t.content,
+                author: t.author ?? "Awanama",
+                createdAt: t.createdAt!,
+                isPinned: t.isPinned ?? false,
+                isLocked: t.isLocked ?? false,
+                isDeleted: t.isDeleted ?? false,
+                isNsfw: t.isNsfw ?? false,
+                isSpoiler: t.isSpoiler ?? false,
+                bumpedAt: t.bumpedAt!,
+                image: t.image ?? undefined,
+                imageMetadata: t.imageMetadata,
+                postNumber: t.postNumber!,
+                posterId: generatePosterId(t.ipAddress, t.id),
+            }))
     } catch (error) {
         console.error("Search error:", error)
         return []
     }
 }
+

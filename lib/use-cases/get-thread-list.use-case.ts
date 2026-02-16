@@ -1,9 +1,9 @@
 import type { ThreadRepository } from "@/lib/repositories/thread.repository"
-import type { ReplyRepository } from "@/lib/repositories/reply.repository"
-import type { ThreadEntity } from "@/lib/entities/thread.entity"
-import { ReplyUI } from "@/lib/entities/reply.entity"
+import type { ThreadUI } from "@/lib/entities/thread.entity"
+import type { ReplyUI } from "@/lib/entities/reply.entity"
+import { generatePosterId } from "../utils/poster-id"
 
-export interface ThreadWithReplyCount extends ThreadEntity {
+export interface ThreadWithReplyCount extends ThreadUI {
   replyCount: number
   replies?: ReplyUI[]
 }
@@ -23,9 +23,44 @@ export class GetThreadListUseCase {
       this.threadRepository.countByBoardId(boardId),
     ])
 
+    const threadsUI: ThreadWithReplyCount[] = threads.map(t => ({
+      id: t.id,
+      boardId: t.boardId,
+      subject: t.subject,
+      content: t.content,
+      author: t.author,
+      createdAt: t.createdAt,
+      isPinned: t.isPinned,
+      isLocked: t.isLocked,
+      isDeleted: t.isDeleted,
+      isNsfw: t.isNsfw,
+      isSpoiler: t.isSpoiler,
+      bumpedAt: t.bumpedAt,
+      image: t.image,
+      imageMetadata: t.imageMetadata,
+      postNumber: t.postNumber,
+      posterId: generatePosterId(t.ipAddress, t.id),
+      replyCount: t.replyCount,
+      replies: t.replies.map(r => ({
+        id: r.id,
+        threadId: r.threadId,
+        content: r.content,
+        author: r.author,
+        createdAt: r.createdAt,
+        isDeleted: r.isDeleted,
+        isNsfw: r.isNsfw,
+        isSpoiler: r.isSpoiler,
+        image: r.image,
+        imageMetadata: r.imageMetadata,
+        postNumber: r.postNumber,
+        posterId: generatePosterId(r.ipAddress, t.id)
+      }))
+    }))
+
     return {
-      threads,
+      threads: threadsUI,
       totalPages: Math.ceil(totalCount / limit),
     }
   }
 }
+
