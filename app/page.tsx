@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "62chan",
   description:
-    "62chan adalah imageboard Indonesia tempat diskusi bebas tentang berbagai topik mulai dari popkultur, hobi, teknologi, hingga gaya hidup. Berbagi ide dan gambar secara anonim.",
+    "Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem, harap laporkan melalui postingan di /tlg/",
 };
 
 export const dynamic = "force-dynamic";

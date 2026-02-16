@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | 62chan",
   },
   description:
-    "62chan (boards.slug.my.id) adalah forum papan gambar anonim (imageboard) Indonesia untuk berbagi ide, hobi, dan diskusi bebas. Tempat berkumpulnya komunitas popkultur, teknologi, otomotif, dan lainnya.",
+    "Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem, harap laporkan melalui postingan di /tlg/",
   keywords: [
     "62chan",
     "imageboard Indonesia",
@@ -39,6 +39,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || "https://boards.slug.my.id",
   ),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "id_ID",
@@ -46,14 +49,22 @@ export const metadata: Metadata = {
     siteName: "62chan",
     title: "62chan",
     description:
-      "Forum papan gambar anonim Indonesia untuk berbagi ide, hobi, dan diskusi bebas.",
+      "Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem, harap laporkan melalui postingan di /tlg/",
   },
   twitter: {
     card: "summary_large_image",
     title: "62chan",
     description:
-      "Forum papan gambar anonim Indonesia untuk berbagi ide, hobi, dan diskusi bebas.",
+      "Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem, harap laporkan melalui postingan di /tlg/",
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "62chan",
+  alternateName: ["Enam Dua Chan", "62 chan"],
+  url: "https://boards.slug.my.id",
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
@@ -69,6 +80,10 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
