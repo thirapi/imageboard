@@ -31,11 +31,26 @@ export async function getRecentImages(limit?: number) {
   }
 }
 
+
 export async function getPostByNumber(postNumber: number) {
   try {
     return await homeController.getPostByNumber(postNumber)
   } catch (error) {
     console.error(`Error fetching post by number ${postNumber}:`, error)
     return null
+  }
+}
+
+export async function getSystemStats() {
+  try {
+    return await homeController.getSystemStats()
+  } catch (error) {
+    console.error("Error fetching system stats:", error)
+    return {
+      totalPosts: 0,
+      postsToday: 0,
+      totalImages: 0,
+      activeThreads24h: 0
+    }
   }
 }

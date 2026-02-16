@@ -3,6 +3,7 @@ import {
   getBoardList,
   getLatestPosts,
   getRecentImages,
+  getSystemStats,
 } from "@/lib/actions/home.actions";
 import { footerLinks, footerText } from "@/constants/footer";
 import { FormattedText } from "@/components/formatted-text";
@@ -43,7 +44,8 @@ function groupBoards(boards: any[]) {
 export default async function HomePage() {
   const boards = await getBoardList();
   const latestPosts = await getLatestPosts(10);
-  const recentImages = await getRecentImages(24);
+  const recentImages = await getRecentImages(25);
+  const stats = await getSystemStats();
 
   const groupedBoards = groupBoards(boards);
 
@@ -188,7 +190,7 @@ export default async function HomePage() {
                   <h2 className="text-lg font-bold mb-3 text-accent border-b pb-1">
                     Gambar Terbaru
                   </h2>
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                     {recentImages.map((image) => (
                       <Link
                         key={`${image.id}-${image.imageUrl}`}
@@ -214,16 +216,12 @@ export default async function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-6 bg-muted/10 mt-12">
+      <footer className="border-t py-6 bg-muted/10">
         <div className="container mx-auto px-4 text-center space-y-2">
           <div className="flex items-center justify-center gap-3 text-xs font-mono">
             <Link href="/" className="text-accent hover:underline">
               Home
             </Link>
-            {/* <span className="text-muted-foreground">•</span>
-            <Link href="/mod" className="text-accent hover:underline">
-              Moderasi
-            </Link> */}
             <span className="text-muted-foreground">•</span>
             <Link href="/rules" className="text-accent hover:underline">
               Peraturan
@@ -232,6 +230,42 @@ export default async function HomePage() {
           <p className="text-xs text-muted-foreground">{footerText}</p>
         </div>
       </footer>
+
+      {/* Site Stats - Absolute Bottom */}
+      <div className="border-t py-1">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[10px] font-mono text-muted-foreground/80 whitespace-nowrap uppercase tracking-tighter">
+            <span>
+              [ Total Posts:{" "}
+              <span className="text-accent font-bold">
+                {stats.totalPosts.toLocaleString()}
+              </span>{" "}
+              ]
+            </span>
+            <span>
+              [ Posts Today:{" "}
+              <span className="text-accent font-bold">
+                {stats.postsToday.toLocaleString()}
+              </span>{" "}
+              ]
+            </span>
+            <span>
+              [ Total Images:{" "}
+              <span className="text-accent font-bold">
+                {stats.totalImages.toLocaleString()}
+              </span>{" "}
+              ]
+            </span>
+            <span>
+              [ Active Threads:{" "}
+              <span className="text-accent font-bold">
+                {stats.activeThreads24h.toLocaleString()}
+              </span>{" "}
+              ]
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

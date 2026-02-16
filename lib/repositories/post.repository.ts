@@ -1,7 +1,8 @@
 import { db } from "@/lib/db"
 import { threads, replies, boards } from "@/lib/db/schema"
-import { desc, eq, isNotNull, and } from "drizzle-orm"
+import { desc, eq, isNotNull, and, sql, count, gt } from "drizzle-orm"
 import type { LatestPostEntity, RecentImageEntity, PostInfoEntity } from "@/lib/entities/post.entity"
+import type { SystemStatsEntity } from "@/lib/entities/stats.entity"
 
 export class PostRepository {
   async getLatestPosts(limit = 10): Promise<LatestPostEntity[]> {
@@ -197,5 +198,54 @@ export class PostRepository {
     }
 
     return null
+  }
+
+  async getSystemStats(): Promise<SystemStatsEntity> {
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+    const [threadCount] = await db.select({ value: count() }).from(threads)
+    const [replyCount] = await db.select({ value: count() }).from(replies)
+
+    const [threadsToday] = await db
+      .select({ value: count() })
+      .from(threads)
+      .where(gt(threads.createdAt, twentyFourHoursAgo))
+
+    const [repliesToday] = await db
+      .select({ value: count() })
+      .from(replies)
+      .where(gt(replies.createdAt, twentyFourHoursAgo))
+
+    const [threadImages] = await db
+      .select({ value: count() })
+      .from(threads)
+      .where(isNotNull(threads.image))
+
+    const [replyImages] = await db
+      .select({ value: count() })
+      .from(replies)
+      .where(isNotNull(replies.image))
+
+    // Active Threads: Unique thread IDs that had activity (created or replied to) in last 24h
+    const tActive = await db
+      .select({ id: threads.id })
+      .from(threads)
+      .where(gt(threads.createdAt, twentyFourHoursAgo))
+
+    const rActive = await db
+      .select({ threadId: replies.threadId })
+      .from(replies)
+      .where(gt(replies.createdAt, twentyFourHoursAgo))
+
+    const activeThreadIds = new Set()
+    tActive.forEach((t) => activeThreadIds.add(t.id))
+    rActive.forEach((r) => activeThreadIds.add(r.threadId))
+
+    return {
+      totalPosts: Number(threadCount.value) + Number(replyCount.value),
+      postsToday: Number(threadsToday.value) + Number(repliesToday.value),
+      totalImages: Number(threadImages.value) + Number(replyImages.value),
+      activeThreads24h: activeThreadIds.size,
+    }
   }
 }

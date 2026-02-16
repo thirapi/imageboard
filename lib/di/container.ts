@@ -28,6 +28,7 @@ import { GetPendingReportsUseCase } from "@/lib/use-cases/get-pending-reports.us
 import { GetResolvedReportsUseCase } from "@/lib/use-cases/get-resolved-reports.use-case"
 import { GetPostByNumberUseCase } from "@/lib/use-cases/get-post-by-number.use-case"
 import { GetRecentImagesUseCase } from "@/lib/use-cases/get-recent-images.use-case"
+import { GetSystemStatsUseCase } from "@/lib/use-cases/get-system-stats.use-case"
 import { GetReportsUseCase } from "@/lib/use-cases/get-reports.use-case"
 import { GetThreadDetailUseCase } from "@/lib/use-cases/get-thread-detail.use-case"
 import { GetThreadListUseCase } from "@/lib/use-cases/get-thread-list.use-case"
@@ -81,6 +82,7 @@ const getPendingReportsUseCase = new GetPendingReportsUseCase(reportRepository, 
 const getResolvedReportsUseCase = new GetResolvedReportsUseCase(reportRepository, threadRepository, replyRepository, banRepository)
 const getRecentImagesUseCase = new GetRecentImagesUseCase(postRepository)
 const getPostByNumberUseCase = new GetPostByNumberUseCase(postRepository)
+const getSystemStatsUseCase = new GetSystemStatsUseCase(postRepository)
 const getReportsUseCase = new GetReportsUseCase(reportRepository)
 const getThreadDetailUseCase = new GetThreadDetailUseCase(threadRepository, replyRepository)
 const getThreadListUseCase = new GetThreadListUseCase(threadRepository)
@@ -116,7 +118,8 @@ const homeController = new HomeController(
   getLatestPostsUseCase,
   getRecentImagesUseCase,
   getBoardListUseCase,
-  getPostByNumberUseCase
+  getPostByNumberUseCase,
+  getSystemStatsUseCase
 )
 const moderationController = new ModerationController(
   lockThreadUseCase,
