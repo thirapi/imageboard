@@ -10,30 +10,42 @@ export const size = {
 };
 export const contentType = "image/png";
 
+// Fetch font
+const dotoFont = fetch(
+  "https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFuOWezw.ttf",
+).then((res) => res.arrayBuffer());
+
 // Image generation
-export default function Icon() {
+export default async function Icon() {
+  const fontData = await dotoFont;
+
   return new ImageResponse(
-    // ImageResponse JSX element
     <div
       style={{
         fontSize: 24,
-        // background: "#117743",
+        // background: "#117743", // Classic chan green
         width: "100%",
         height: "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         color: "white",
-        fontWeight: "bold",
-        fontFamily: "serif",
+        fontFamily: "Doto",
         borderRadius: "4px",
       }}
     >
       62
     </div>,
-    // ImageResponse options
     {
       ...size,
+      fonts: [
+        {
+          name: "Doto",
+          data: fontData,
+          weight: 800,
+          style: "normal",
+        },
+      ],
     },
   );
 }
