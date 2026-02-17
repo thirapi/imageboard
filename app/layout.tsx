@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | 62chan",
   },
   description:
-    "Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem, harap laporkan melalui postingan di /tlg/",
+    "62chan: Forum papan gambar (imageboard) anonim Indonesia. Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem di /tlg/",
   keywords: [
     "62chan",
     "imageboard Indonesia",
@@ -32,9 +32,6 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    nosnippet: true,
-    noarchive: true,
-    noimageindex: true,
   },
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || "https://boards.slug.my.id",
@@ -49,13 +46,13 @@ export const metadata: Metadata = {
     siteName: "62chan",
     title: "62chan",
     description:
-      "Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem, harap laporkan melalui postingan di /tlg/",
+      "62chan: Forum papan gambar (imageboard) anonim Indonesia. Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem di /tlg/",
   },
   twitter: {
     card: "summary_large_image",
     title: "62chan",
     description:
-      "Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem, harap laporkan melalui postingan di /tlg/",
+      "62chan: Forum papan gambar (imageboard) anonim Indonesia. Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem di /tlg/",
   },
 };
 
