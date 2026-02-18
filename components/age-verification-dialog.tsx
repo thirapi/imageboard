@@ -42,7 +42,10 @@ export function AgeVerificationDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" showCloseButton={false}>
+      <DialogContent
+        className="sm:max-w-md max-h-[90dvh] overflow-y-auto"
+        showCloseButton={false}
+      >
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <AlertTriangle className="h-6 w-6 text-amber-500" />

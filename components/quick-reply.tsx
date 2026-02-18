@@ -30,8 +30,12 @@ export function QuickReply({
   // Set initial position on mount (right side of screen)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const initialX = Math.max(10, window.innerWidth - 450);
-      const initialY = 150;
+      const width = Math.min(400, window.innerWidth - 16);
+      const initialX =
+        window.innerWidth > 640
+          ? Math.max(10, window.innerWidth - 450)
+          : (window.innerWidth - width) / 2;
+      const initialY = window.innerWidth > 640 ? 150 : 80;
       setPosition({
         x: initialX,
         y: initialY,
@@ -116,9 +120,9 @@ export function QuickReply({
         zIndex: 50,
       }}
       className={cn(
-        "w-[350px] sm:w-[400px] bg-card border shadow-2xl rounded-xl overflow-hidden transition-shadow duration-300",
+        "w-[calc(100vw-1rem)] sm:w-[400px] max-w-[400px] bg-card border shadow-2xl rounded-xl overflow-hidden transition-shadow duration-300",
         isDragging ? "shadow-blue-500/20 ring-1 ring-primary/20" : "",
-        isMinimized ? "h-auto" : "",
+        isMinimized ? "h-auto" : "max-h-[90vh] overflow-y-auto",
       )}
     >
       {/* Header / Drag Handle */}
