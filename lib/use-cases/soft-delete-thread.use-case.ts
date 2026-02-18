@@ -1,16 +1,22 @@
 import type { ThreadRepository } from "@/lib/repositories/thread.repository"
 
 export class SoftDeleteThreadUseCase {
-  constructor(private threadRepository: ThreadRepository) {}
+  constructor(private threadRepository: ThreadRepository) { }
 
-  async execute(threadId: number): Promise<void> {
+  async execute(threadId: number): Promise<any> {
     // Business rule: Validate thread exists
     const thread = await this.threadRepository.findById(threadId)
     if (!thread) {
       throw new Error("Thread not found")
     }
 
+    if (thread.isDeleted) {
+      return thread // Already deleted
+    }
+
     // Business rule: Soft delete the thread
     await this.threadRepository.softDelete(threadId)
+
+    return thread
   }
 }

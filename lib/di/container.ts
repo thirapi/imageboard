@@ -151,5 +151,6 @@ export const container = {
   reportController,
   threadController,
   seedController,
-  createReportUseCase, // Export use case directly for actions that don't use a controller
+  createReportUseCase,
+  boardRepository, // Export repository for actions
 }

@@ -18,7 +18,7 @@ export class GetThreadDetailUseCase {
   async execute(threadId: number): Promise<ThreadDetail | null> {
     const thread = await this.threadRepository.findById(threadId)
 
-    if (!thread) {
+    if (!thread || thread.isDeleted) {
       return null
     }
 

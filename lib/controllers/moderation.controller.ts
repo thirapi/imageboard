@@ -84,8 +84,8 @@ export class ModerationController {
     }
 
     // Call use case
-    await this.softDeleteThreadUseCase.execute(threadId)
-    return { success: true }
+    const thread = await this.softDeleteThreadUseCase.execute(threadId)
+    return { success: true, thread }
   }
 
   async deleteReply(replyId: number) {
@@ -95,8 +95,8 @@ export class ModerationController {
     }
 
     // Call use case
-    await this.softDeleteReplyUseCase.execute(replyId)
-    return { success: true }
+    const reply = await this.softDeleteReplyUseCase.execute(replyId)
+    return { success: true, reply }
   }
 
   async resolveReport(reportId: number, resolvedBy: string) {

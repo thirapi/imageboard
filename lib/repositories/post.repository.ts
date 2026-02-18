@@ -32,7 +32,12 @@ export class PostRepository {
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
       .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(eq(replies.isDeleted, false))
+      .where(
+        and(
+          eq(replies.isDeleted, false),
+          eq(threads.isDeleted, false)
+        )
+      )
       .orderBy(desc(replies.createdAt))
       .limit(limit)
 
@@ -101,6 +106,7 @@ export class PostRepository {
       .where(
         and(
           eq(replies.isDeleted, false),
+          eq(threads.isDeleted, false),
           isNotNull(replies.image),
         )
       )
@@ -148,7 +154,12 @@ export class PostRepository {
       })
       .from(threads)
       .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(eq(threads.postNumber, postNumber))
+      .where(
+        and(
+          eq(threads.postNumber, postNumber),
+          eq(threads.isDeleted, false),
+        )
+      )
       .limit(1)
 
     if (thread.length > 0) {
@@ -180,7 +191,13 @@ export class PostRepository {
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
       .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(eq(replies.postNumber, postNumber))
+      .where(
+        and(
+          eq(replies.postNumber, postNumber),
+          eq(replies.isDeleted, false),
+          eq(threads.isDeleted, false),
+        )
+      )
       .limit(1)
 
     if (reply.length > 0) {
@@ -203,39 +220,72 @@ export class PostRepository {
   async getSystemStats(): Promise<SystemStatsEntity> {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
-    const [threadCount] = await db.select({ value: count() }).from(threads)
-    const [replyCount] = await db.select({ value: count() }).from(replies)
+    const [threadCount] = await db.select({ value: count() }).from(threads).where(eq(threads.isDeleted, false))
+    const [replyCount] = await db.select({ value: count() }).from(replies).where(eq(replies.isDeleted, false))
 
     const [threadsToday] = await db
       .select({ value: count() })
       .from(threads)
-      .where(gt(threads.createdAt, twentyFourHoursAgo))
+      .where(
+        and(
+          gt(threads.createdAt, twentyFourHoursAgo),
+          eq(threads.isDeleted, false)
+        )
+      )
 
     const [repliesToday] = await db
       .select({ value: count() })
       .from(replies)
-      .where(gt(replies.createdAt, twentyFourHoursAgo))
+      .where(
+        and(
+          gt(replies.createdAt, twentyFourHoursAgo),
+          eq(replies.isDeleted, false)
+        )
+      )
 
     const [threadImages] = await db
       .select({ value: count() })
       .from(threads)
-      .where(isNotNull(threads.image))
+      .where(
+        and(
+          isNotNull(threads.image),
+          eq(threads.isDeleted, false)
+        )
+      )
 
     const [replyImages] = await db
       .select({ value: count() })
       .from(replies)
-      .where(isNotNull(replies.image))
+      .where(
+        and(
+          isNotNull(replies.image),
+          eq(replies.isDeleted, false)
+        )
+      )
 
     // Active Threads: Unique thread IDs that had activity (created or replied to) in last 24h
+    // Only count threads that are not deleted
     const tActive = await db
       .select({ id: threads.id })
       .from(threads)
-      .where(gt(threads.createdAt, twentyFourHoursAgo))
+      .where(
+        and(
+          gt(threads.createdAt, twentyFourHoursAgo),
+          eq(threads.isDeleted, false)
+        )
+      )
 
     const rActive = await db
       .select({ threadId: replies.threadId })
       .from(replies)
-      .where(gt(replies.createdAt, twentyFourHoursAgo))
+      .innerJoin(threads, eq(replies.threadId, threads.id)) // Ensure parent thread not deleted too
+      .where(
+        and(
+          gt(replies.createdAt, twentyFourHoursAgo),
+          eq(replies.isDeleted, false),
+          eq(threads.isDeleted, false)
+        )
+      )
 
     const activeThreadIds = new Set()
     tActive.forEach((t) => activeThreadIds.add(t.id))

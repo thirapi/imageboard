@@ -30,9 +30,16 @@ async function handleModerationAction(action: Promise<any>, revalidate: string |
   try {
     await checkModeratorAuth()
     await action
+
+    // Specifically revalidate the requested path (usually /mod)
     if (revalidate) {
       revalidatePath(revalidate)
     }
+
+    // Aggressively revalidate everything to ensure deleted threads/posts 
+    // disappear from Home, Board List, and Thread Detail pages immediately.
+    revalidatePath("/", "layout")
+
     return { success: true }
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : "An unexpected error occurred" }
