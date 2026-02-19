@@ -38,11 +38,21 @@ export async function generateMetadata({
   return {
     title: `/${board.code}/ - ${board.name}`,
     description:
-      board.description || `Diskusi di papan /${board.code}/ 62chan.`,
+      board.description ||
+      `Papan /${board.code}/ - ${board.name} di 62chan. Tempat diskusi anonim mengenai ${board.name}.`,
     openGraph: {
       title: `/${board.code}/ - ${board.name} | 62chan`,
       description:
-        board.description || `Diskusi di papan /${board.code}/ 62chan.`,
+        board.description ||
+        `Papan /${board.code}/ - ${board.name} di 62chan. Tempat diskusi anonim mengenai ${board.name}.`,
+      images: ["/opengraph-image"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `/${board.code}/ - ${board.name} | 62chan`,
+      description:
+        board.description || `Papan /${board.code}/ - ${board.name} di 62chan.`,
+      images: ["/opengraph-image"],
     },
   };
 }

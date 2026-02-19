@@ -200,7 +200,7 @@ export default async function HomePage() {
                         <div className="aspect-square overflow-hidden rounded border border-muted/50 hover:border-accent transition-all">
                           <img
                             src={image.imageUrl || "/placeholder.svg"}
-                            alt="Recent"
+                            alt={`Gambar terbaru di 62chan - ${image.boardCode}`}
                             className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all"
                             loading="lazy"
                           />

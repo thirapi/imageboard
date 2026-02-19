@@ -31,15 +31,28 @@ export async function generateMetadata({
   }
 
   const { thread } = result;
-  const title = thread.subject || thread.content.substring(0, 50) + "...";
+  const title =
+    thread.subject ||
+    thread.content.substring(0, 50).replace(/\n/g, " ") + "...";
+  const cleanDescription = thread.content
+    .substring(0, 160)
+    .replace(/\n/g, " ")
+    .replace(/>/g, "");
 
   return {
     title: `${title} - /${boardCode}/`,
-    description: thread.content.substring(0, 160),
+    description: cleanDescription,
     openGraph: {
       title: `${title} | /${boardCode}/ | 62chan`,
-      description: thread.content.substring(0, 160),
-      images: thread.image ? [thread.image] : [],
+      description: cleanDescription,
+      images: thread.image ? [thread.image] : ["/opengraph-image"],
+      type: "article",
+    },
+    twitter: {
+      card: thread.image ? "summary_large_image" : "summary",
+      title: `${title} | /${boardCode}/ | 62chan`,
+      description: cleanDescription,
+      images: thread.image ? [thread.image] : ["/opengraph-image"],
     },
   };
 }

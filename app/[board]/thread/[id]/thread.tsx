@@ -114,7 +114,7 @@ export function ThreadClient({
             <Lock className="h-3 w-3 text-muted-foreground" />
           )}
           {thread.subject && (
-            <span className="ib-subject text-lg mr-2">{thread.subject}</span>
+            <h1 className="ib-subject text-lg mr-2 inline">{thread.subject}</h1>
           )}
           <TripcodeDisplay
             author={thread.author || "Awanama"}
