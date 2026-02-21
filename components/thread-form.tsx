@@ -26,6 +26,7 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
   const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [showTips, setShowTips] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
 
@@ -49,8 +50,10 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
     formData.append("boardId", boardId.toString());
     formData.append("boardCode", boardCode);
 
-    if (imageFile) {
-      formData.append("image", imageFile);
+    if (!imageFile || imageFile.size === 0) {
+      setError("Anda harus mengunggah gambar untuk membuat thread baru.");
+      setIsSubmitting(false);
+      return;
     }
 
     try {
@@ -172,11 +175,17 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
           <div className="space-y-4">
-            <ImageUploader
-              onImageSelect={setImageFile}
-              maxSizeMB={5}
-              resetTrigger={resetTrigger}
-            />
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold uppercase opacity-70">
+                Gambar <span className="text-accent">(WAJIB)</span>
+              </Label>
+              <ImageUploader
+                onImageSelect={setImageFile}
+                maxSizeMB={5}
+                resetTrigger={resetTrigger}
+                hideLabel={true}
+              />
+            </div>
 
             <div className="flex items-center space-x-2 bg-destructive/5 p-2 rounded border border-destructive/10">
               <Checkbox id="isNsfw" name="isNsfw" />
@@ -258,6 +267,27 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
               Lupakan (Batal)
             </Button>
           </div>
+        </div>
+        <div className="mt-4 pt-3 border-t border-muted/10">
+          <button
+            type="button"
+            onClick={() => setShowTips(!showTips)}
+            className="text-[10px] text-muted-foreground hover:text-accent flex items-center gap-1 mx-auto transition-colors"
+          >
+            {showTips ? "[ Sembunyikan Bantuan ]" : "[ Bantuan Posting ]"}
+          </button>
+
+          {showTips && (
+            <div className="text-[10px] text-muted-foreground italic space-y-1 text-center mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+              <p>Tip: Gunakan {`>>NomorPost`} untuk membalas post tertentu.</p>
+              <p>
+                Gunakan {`[spoiler]teks[/spoiler]`} untuk menyembunyikan teks.
+              </p>
+              <p>
+                Gunakan {`Nama#Sandi`} di kolom Nama untuk membuat Tripcode.
+              </p>
+            </div>
+          )}
         </div>
       </form>
     </div>

@@ -13,6 +13,7 @@ interface ImageUploaderProps {
   selectedFile?: File | null;
   maxSizeMB?: number;
   resetTrigger?: number; // Add this to trigger reset from parent
+  hideLabel?: boolean;
 }
 
 export function ImageUploader({
@@ -20,6 +21,7 @@ export function ImageUploader({
   selectedFile,
   maxSizeMB = 5,
   resetTrigger,
+  hideLabel = false,
 }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +98,7 @@ export function ImageUploader({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="image">Gambar (opsional)</Label>{" "}
+      {!hideLabel && <Label htmlFor="image">Gambar (opsional)</Label>}
       <div className="space-y-2">
         {!preview ? (
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 hover:border-muted-foreground/50 transition-colors">

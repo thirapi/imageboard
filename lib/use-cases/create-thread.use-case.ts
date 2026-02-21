@@ -26,6 +26,11 @@ export class CreateThreadUseCase {
       }
     }
 
+    // Business rule: Thread MUST have an image
+    if (!input.imageFile || input.imageFile.size === 0) {
+      throw new Error("Anda harus mengunggah gambar untuk membuat thread baru.")
+    }
+
     // Business rule: Validate content length
     if (input.content.trim().length < 1) {
       throw new Error("Thread content cannot be empty")

@@ -33,6 +33,7 @@ export function ReplyForm({
   const [resetTrigger, setResetTrigger] = useState(0);
   const [captchaQuestion, setCaptchaQuestion] = useState("");
   const [captcha, setLocalCaptcha] = useState("");
+  const [showTips, setShowTips] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
 
@@ -233,9 +234,27 @@ export function ReplyForm({
           </Button>
         </div>
 
-        <p className="text-[10px] text-muted-foreground italic opacity-50 text-center">
-          Tip: Gunakan {`>>NomorPost`} untuk membalas post tertentu.
-        </p>
+        <div className="mt-4 pt-3 border-t border-muted/10">
+          <button
+            type="button"
+            onClick={() => setShowTips(!showTips)}
+            className="text-[10px] text-muted-foreground hover:text-accent flex items-center gap-1 mx-auto transition-colors"
+          >
+            {showTips ? "[ Sembunyikan Bantuan ]" : "[ Bantuan Posting ]"}
+          </button>
+
+          {showTips && (
+            <div className="text-[10px] text-muted-foreground italic space-y-1 text-center mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+              <p>Tip: Gunakan {`>>NomorPost`} untuk membalas post tertentu.</p>
+              <p>
+                Gunakan {`[spoiler]teks[/spoiler]`} untuk menyembunyikan teks.
+              </p>
+              <p>
+                Gunakan {`Nama#Sandi`} di kolom Nama untuk membuat Tripcode.
+              </p>
+            </div>
+          )}
+        </div>
       </form>
     </div>
   );
