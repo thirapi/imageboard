@@ -11,6 +11,7 @@ import { getPostByNumber } from "@/lib/actions/home.actions";
 import type { PostInfoEntity } from "@/lib/entities/post.entity";
 import { cn } from "@/lib/utils";
 import { YouTubeEmbed } from "@/components/youtube-embed";
+import { getThumbnailUrl } from "@/lib/utils/image";
 
 interface FormattedTextProps {
   content: string;
@@ -276,7 +277,7 @@ function PostQuote({
               {post.image && (
                 <div className="w-16 h-16 flex-shrink-0 border rounded overflow-hidden">
                   <img
-                    src={post.image}
+                    src={getThumbnailUrl(post.image, 100, 100, "fill")}
                     alt=""
                     className="w-full h-full object-cover"
                   />

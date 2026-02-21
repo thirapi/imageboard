@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Maximize2, Minimize2, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getThumbnailUrl } from "@/lib/utils/image";
 
 interface ExpandableImageProps {
   src: string;
@@ -86,7 +87,11 @@ export function ExpandableImage({
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <img
-          src={src}
+          src={
+            isExpanded
+              ? src
+              : getThumbnailUrl(src, isOP ? 300 : 250, isOP ? 300 : 250, "fit")
+          }
           alt={alt}
           className={cn(
             "transition-all duration-300",

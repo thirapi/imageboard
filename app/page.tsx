@@ -7,6 +7,7 @@ import {
 } from "@/lib/actions/home.actions";
 import { footerLinks, footerText } from "@/constants/footer";
 import { FormattedText } from "@/components/formatted-text";
+import { getThumbnailUrl } from "@/lib/utils/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -199,7 +200,7 @@ export default async function HomePage() {
                       >
                         <div className="aspect-square overflow-hidden rounded border border-muted/50 hover:border-accent transition-all">
                           <img
-                            src={image.imageUrl || "/placeholder.svg"}
+                            src={getThumbnailUrl(image.imageUrl, 200, 200)}
                             alt={`Gambar terbaru di 62chan - ${image.boardCode}`}
                             className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all"
                             loading="lazy"

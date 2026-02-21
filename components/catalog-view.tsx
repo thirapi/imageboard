@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { MessageSquare, ImageIcon, Pin, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getThumbnailUrl } from "@/lib/utils/image";
 
 interface CatalogViewProps {
   threads: any[];
@@ -23,7 +24,7 @@ export function CatalogView({ threads, boardCode }: CatalogViewProps) {
             {thread.image ? (
               <div className="relative w-full h-full">
                 <img
-                  src={thread.image}
+                  src={getThumbnailUrl(thread.image, 250, 250, "fill")}
                   alt={thread.subject || "Thread image"}
                   className={cn(
                     "w-full h-full object-cover transition-all duration-500",
