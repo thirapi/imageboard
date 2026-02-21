@@ -90,12 +90,18 @@ export default async function ThreadPage({
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="py-2 px-4 border-b flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm sm:text-base">
           <Link
             href={`/${boardCode}`}
             className="text-accent hover:underline font-bold"
           >
             [ Kembali ke /{boardCode}/ ]
+          </Link>
+          <Link
+            href={`/${boardCode}?view=catalog`}
+            className="text-accent hover:underline font-bold"
+          >
+            [ Katalog ]
           </Link>
         </div>
         <div className="text-xl font-bold text-accent">
@@ -111,20 +117,22 @@ export default async function ThreadPage({
         />
       </main>
 
-      <footer className="mt-20 border-t py-8 bg-muted/20">
-        <div className="container mx-auto px-4 text-center text-xs text-muted-foreground whitespace-pre-wrap">
-          [{" "}
-          <Link href="/" className="hover:underline text-accent mx-1">
-            Home
-          </Link>{" "}
-          ] [{" "}
-          <Link
-            href={`/${boardCode}`}
-            className="hover:underline text-accent mx-1"
-          >
-            /{boardCode}/
-          </Link>{" "}
-          ]{footerText}
+      <footer className="mt-12 border-t py-8 bg-muted/20">
+        <div className="container mx-auto px-4 text-center space-y-4">
+          <div className="flex justify-center gap-4 text-xs font-mono">
+            <Link href="/" className="text-accent hover:underline">
+              [ Home ]
+            </Link>
+            <Link
+              href={`/${boardCode}`}
+              className="text-accent hover:underline"
+            >
+              [ /{boardCode}/ ]
+            </Link>
+          </div>
+          <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+            {footerText}
+          </p>
         </div>
       </footer>
     </div>

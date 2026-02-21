@@ -80,6 +80,8 @@ export class PostRepository {
         createdAt: threads.createdAt,
         boardCode: boards.code,
         threadId: threads.id,
+        isNsfw: threads.isNsfw,
+        isSpoiler: threads.isSpoiler,
       })
       .from(threads)
       .innerJoin(boards, eq(threads.boardId, boards.id))
@@ -99,6 +101,8 @@ export class PostRepository {
         createdAt: replies.createdAt,
         boardCode: boards.code,
         threadId: replies.threadId,
+        isNsfw: replies.isNsfw,
+        isSpoiler: replies.isSpoiler,
       })
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
@@ -122,6 +126,8 @@ export class PostRepository {
         createdAt: t.createdAt!,
         boardCode: t.boardCode,
         threadId: t.threadId,
+        isNsfw: t.isNsfw ?? false,
+        isSpoiler: t.isSpoiler ?? false,
       })
     }
 
@@ -132,6 +138,8 @@ export class PostRepository {
         createdAt: r.createdAt!,
         boardCode: r.boardCode,
         threadId: r.threadId,
+        isNsfw: r.isNsfw ?? false,
+        isSpoiler: r.isSpoiler ?? false,
       })
     }
 
@@ -151,6 +159,8 @@ export class PostRepository {
         createdAt: threads.createdAt,
         image: threads.image,
         boardCode: boards.code,
+        isNsfw: threads.isNsfw,
+        isSpoiler: threads.isSpoiler,
       })
       .from(threads)
       .innerJoin(boards, eq(threads.boardId, boards.id))
@@ -173,6 +183,8 @@ export class PostRepository {
         boardCode: thread[0].boardCode,
         type: "thread",
         threadId: thread[0].id,
+        isNsfw: thread[0].isNsfw ?? false,
+        isSpoiler: thread[0].isSpoiler ?? false,
       }
     }
 
@@ -187,6 +199,8 @@ export class PostRepository {
         image: replies.image,
         threadId: replies.threadId,
         boardCode: boards.code,
+        isNsfw: replies.isNsfw,
+        isSpoiler: replies.isSpoiler,
       })
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
@@ -211,6 +225,8 @@ export class PostRepository {
         threadId: reply[0].threadId,
         boardCode: reply[0].boardCode,
         type: "reply",
+        isNsfw: reply[0].isNsfw ?? false,
+        isSpoiler: reply[0].isSpoiler ?? false,
       }
     }
 

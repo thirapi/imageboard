@@ -56,6 +56,8 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
       return;
     }
 
+    formData.append("image", imageFile);
+
     try {
       const result = await createThread(formData);
 

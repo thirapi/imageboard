@@ -14,6 +14,8 @@ export interface RecentImageEntity {
   createdAt: Date
   boardCode: string
   threadId: number
+  isNsfw: boolean
+  isSpoiler: boolean
 }
 
 export interface PostInfoEntity {
@@ -26,4 +28,6 @@ export interface PostInfoEntity {
   image?: string | null
   threadId: number
   boardCode: string
+  isNsfw?: boolean
+  isSpoiler?: boolean
 }

@@ -99,18 +99,18 @@ export function ImageUploader({
   return (
     <div className="space-y-2">
       {!hideLabel && <Label htmlFor="image">Gambar (opsional)</Label>}
+      <input
+        ref={fileInputRef}
+        type="file"
+        id="image"
+        name="image"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
       <div className="space-y-2">
         {!preview ? (
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 hover:border-muted-foreground/50 transition-colors">
-            <input
-              ref={fileInputRef}
-              type="file"
-              id="image"
-              name="image"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}

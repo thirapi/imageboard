@@ -275,12 +275,23 @@ function PostQuote({
             </div>
             <div className="flex gap-2">
               {post.image && (
-                <div className="w-16 h-16 flex-shrink-0 border rounded overflow-hidden">
+                <div className="w-16 h-16 flex-shrink-0 flex items-center justify-center border rounded overflow-hidden relative bg-muted/20">
                   <img
                     src={getThumbnailUrl(post.image, 100, 100, "fill")}
                     alt=""
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover transition-all ${
+                      post.isNsfw || post.isSpoiler
+                        ? "blur-sm scale-110 opacity-60"
+                        : ""
+                    }`}
                   />
+                  {(post.isNsfw || post.isSpoiler) && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="text-[8px] font-bold text-white bg-black/60 px-1 py-0.5 rounded leading-none">
+                        {post.isSpoiler ? "SPOIL" : "NSFW"}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="flex-1 min-w-0">
