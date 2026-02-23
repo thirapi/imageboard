@@ -39,6 +39,8 @@ export async function createReply(formData: FormData) {
       ipAddress,
     })
 
+    revalidatePath("/")
+    revalidatePath(`/${boardCode}`)
     revalidatePath(`/${boardCode}/thread/${threadId}`)
     return { success: true, replyId: result.replyId }
   } catch (error) {

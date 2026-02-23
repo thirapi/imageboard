@@ -41,6 +41,7 @@ export async function createThread(formData: FormData) {
       ipAddress,
     })
 
+    revalidatePath("/")
     revalidatePath(`/${boardCode}`)
     return { success: true, threadId: result.threadId }
   } catch (error) {
