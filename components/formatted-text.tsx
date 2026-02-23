@@ -41,7 +41,7 @@ export function FormattedText({
     );
   }
 
-  const lines = content.split("\n");
+  const lines = content.replace(/\r\n/g, "\n").split("\n");
 
   return (
     <div className={cn("whitespace-pre-wrap break-words font-sans", className)}>
@@ -52,7 +52,7 @@ export function FormattedText({
             disableEmbeds={disableEmbeds}
             preview={preview}
           />
-          {i < lines.length - 1 && <br />}
+          {i < lines.length - 1 && "\n"}
         </React.Fragment>
       ))}
     </div>
