@@ -194,7 +194,7 @@ export function ThreadClient({
                 No.{reply.postNumber}
               </span>
 
-              <div className="flex items-center gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 ml-auto opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                 <DeletePostButton
                   postId={reply.id}
                   postType="reply"
