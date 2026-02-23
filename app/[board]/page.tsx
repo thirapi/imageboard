@@ -172,10 +172,10 @@ export default async function BoardPage({
                     </Link>
                   </div>
 
-                  {/* Content area with side-by-side layout for OP */}
-                  <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                  {/* Content area with classic layout for OP */}
+                  <div className="mt-2 block overflow-hidden">
                     {thread.image && (
-                      <div className="shrink-0">
+                      <div className="float-left mr-4 mb-2">
                         <ExpandableImage
                           src={thread.image}
                           alt="Thumbnail"
@@ -185,24 +185,22 @@ export default async function BoardPage({
                         />
                       </div>
                     )}
-                    <div className="flex-1">
-                      <div className="text-sm leading-relaxed whitespace-pre-wrap break-words max-w-4xl">
-                        <FormattedText content={thread.content} />
-                      </div>
-
-                      {thread.replyCount > (thread.replies?.length || 0) && (
-                        <div className="mt-4 text-xs text-muted-foreground italic">
-                          {thread.replyCount - (thread.replies?.length || 0)}{" "}
-                          balasan diabaikan.
-                          <Link
-                            href={`/${boardCode}/thread/${thread.id}`}
-                            className="text-accent hover:underline ml-1"
-                          >
-                            Klik di sini untuk melihat semua.
-                          </Link>
-                        </div>
-                      )}
+                    <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      <FormattedText content={thread.content} />
                     </div>
+
+                    {thread.replyCount > (thread.replies?.length || 0) && (
+                      <div className="mt-4 text-xs text-muted-foreground italic clear-both">
+                        {thread.replyCount - (thread.replies?.length || 0)}{" "}
+                        balasan diabaikan.
+                        <Link
+                          href={`/${boardCode}/thread/${thread.id}`}
+                          className="text-accent hover:underline ml-1"
+                        >
+                          Klik di sini untuk melihat semua.
+                        </Link>
+                      </div>
+                    )}
                   </div>
 
                   {/* Reply Previews */}
@@ -216,9 +214,9 @@ export default async function BoardPage({
                         .map((reply) => (
                           <div
                             key={reply.id}
-                            className="ib-reply shadow-sm border border-muted/20"
+                            className="ib-reply shadow-sm border border-muted/20 w-fit max-w-full"
                           >
-                            <div className="ib-post-metaline text-xs px-2 pt-1">
+                            <div className="ib-post-metaline text-xs px-2 pt-1 border-b border-muted/5 bg-muted/5">
                               <TripcodeDisplay
                                 author={reply.author || "Awanama"}
                                 className="ib-author"
@@ -230,9 +228,9 @@ export default async function BoardPage({
                                 No.{reply.postNumber}
                               </span>
                             </div>
-                            <div className="flex gap-3 p-2">
+                            <div className="p-2 block overflow-hidden">
                               {reply.image && (
-                                <div className="shrink-0">
+                                <div className="float-left mr-3 mb-1">
                                   <ExpandableImage
                                     src={reply.image}
                                     alt="Reply thumbnail"
@@ -241,7 +239,7 @@ export default async function BoardPage({
                                   />
                                 </div>
                               )}
-                              <div className="text-sm leading-snug flex-1 overflow-hidden">
+                              <div className="text-sm leading-snug">
                                 <FormattedText content={reply.content} />
                               </div>
                             </div>

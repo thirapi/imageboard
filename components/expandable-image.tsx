@@ -38,8 +38,15 @@ export function ExpandableImage({
   return (
     <div
       className={cn(
-        "flex flex-col gap-1.5 mb-2",
-        isExpanded ? "w-full" : "w-fit max-w-full",
+        "flex flex-col gap-0.5 mb-1",
+        isExpanded
+          ? "w-full"
+          : cn(
+              "w-fit",
+              isOP
+                ? "max-w-[200px] sm:max-w-[300px]"
+                : "max-w-[150px] sm:max-w-[250px]",
+            ),
         className,
       )}
     >

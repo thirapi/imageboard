@@ -145,9 +145,9 @@ export function ThreadClient({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-6 mt-4">
+        <div className="mt-4 block overflow-hidden">
           {thread.image && (
-            <div className="shrink-0 max-w-sm">
+            <div className="float-left mr-5 mb-2">
               <ExpandableImage
                 src={thread.image}
                 alt="Thread image"
@@ -159,11 +159,9 @@ export function ThreadClient({
               />
             </div>
           )}
-          <div className="flex-1">
-            <div className="text-base leading-relaxed whitespace-pre-wrap break-words ib-content">
-              <FormattedText content={thread.content} />
-              <Backlinks links={getBacklinks(thread.postNumber)} />
-            </div>
+          <div className="text-base leading-relaxed whitespace-pre-wrap break-words ib-content">
+            <FormattedText content={thread.content} />
+            <Backlinks links={getBacklinks(thread.postNumber)} />
           </div>
         </div>
       </div>
@@ -174,7 +172,7 @@ export function ThreadClient({
           <div
             key={reply.id}
             id={`p${reply.postNumber}`}
-            className="ib-reply border border-muted/20 shadow-sm relative group"
+            className="ib-reply border border-muted/20 shadow-sm relative group w-fit max-w-full"
           >
             <div className="ib-post-metaline px-2 pt-1 border-b border-muted/5 bg-muted/5">
               <TripcodeDisplay
@@ -206,9 +204,9 @@ export function ThreadClient({
               </div>
             </div>
 
-            <div className="p-3">
+            <div className="p-3 block overflow-hidden">
               {reply.image && (
-                <div className="mb-3">
+                <div className="float-left mr-3 mb-1">
                   <ExpandableImage
                     src={reply.image}
                     alt="Reply image"
