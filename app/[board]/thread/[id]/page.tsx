@@ -8,6 +8,8 @@ import ThreadPageWrapper from "./thread";
 import { footerText } from "@/constants/footer";
 import type { Metadata } from "next";
 
+export const revalidate = 3600; // Cache selama 1 jam, akan di-update instan saat ada balasan baru via revalidatePath
+
 export async function generateMetadata({
   params,
 }: {

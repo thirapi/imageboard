@@ -20,6 +20,8 @@ import { TripcodeDisplay } from "@/components/tripcode-display";
 import { Pagination } from "@/components/pagination";
 import type { Metadata } from "next";
 
+export const revalidate = 60; // Cache halaman board selama 60 detik
+
 export async function generateMetadata({
   params,
 }: {
