@@ -14,9 +14,9 @@ export const metadata: Metadata = {
     template: "%s | 62chan",
   },
   description:
-    "62chan: Forum papan gambar (imageboard) anonim Indonesia tempat diskusi bebas mengenai berbagai topik mulai dari popkultur hingga teknologi.",
+    "62chan adalah forum papan gambar (imageboard) anonim Indonesia. Di 62chan, kamu bisa diskusi bebas anonim soal anime, teknologi, budaya pop, meme, dan topik lainnya.",
   applicationName: "62chan",
-  authors: [{ name: "62chan", url: "https://62chan.qzz.io" }],
+  authors: [{ name: "62chan", url: "http://62chan.my.id" }],
   generator: "62chan",
   robots: {
     index: true,
@@ -48,19 +48,19 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || "https://62chan.qzz.io",
+    process.env.NEXT_PUBLIC_BASE_URL || "https://62chan.my.id",
   ),
   alternates: {
-    canonical: "/",
+    canonical: "https://62chan.my.id",
   },
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://62chan.qzz.io",
+    url: "https://62chan.my.id",
     siteName: "62chan",
     title: "62chan - Papan Gambar Anonim Indonesia",
     description:
-      "62chan: Forum papan gambar (imageboard) anonim Indonesia tempat diskusi bebas mengenai berbagai topik mulai dari popkultur hingga teknologi.",
+      "62chan adalah forum papan gambar (imageboard) anonim Indonesia. Di 62chan, kamu bisa diskusi bebas anonim soal anime, teknologi, budaya pop, meme, dan topik lainnya.",
     images: [
       {
         url: "/opengraph-image",
@@ -74,23 +74,44 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "62chan - Papan Gambar Anonim Indonesia",
     description:
-      "62chan: Forum papan gambar (imageboard) anonim Indonesia tempat diskusi bebas mengenai berbagai topik.",
+      "62chan adalah forum papan gambar (imageboard) anonim Indonesia. Di 62chan, kamu bisa diskusi bebas anonim soal anime, teknologi, budaya pop, meme, dan topik lainnya.",
     images: ["/opengraph-image"],
   },
-  category: "technology",
+  category: "forum",
 };
 
 export const viewport: Viewport = {
   themeColor: "#f97316",
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "62chan",
-  alternateName: ["Enam Dua Chan", "62 chan"],
-  url: "https://62chan.qzz.io",
-};
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "62chan",
+    alternateName: ["Enam Dua Chan", "62 chan", "Enampuluhdua Chan"],
+    url: "https://62chan.my.id",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://62chan.my.id/search?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "62chan",
+    alternateName: ["Enam Dua Chan", "62 chan"],
+    url: "https://62chan.my.id",
+    logo: "https://62chan.my.id/opengraph-image",
+    description:
+      "62chan adalah forum papan gambar (imageboard) anonim Indonesia untuk diskusi bebas anonim.",
+    sameAs: [],
+  },
+];
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { NavProvider } from "@/components/nav-provider";
@@ -105,10 +126,13 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {jsonLd.map((schema, i) => (
+          <script
+            key={i}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          />
+        ))}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
