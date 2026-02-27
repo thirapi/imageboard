@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description:
     "62chan adalah forum papan gambar (imageboard) anonim Indonesia. Di 62chan, kamu bisa diskusi bebas anonim soal anime, teknologi, budaya pop, meme, dan topik lainnya.",
   applicationName: "62chan",
-  authors: [{ name: "62chan", url: "http://62chan.my.id" }],
+  authors: [{ name: "62chan", url: "https://62chan.my.id" }],
   generator: "62chan",
   robots: {
     index: true,
