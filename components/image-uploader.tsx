@@ -19,7 +19,7 @@ interface ImageUploaderProps {
 export function ImageUploader({
   onImageSelect,
   selectedFile,
-  maxSizeMB = 5,
+  maxSizeMB = 10,
   resetTrigger,
   hideLabel = false,
 }: ImageUploaderProps) {

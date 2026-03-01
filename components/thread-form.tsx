@@ -69,12 +69,16 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
         router.push(`/${boardCode}/thread/${result.threadId}`);
         router.refresh();
       } else {
-        setError(result.error || "Gagal membuat thread");
+        // Log detailed error for debugging
+        console.error("[ThreadForm] Action failed:", result.error);
+        setError(result.error || "Gagal membuat thread. Silakan coba lagi.");
         refreshCaptcha(); // Refresh captcha on error
       }
-    } catch (error) {
-      console.error("Error creating thread:", error);
-      setError("Terjadi kesalahan tak terduga");
+    } catch (err) {
+      console.error("[ThreadForm] Unexpected client error:", err);
+      setError(
+        `Terjadi kesalahan tak terduga: ${err instanceof Error ? err.message : "Internal Error"}`,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -183,7 +187,7 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
               </Label>
               <ImageUploader
                 onImageSelect={setImageFile}
-                maxSizeMB={5}
+                maxSizeMB={10}
                 resetTrigger={resetTrigger}
                 hideLabel={true}
               />

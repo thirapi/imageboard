@@ -148,8 +148,8 @@ export default function RulesPage() {
               <div className="flex gap-3">
                 <span className="font-bold text-accent min-w-[2rem]">•</span>
                 <p>
-                  <strong>Ukuran file maksimal: 5MB.</strong> Format yang
-                  didukung: JPG, PNG, GIF, WebP.
+                  <strong>Ukuran file maksimal: 10MB.</strong> Format yang
+                  didukung: JPG, JPEG, PNG, GIF, WebP.
                 </p>
               </div>
               <div className="flex gap-3">
@@ -208,7 +208,7 @@ export default function RulesPage() {
       <footer className="border-t py-6 bg-muted/10 mt-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-muted-foreground">
-            Terakhir diperbarui: Februari 2026
+            Terakhir diperbarui: Maret 2026
           </p>
         </div>
       </footer>

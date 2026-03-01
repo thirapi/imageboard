@@ -81,12 +81,15 @@ export function ReplyForm({
         setResetTrigger((prev) => prev + 1); // Trigger image uploader reset
         router.refresh();
       } else {
-        setError(result.error || "Gagal mengirim balasan");
+        console.error("[ReplyForm] Action failed:", result.error);
+        setError(result.error || "Gagal mengirim balasan. Silakan coba lagi.");
         refreshCaptcha(); // Refresh captcha on error
       }
-    } catch (error) {
-      console.error("Error posting reply:", error);
-      setError("Terjadi kesalahan tak terduga");
+    } catch (err) {
+      console.error("[ReplyForm] Unexpected client error:", err);
+      setError(
+        `Terjadi kesalahan tak terduga: ${err instanceof Error ? err.message : "Internal Error"}`,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -181,7 +184,7 @@ export function ReplyForm({
             <ImageUploader
               onImageSelect={setImageFile}
               selectedFile={state.imageFile}
-              maxSizeMB={5}
+              maxSizeMB={10}
               resetTrigger={resetTrigger}
             />
 

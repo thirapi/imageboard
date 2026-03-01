@@ -27,10 +27,11 @@ export class CloudinaryService {
       throw new Error("Invalid file type. Allowed: jpg, jpeg, png, webp, gif")
     }
 
-    // Business rule: Validate file size (5MB max)
-    const maxSizeMB = 5
+    // Business rule: Validate file size (10MB max as requested)
+    const maxSizeMB = 10
     const maxSizeBytes = maxSizeMB * 1024 * 1024
     if (file.size > maxSizeBytes) {
+      console.warn(`[CloudinaryService] File size validation failed: ${file.size} chars (max: ${maxSizeBytes})`)
       throw new Error(`File too large. Maximum size is ${maxSizeMB}MB`)
     }
 
@@ -39,16 +40,21 @@ export class CloudinaryService {
       formData.append("file", file)
       formData.append("upload_preset", this.uploadPreset)
 
+      console.log(`[CloudinaryService] Starting upload for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`)
+
       const response = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
         method: "POST",
         body: formData,
       })
 
       if (!response.ok) {
-        throw new Error("Upload failed")
+        const errorText = await response.text()
+        console.error(`[CloudinaryService] Upload failed with status ${response.status}:`, errorText)
+        throw new Error(`Upload failed with status ${response.status}: ${errorText || "Unknown error"}`)
       }
 
       const data = await response.json()
+      console.log(`[CloudinaryService] Upload successful: ${data.secure_url}`)
 
       return {
         url: data.secure_url,
@@ -59,7 +65,8 @@ export class CloudinaryService {
         bytes: data.bytes,
       }
     } catch (error) {
-      throw new Error(`Image upload failed: ${error instanceof Error ? error.message : "Unknown error"}`)
+      console.error(`[CloudinaryService] Unexpected error during upload:`, error)
+      throw new Error(`Image upload failed: ${error instanceof Error ? error.message : "Internal Server Error during upload"}`)
     }
   }
 
