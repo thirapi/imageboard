@@ -1,11 +1,14 @@
 import { db } from "@/lib/db"
 import { threads, replies, boards } from "@/lib/db/schema"
-import { desc, eq, isNotNull, and, sql, count, gt } from "drizzle-orm"
+import { desc, eq, isNotNull, and, sql, count, gt, lt } from "drizzle-orm"
 import type { LatestPostEntity, RecentImageEntity, PostInfoEntity } from "@/lib/entities/post.entity"
 import type { SystemStatsEntity } from "@/lib/entities/stats.entity"
 
 export class PostRepository {
-  async getLatestPosts(limit = 10): Promise<LatestPostEntity[]> {
+  async getLatestPosts(limit = 10, beforeDate?: Date): Promise<LatestPostEntity[]> {
+    const threadWhere = beforeDate 
+      ? and(eq(threads.isDeleted, false), lt(threads.createdAt, beforeDate))
+      : eq(threads.isDeleted, false)
 
     const latestThreads = await db
       .select({
@@ -17,9 +20,20 @@ export class PostRepository {
       })
       .from(threads)
       .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(eq(threads.isDeleted, false))
+      .where(threadWhere)
       .orderBy(desc(threads.createdAt))
       .limit(limit)
+
+    const replyWhere = beforeDate
+      ? and(
+          eq(replies.isDeleted, false),
+          eq(threads.isDeleted, false),
+          lt(replies.createdAt, beforeDate)
+        )
+      : and(
+          eq(replies.isDeleted, false),
+          eq(threads.isDeleted, false)
+        )
 
     const latestReplies = await db
       .select({
@@ -32,12 +46,7 @@ export class PostRepository {
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
       .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(
-        and(
-          eq(replies.isDeleted, false),
-          eq(threads.isDeleted, false)
-        )
-      )
+      .where(replyWhere)
       .orderBy(desc(replies.createdAt))
       .limit(limit)
 

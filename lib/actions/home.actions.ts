@@ -13,9 +13,9 @@ export async function getBoardList() {
   }
 }
 
-export async function getLatestPosts(limit?: number) {
+export async function getLatestPosts(limit?: number, beforeDate?: Date) {
   try {
-    return await homeController.getLatestPosts(limit)
+    return await homeController.getLatestPosts(limit, beforeDate)
   } catch (error) {
     console.error("Error fetching latest posts:", error)
     return []

@@ -17,12 +17,12 @@ export class HomeController {
     return await this.getBoardListUseCase.execute()
   }
 
-  async getLatestPosts(limit?: number) {
+  async getLatestPosts(limit?: number, beforeDate?: Date) {
     // Input validation only
     const validLimit = limit && limit > 0 ? limit : 10
 
     // Call use case
-    return await this.getLatestPostsUseCase.execute(validLimit)
+    return await this.getLatestPostsUseCase.execute(validLimit, beforeDate)
   }
 
   async getRecentImages(limit?: number) {

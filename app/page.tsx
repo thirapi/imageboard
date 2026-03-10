@@ -8,6 +8,7 @@ import {
 import { footerLinks, footerText } from "@/constants/footer";
 import { FormattedText } from "@/components/formatted-text";
 import { getThumbnailUrl } from "@/lib/utils/image";
+import { LatestPosts } from "@/components/latest-posts";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -175,38 +176,7 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Latest Posts */}
               {latestPosts.length > 0 && (
-                <section className="lg:col-span-5">
-                  <h2 className="text-lg font-bold mb-3 text-accent border-b pb-1">
-                    Postingan Terbaru
-                  </h2>
-                  <div className="space-y-2">
-                    {latestPosts.map((post) => (
-                      <Link
-                        key={`${post.type}-${post.id}`}
-                        href={`/${post.boardCode}/thread/${post.threadId}`}
-                        className="block text-sm hover:bg-accent/5 p-2 rounded transition-colors"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <div className="font-medium truncate text-xs">
-                              {post.title || (
-                                <span className="text-muted-foreground italic">
-                                  {post.type === "thread" ? "Utas" : "Balasan"}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                              <FormattedText content={post.excerpt} preview />
-                            </div>
-                          </div>
-                          <span className="text-[10px] font-mono text-accent font-bold whitespace-nowrap">
-                            /{post.boardCode}/
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
+                <LatestPosts initialPosts={latestPosts} />
               )}
 
               {/* Recent Images */}
