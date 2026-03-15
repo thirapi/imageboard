@@ -90,23 +90,23 @@ export async function createReport(contentType: "thread" | "reply", contentId: n
   }
 }
 
-export async function getPendingReports() {
+export async function getPendingReports(limit?: number, offset?: number, boardId?: number) {
   try {
     const user = await getModeratorAuthorizer()
-    return await moderationController.getPendingReports(user)
+    return await moderationController.getPendingReports(user, { limit, offset, boardId })
   } catch (error) {
     console.error("Error fetching pending reports:", error)
-    return []
+    return { reports: [], total: 0 }
   }
 }
 
-export async function getResolvedReports() {
+export async function getResolvedReports(limit?: number, offset?: number, boardId?: number) {
   try {
     const user = await getModeratorAuthorizer()
-    return await moderationController.getResolvedReports(user)
+    return await moderationController.getResolvedReports(user, { limit, offset, boardId })
   } catch (error) {
     console.error("Error fetching resolved reports:", error)
-    return []
+    return { reports: [], total: 0 }
   }
 }
 
@@ -134,4 +134,29 @@ export async function getBans() {
 
 export async function updateBan(id: number, reason?: string, durationHours?: number | null) {
   return handleModerationAction((user) => moderationController.updateBan(user, id, reason, durationHours))
+}
+
+export async function bulkResolveReports(reportIds: number[]) {
+  return handleModerationAction((user) => moderationController.bulkResolveReports(user, reportIds))
+}
+
+export async function bulkDismissReports(reportIds: number[]) {
+  return handleModerationAction((user) => moderationController.bulkDismissReports(user, reportIds))
+}
+
+export async function handleSpamMacro(reportId: number, contentType: "thread" | "reply", contentId: number, ipAddress: string) {
+  return handleModerationAction(async (user) => {
+    // 1. Ban User
+    await moderationController.banUser(user, ipAddress, "Spam / Iklan", 24)
+    
+    // 2. Delete Content
+    if (contentType === "thread") {
+      await moderationController.deleteThread(user, contentId)
+    } else {
+      await moderationController.deleteReply(user, contentId)
+    }
+
+    // 3. Resolve Report
+    await moderationController.resolveReport(user, reportId, "moderator")
+  })
 }

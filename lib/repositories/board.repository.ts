@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
 import { boards } from "@/lib/db/schema"
-import { asc, eq } from "drizzle-orm"
+import { asc, eq, inArray } from "drizzle-orm"
 import type { BoardEntity } from "@/lib/entities/board.entity"
 
 export class BoardRepository {
@@ -39,6 +39,16 @@ export class BoardRepository {
     }
 
     return this.mapToEntity(rows[0])
+  }
+
+  async findManyByIds(ids: number[]): Promise<BoardEntity[]> {
+    if (ids.length === 0) return []
+    const rows = await db
+      .select()
+      .from(boards)
+      .where(inArray(boards.id, ids))
+
+    return rows.map(this.mapToEntity)
   }
 
   private mapToEntity(row: typeof boards.$inferSelect): BoardEntity {

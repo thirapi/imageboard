@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
 import { replies } from "@/lib/db/schema"
-import { asc, eq, and, sql, desc } from "drizzle-orm"
+import { asc, eq, and, sql, desc, inArray } from "drizzle-orm"
 import type { ReplyEntity, CreateReplyInput } from "@/lib/entities/reply.entity"
 
 export class ReplyRepository {
@@ -152,5 +152,11 @@ export class ReplyRepository {
 
     return rows.map((row) => this.mapToEntity(row))
   }
-
+  async findManyByIds(ids: number[]): Promise<ReplyEntity[]> {
+    if (ids.length === 0) return []
+    const rows = await db.query.replies.findMany({
+      where: inArray(replies.id, ids),
+    })
+    return rows.map((row) => this.mapToEntity(row))
+  }
 }

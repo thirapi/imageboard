@@ -254,6 +254,14 @@ export class ThreadRepository {
     return result[0]?.count ?? 0
   }
 
+  async findManyByIds(ids: number[]): Promise<ThreadEntity[]> {
+    if (ids.length === 0) return []
+    const rows = await db.query.threads.findMany({
+      where: inArray(threads.id, ids),
+    })
+    return rows.map((row) => this.mapToEntity(row))
+  }
+
   private mapToEntity(row: typeof threads.$inferSelect): ThreadEntity {
     return {
       id: row.id,

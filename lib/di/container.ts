@@ -42,6 +42,8 @@ import { UnlockThreadUseCase } from "@/lib/use-cases/unlock-thread.use-case"
 import { UnpinThreadUseCase } from "@/lib/use-cases/unpin-thread.use-case"
 import { SeedBoardLoadTestUseCase } from "@/lib/use-cases/seed-board.use-case"
 import { DeletePostWithPasswordUseCase } from "@/lib/use-cases/delete-post-with-password.use-case"
+import { BulkResolveReportsUseCase } from "@/lib/use-cases/bulk-resolve-reports.use-case"
+import { BulkDismissReportsUseCase } from "@/lib/use-cases/bulk-dismiss-reports.use-case"
 
 // Controllers
 import { HomeController } from "@/lib/controllers/home.controller"
@@ -108,6 +110,8 @@ const markNsfwUseCase = new MarkNsfwUseCase(threadRepository, replyRepository)
 const getBansUseCase = new GetBansUseCase(banRepository)
 const updateBanUseCase = new UpdateBanUseCase(banRepository)
 const deletePostWithPasswordUseCase = new DeletePostWithPasswordUseCase(threadRepository, replyRepository)
+const bulkResolveReportsUseCase = new BulkResolveReportsUseCase(reportRepository)
+const bulkDismissReportsUseCase = new BulkDismissReportsUseCase(reportRepository)
 
 const seedBoardLoadTestUseCase = new SeedBoardLoadTestUseCase(
   threadRepository,
@@ -139,6 +143,8 @@ const moderationController = new ModerationController(
   markNsfwUseCase,
   getBansUseCase,
   updateBanUseCase,
+  bulkResolveReportsUseCase,
+  bulkDismissReportsUseCase,
 )
 const replyController = new ReplyController(replyToThreadUseCase)
 const reportController = new ReportController(reportRepository, getReportsUseCase)

@@ -13,6 +13,8 @@ import type { UnbanUserUseCase } from "@/lib/use-cases/unban-user.use-case"
 import type { MarkNsfwUseCase } from "@/lib/use-cases/mark-nsfw.use-case"
 import type { GetBansUseCase } from "@/lib/use-cases/get-bans.use-case"
 import type { UpdateBanUseCase } from "@/lib/use-cases/update-ban.use-case"
+import type { BulkResolveReportsUseCase } from "@/lib/use-cases/bulk-resolve-reports.use-case"
+import type { BulkDismissReportsUseCase } from "@/lib/use-cases/bulk-dismiss-reports.use-case"
 
 export class ModerationController {
   constructor(
@@ -31,6 +33,8 @@ export class ModerationController {
     private markNsfwUseCase: MarkNsfwUseCase,
     private getBansUseCase: GetBansUseCase,
     private updateBanUseCase: UpdateBanUseCase,
+    private bulkResolveReportsUseCase: BulkResolveReportsUseCase,
+    private bulkDismissReportsUseCase: BulkDismissReportsUseCase,
   ) { }
 
   async lockThread(user: any, threadId: number) {
@@ -121,13 +125,13 @@ export class ModerationController {
     return { success: true }
   }
 
-  async getPendingReports(user: any) {
+  async getPendingReports(user: any, options: { limit?: number; offset?: number; boardId?: number } = {}) {
     // Call use case
-    return await this.getPendingReportsUseCase.execute(user)
+    return await this.getPendingReportsUseCase.execute(user, options)
   }
 
-  async getResolvedReports(user: any) {
-    return await this.getResolvedReportsUseCase.execute(user)
+  async getResolvedReports(user: any, options: { limit?: number; offset?: number; boardId?: number } = {}) {
+    return await this.getResolvedReportsUseCase.execute(user, options)
   }
 
   async banUser(user: any, ipAddress: string, reason?: string, durationHours?: number) {
@@ -155,6 +159,16 @@ export class ModerationController {
   async updateBan(user: any, id: number, reason?: string, durationHours?: number | null) {
     if (!id) throw new Error("Ban ID is required")
     await this.updateBanUseCase.execute(user, { id, reason, durationHours })
+    return { success: true }
+  }
+
+  async bulkResolveReports(user: any, reportIds: number[]) {
+    await this.bulkResolveReportsUseCase.execute(user, reportIds, "moderator")
+    return { success: true }
+  }
+
+  async bulkDismissReports(user: any, reportIds: number[]) {
+    await this.bulkDismissReportsUseCase.execute(user, reportIds, "moderator")
     return { success: true }
   }
 }

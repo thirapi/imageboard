@@ -16,6 +16,7 @@ import {
   banUser,
   unbanUser,
   markAsNsfw,
+  handleSpamMacro,
 } from "@/lib/actions/moderation.actions";
 import { Ban, ShieldAlert, LockKeyholeOpen, PinOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -103,6 +104,11 @@ export function ModActions({
             contentType as "thread" | "reply",
             contentId,
           );
+          break;
+        case "spamMacro":
+          if (ipAddress) {
+            result = await handleSpamMacro(reportId, contentType as "thread" | "reply", contentId, ipAddress);
+          }
           break;
       }
 
@@ -227,6 +233,19 @@ export function ModActions({
         <ShieldAlert className="h-4 w-4 mr-2 text-destructive" />
         Tandai NSFW
       </Button>
+
+      {ipAddress && (
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => handleAction("spamMacro")}
+          disabled={isProcessing}
+          className="flex-1 bg-red-600 hover:bg-red-700"
+        >
+          <ShieldAlert className="h-4 w-4 mr-2" />
+          Quick Spam (Ban+Del)
+        </Button>
+      )}
 
       {ipAddress && (
         <BanDialog

@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
 import { bans } from "@/lib/db/schema"
-import { eq, and, gt, or, isNull } from "drizzle-orm"
+import { eq, and, gt, or, isNull, inArray } from "drizzle-orm"
 
 export interface BanEntity {
     id: number
@@ -35,6 +35,28 @@ export class BanRepository {
             expiresAt: row.expiresAt,
             createdAt: row.createdAt!
         }
+    }
+
+    async findActiveByIps(ips: string[]): Promise<BanEntity[]> {
+        if (ips.length === 0) return []
+        const now = new Date()
+        const rows = await db.query.bans.findMany({
+            where: and(
+                inArray(bans.ipAddress, ips),
+                or(
+                    isNull(bans.expiresAt),
+                    gt(bans.expiresAt, now)
+                )
+            )
+        })
+
+        return rows.map(row => ({
+            id: row.id,
+            ipAddress: row.ipAddress,
+            reason: row.reason,
+            expiresAt: row.expiresAt,
+            createdAt: row.createdAt!
+        }))
     }
 
     async create(input: { ipAddress: string; reason?: string; expiresAt?: Date }): Promise<void> {
