@@ -4,6 +4,7 @@ import { lucia } from '@/lib/auth';
 import { AuthController } from '@/lib/controllers/auth.controller';
 import { UserRepository } from '@/lib/repositories/user.repository';
 import { LoginUseCase } from '@/lib/use-cases/login.use-case';
+import { PasswordService } from '../services/password.service';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -14,7 +15,8 @@ import { redirect } from 'next/navigation';
 export async function login(prevState: any, formData: FormData) {
   // 1. Dependency Injection (Composition Root)
   const userRepository = new UserRepository();
-  const loginUseCase = new LoginUseCase(userRepository);
+  const passwordService = new PasswordService();
+  const loginUseCase = new LoginUseCase(userRepository, passwordService);
   const authController = new AuthController(loginUseCase);
 
   try {

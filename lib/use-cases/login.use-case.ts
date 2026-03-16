@@ -1,7 +1,7 @@
 
 import { User } from '@/lib/entities/user.entity';
 import { IUserRepository } from '@/lib/repositories/user.repository';
-import { verify } from "@node-rs/argon2";
+import { PasswordService } from "../services/password.service"
 
 interface ILoginCredentials {
   email: string;
@@ -9,7 +9,10 @@ interface ILoginCredentials {
 }
 
 export class LoginUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private passwordService: PasswordService
+  ) {}
 
   async execute({ email, password }: ILoginCredentials): Promise<User> {
     const existingUser = await this.userRepository.getUserByEmail(email);
@@ -18,7 +21,7 @@ export class LoginUseCase {
       throw new Error('Invalid email or password');
     }
 
-    const validPassword = await verify(
+    const validPassword = await this.passwordService.verify(
       existingUser.hashedPassword,
       password
     );

@@ -12,6 +12,7 @@ import { BanRepository } from "@/lib/repositories/ban.repository"
 // Services
 import { CloudinaryService } from "@/lib/services/cloudinary.service"
 import { ContentFilterService } from "@/lib/services/content-filter.service"
+import { PasswordService } from "@/lib/services/password.service"
 
 // Use Cases
 import { CreateReportUseCase } from "@/lib/use-cases/create-report.use-case"
@@ -67,6 +68,7 @@ const banRepository = new BanRepository()
 const cloudinaryService = new CloudinaryService()
 const contentFilterService = new ContentFilterService()
 const sequenceService = new SequenceService()
+const passwordService = new PasswordService()
 
 // Instantiate Use Cases
 const createReportUseCase = new CreateReportUseCase(reportRepository)
@@ -76,7 +78,8 @@ const createThreadUseCase = new CreateThreadUseCase(
   imageRepository,
   cloudinaryService,
   sequenceService,
-  banRepository
+  banRepository,
+  passwordService
 )
 const dismissReportUseCase = new DismissReportUseCase(reportRepository)
 const getBoardListUseCase = new GetBoardListUseCase(boardRepository)
@@ -97,7 +100,8 @@ const replyToThreadUseCase = new ReplyToThreadUseCase(
   imageRepository,
   cloudinaryService,
   sequenceService,
-  banRepository
+  banRepository,
+  passwordService
 )
 const resolveReportUseCase = new ResolveReportUseCase(reportRepository)
 const softDeleteReplyUseCase = new SoftDeleteReplyUseCase(replyRepository)
@@ -109,7 +113,7 @@ const unbanUserUseCase = new UnbanUserUseCase(banRepository)
 const markNsfwUseCase = new MarkNsfwUseCase(threadRepository, replyRepository)
 const getBansUseCase = new GetBansUseCase(banRepository)
 const updateBanUseCase = new UpdateBanUseCase(banRepository)
-const deletePostWithPasswordUseCase = new DeletePostWithPasswordUseCase(threadRepository, replyRepository)
+const deletePostWithPasswordUseCase = new DeletePostWithPasswordUseCase(threadRepository, replyRepository, passwordService)
 const bulkResolveReportsUseCase = new BulkResolveReportsUseCase(reportRepository)
 const bulkDismissReportsUseCase = new BulkDismissReportsUseCase(reportRepository)
 

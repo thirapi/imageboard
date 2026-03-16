@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { resolve } from "path";
-import { hash } from "@node-rs/argon2";
+import { PasswordService } from "../lib/services/password.service";
 import crypto from "crypto";  // Built-in Node
 config({ path: resolve(__dirname, "../.env") });
 
@@ -10,6 +10,7 @@ config({ path: resolve(__dirname, "../.env") });
  * Set env: ADMIN_PASSWORD=rahasia-kuat-123 di .env.local.
  */
 async function generateSeed() {
+  const passwordService = new PasswordService();
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
@@ -21,12 +22,7 @@ async function generateSeed() {
   console.log('Menghasilkan hash untuk admin...');
 
   try {
-    // Custom Argon2 options (OWASP-compliant)
-    const hashedPassword = await hash(adminPassword, {
-      memoryCost: 19456,  // 19 MiB
-      timeCost: 2,
-      outputLen: 32,  // Salted hash length
-    });
+    const hashedPassword = await passwordService.hash(adminPassword);
 
     console.log('Hash berhasil dibuat.');
 

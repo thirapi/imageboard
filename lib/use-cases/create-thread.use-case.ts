@@ -6,7 +6,7 @@ import type { BanRepository } from "@/lib/repositories/ban.repository"
 import { CreateThreadCommand } from "@/lib/entities/thread.entity"
 import { SequenceService } from "../services/sequence.service"
 import { generateTripcode } from "../utils/tripcode"
-import { hash } from "@node-rs/argon2"
+import { PasswordService } from "../services/password.service"
 
 export class CreateThreadUseCase {
   constructor(
@@ -16,6 +16,7 @@ export class CreateThreadUseCase {
     private cloudinaryService: CloudinaryService,
     private sequenceService: SequenceService,
     private banRepository: BanRepository,
+    private passwordService: PasswordService,
   ) { }
 
   async execute(input: CreateThreadCommand): Promise<number> {
@@ -88,7 +89,7 @@ export class CreateThreadUseCase {
     // Hash deletion password if provided
     let hashedPassword: string | null = null
     if (input.deletionPassword) {
-      hashedPassword = await hash(input.deletionPassword)
+      hashedPassword = await this.passwordService.hash(input.deletionPassword)
     }
 
     // Create thread

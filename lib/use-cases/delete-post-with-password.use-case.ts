@@ -1,11 +1,12 @@
 import type { ThreadRepository } from "@/lib/repositories/thread.repository"
 import type { ReplyRepository } from "@/lib/repositories/reply.repository"
-import { verify } from "@node-rs/argon2"
+import { PasswordService } from "../services/password.service"
 
 export class DeletePostWithPasswordUseCase {
     constructor(
         private threadRepository: ThreadRepository,
-        private replyRepository: ReplyRepository
+        private replyRepository: ReplyRepository,
+        private passwordService: PasswordService
     ) { }
 
     async execute(postId: number, postType: "thread" | "reply", password?: string): Promise<void> {
@@ -50,15 +51,15 @@ export class DeletePostWithPasswordUseCase {
     }
 
     private async verifyPassword(input: string, stored: string): Promise<boolean> {
-        // Check if it's an argon2 hash (usually starts with $argon2)
-        if (stored.startsWith("$argon2")) {
-            try {
-                return await verify(stored, input)
-            } catch (e) {
-                return false
-            }
+        // Try to verify using the PasswordService (handles Scrypt and Argon2id)
+        const isValid = await this.passwordService.verify(stored, input);
+        if (isValid) return true;
+
+        // Fallback for plain text (legacy) - only if it doesn't look like a hash
+        if (!stored.startsWith("$")) {
+            return input === stored;
         }
-        // Fallback for plain text (legacy)
-        return input === stored
+
+        return false;
     }
 }
