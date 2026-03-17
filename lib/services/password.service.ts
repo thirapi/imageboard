@@ -1,4 +1,5 @@
-import { scrypt, argon2Verify } from "hash-wasm";
+import { scrypt } from "@noble/hashes/scrypt.js";
+import { argon2Verify } from "argon2-wasm-edge";
 
 export interface IPasswordService {
   hash(password: string): Promise<string>;
@@ -16,9 +17,9 @@ export class PasswordService implements IPasswordService {
 
   // Scrypt parameters (Standard secure defaults)
   private readonly scryptOptions = {
-    costFactor: 16384,
-    blockSize: 8,
-    parallelism: 1,
+    costFactor: 16384, // N
+    blockSize: 8,     // r
+    parallelism: 1,   // p
     saltSize: 16,
     hashLength: 32,
   };
@@ -32,14 +33,12 @@ export class PasswordService implements IPasswordService {
     const passwordBytes = encoder.encode(password);
     const salt = crypto.getRandomValues(new Uint8Array(this.scryptOptions.saltSize));
     
-    const hashData = await scrypt({
-      password: passwordBytes,
-      salt: salt,
-      costFactor: this.scryptOptions.costFactor,
-      blockSize: this.scryptOptions.blockSize,
-      parallelism: this.scryptOptions.parallelism,
-      hashLength: this.scryptOptions.hashLength,
-      outputType: "binary",
+    // @noble/hashes scrypt is synchronous
+    const hashData = scrypt(passwordBytes, salt, {
+      N: this.scryptOptions.costFactor,
+      r: this.scryptOptions.blockSize,
+      p: this.scryptOptions.parallelism,
+      dkLen: this.scryptOptions.hashLength,
     });
 
     const saltB64 = this.toBase64(salt).replace(/=/g, "");
@@ -82,27 +81,22 @@ export class PasswordService implements IPasswordService {
     const salt = this.fromBase64(saltB64);
     const originalHash = this.fromBase64(hashB64);
 
-    const checkHash = await scrypt({
-      password: passwordBytes,
-      salt: salt,
-      costFactor: n,
-      blockSize: r,
-      parallelism: p,
-      hashLength: originalHash.length,
-      outputType: "binary",
+    const checkHash = scrypt(passwordBytes, salt, {
+      N: n,
+      r: r,
+      p: p,
+      dkLen: originalHash.length,
     });
 
     return this.constantTimeEqual(originalHash, checkHash);
   }
 
   private async verifyArgon2(hash: string, password: string): Promise<boolean> {
-    const encoder = new TextEncoder();
-    const passwordBytes = encoder.encode(password);
-    
     try {
-      // hash-wasm's argon2Verify handles standard PHC encoded strings
+      // argon2-wasm-edge's argon2Verify handles standard PHC encoded strings
+      // and is compatible with Cloudflare Workers security policies.
       return await argon2Verify({
-        password: passwordBytes,
+        password: password,
         hash: hash
       });
     } catch (e) {
