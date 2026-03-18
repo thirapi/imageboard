@@ -152,17 +152,15 @@ export function ThreadClient({
 
         <div className="mt-4 block overflow-hidden">
           {thread.image && (
-            <div className="float-left mr-5 mb-2">
-              <ExpandableImage
-                src={thread.image}
-                alt="Thread image"
-                metadata={thread.imageMetadata || undefined}
-                isOP={true}
-                isNsfw={thread.isNsfw}
-                isSpoiler={thread.isSpoiler}
-                onFullScreen={() => handleImageClick(thread.image!)}
-              />
-            </div>
+            <ExpandableImage
+              src={thread.image}
+              alt="Thread image"
+              metadata={thread.imageMetadata || undefined}
+              isOP={true}
+              isNsfw={thread.isNsfw}
+              isSpoiler={thread.isSpoiler}
+              onFullScreen={() => handleImageClick(thread.image!)}
+            />
           )}
           <div className="text-base leading-relaxed whitespace-pre-wrap break-words ib-content">
             <FormattedText content={thread.content} />
@@ -216,16 +214,14 @@ export function ThreadClient({
 
             <div className="p-3 block overflow-hidden">
               {reply.image && (
-                <div className="float-left mr-3 mb-1">
-                  <ExpandableImage
-                    src={reply.image}
-                    alt="Reply image"
-                    metadata={reply.imageMetadata || undefined}
-                    isNsfw={reply.isNsfw}
-                    isSpoiler={reply.isSpoiler}
-                    onFullScreen={() => handleImageClick(reply.image!)}
-                  />
-                </div>
+                <ExpandableImage
+                  src={reply.image}
+                  alt="Reply image"
+                  metadata={reply.imageMetadata || undefined}
+                  isNsfw={reply.isNsfw}
+                  isSpoiler={reply.isSpoiler}
+                  onFullScreen={() => handleImageClick(reply.image!)}
+                />
               )}
               <div className="whitespace-pre-wrap break-words leading-relaxed text-sm lg:text-base">
                 <FormattedText content={reply.content} />

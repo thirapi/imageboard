@@ -40,12 +40,12 @@ export function ExpandableImage({
       className={cn(
         "flex flex-col gap-0.5 mb-1",
         isExpanded
-          ? "w-full"
+          ? "block w-full clear-both"
           : cn(
-              "w-fit",
+              "w-fit float-left",
               isOP
-                ? "max-w-[200px] sm:max-w-[300px]"
-                : "max-w-[150px] sm:max-w-[250px]",
+                ? "max-w-[200px] sm:max-w-[300px] mr-4 sm:mr-5 mb-2"
+                : "max-w-[150px] sm:max-w-[250px] mr-3 mb-1",
             ),
         className,
       )}

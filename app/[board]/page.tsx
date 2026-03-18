@@ -175,15 +175,13 @@ export default async function BoardPage({
                   {/* Content area with classic layout for OP */}
                   <div className="mt-2 block overflow-hidden">
                     {thread.image && (
-                      <div className="float-left mr-4 mb-2">
-                        <ExpandableImage
-                          src={thread.image}
-                          alt="Thumbnail"
-                          isNsfw={thread.isNsfw}
-                          isSpoiler={thread.isSpoiler}
-                          isOP={true}
-                        />
-                      </div>
+                      <ExpandableImage
+                        src={thread.image}
+                        alt="Thumbnail"
+                        isNsfw={thread.isNsfw}
+                        isSpoiler={thread.isSpoiler}
+                        isOP={true}
+                      />
                     )}
                     <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                       <FormattedText content={thread.content} />
@@ -230,14 +228,12 @@ export default async function BoardPage({
                             </div>
                             <div className="p-2 block overflow-hidden">
                               {reply.image && (
-                                <div className="float-left mr-3 mb-1">
-                                  <ExpandableImage
-                                    src={reply.image}
-                                    alt="Reply thumbnail"
-                                    isNsfw={reply.isNsfw}
-                                    isSpoiler={reply.isSpoiler}
-                                  />
-                                </div>
+                                <ExpandableImage
+                                  src={reply.image}
+                                  alt="Reply thumbnail"
+                                  isNsfw={reply.isNsfw}
+                                  isSpoiler={reply.isSpoiler}
+                                />
                               )}
                               <div className="text-sm leading-snug">
                                 <FormattedText content={reply.content} />
