@@ -2,13 +2,22 @@
 
 import { container } from "@/lib/di/container"
 
-const { homeController } = container
+const { homeController, boardController } = container
 
 export async function getBoardList() {
   try {
     return await homeController.getBoardList()
   } catch (error) {
     console.error("Error fetching board list:", error)
+    return []
+  }
+}
+
+export async function getBoardCategories() {
+  try {
+    return await boardController.getBoardCategories()
+  } catch (error) {
+    console.error("Error fetching board categories:", error)
     return []
   }
 }

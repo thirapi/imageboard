@@ -18,8 +18,12 @@ export async function getModeratorAuthorizer() {
 
   const { session, user } = await lucia.validateSession(sessionId)
 
-  if (!session || (user.role !== "admin" && user.role !== "moderator")) {
-    throw new Error("Unauthorized: Invalid session or insufficient permissions")
+  if (!session) {
+    throw new Error("Unauthorized: Invalid session")
+  }
+
+  if (user.role !== "admin" && user.role !== "moderator") {
+    throw new Error("Unauthorized: insufficient permissions")
   }
 
   return user

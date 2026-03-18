@@ -1,3 +1,4 @@
+export * from './board_categories'
 export * from './boards'
 export * from './threads'
 export * from './replies'

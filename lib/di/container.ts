@@ -8,6 +8,7 @@ import { ReplyRepository } from "@/lib/repositories/reply.repository"
 import { ReportRepository } from "@/lib/repositories/report.repository"
 import { ThreadRepository } from "@/lib/repositories/thread.repository"
 import { BanRepository } from "@/lib/repositories/ban.repository"
+import { BoardCategoryRepository } from "@/lib/repositories/board-category.repository"
 
 // Services
 import { CloudinaryService } from "@/lib/services/cloudinary.service"
@@ -24,6 +25,7 @@ import { GetBansUseCase } from "@/lib/use-cases/get-bans.use-case"
 import { UpdateBanUseCase } from "@/lib/use-cases/update-ban.use-case"
 import { DismissReportUseCase } from "@/lib/use-cases/dismiss-report.use-case"
 import { GetBoardListUseCase } from "@/lib/use-cases/get-board-list.use-case"
+import { GetBoardByIdUseCase } from "@/lib/use-cases/get-board-by-id.use-case"
 import { GetLatestPostsUseCase } from "@/lib/use-cases/get-latest-posts.use-case"
 import { GetPendingReportsUseCase } from "@/lib/use-cases/get-pending-reports.use-case"
 import { GetResolvedReportsUseCase } from "@/lib/use-cases/get-resolved-reports.use-case"
@@ -45,10 +47,20 @@ import { SeedBoardLoadTestUseCase } from "@/lib/use-cases/seed-board.use-case"
 import { DeletePostWithPasswordUseCase } from "@/lib/use-cases/delete-post-with-password.use-case"
 import { BulkResolveReportsUseCase } from "@/lib/use-cases/bulk-resolve-reports.use-case"
 import { BulkDismissReportsUseCase } from "@/lib/use-cases/bulk-dismiss-reports.use-case"
+import { CreateBoardUseCase } from "@/lib/use-cases/create-board.use-case"
+import { UpdateBoardUseCase } from "@/lib/use-cases/update-board.use-case"
+import { DeleteBoardUseCase } from "@/lib/use-cases/delete-board.use-case"
+import { CreateBoardCategoryUseCase } from "@/lib/use-cases/create-board-category.use-case"
+import { UpdateBoardCategoryUseCase } from "@/lib/use-cases/update-board-category.use-case"
+import { DeleteBoardCategoryUseCase } from "@/lib/use-cases/delete-board-category.use-case"
+import { GetBoardCategoriesUseCase } from "@/lib/use-cases/get-board-categories.use-case"
+import { ReorderBoardCategoryUseCase } from "@/lib/use-cases/reorder-board-category.use-case"
 
 // Controllers
 import { HomeController } from "@/lib/controllers/home.controller"
 import { ModerationController } from "@/lib/controllers/moderation.controller"
+import { BoardController } from "@/lib/controllers/board.controller"
+import { BoardCategoryController } from "@/lib/controllers/board-category.controller"
 import { ReplyController } from "@/lib/controllers/reply.controller"
 import { ReportController } from "@/lib/controllers/report.controller"
 import { ThreadController } from "@/lib/controllers/thread.controller"
@@ -63,6 +75,7 @@ const replyRepository = new ReplyRepository()
 const reportRepository = new ReportRepository()
 const threadRepository = new ThreadRepository()
 const banRepository = new BanRepository()
+const categoryRepository = new BoardCategoryRepository()
 
 // Instantiate Services
 const cloudinaryService = new CloudinaryService()
@@ -83,6 +96,7 @@ const createThreadUseCase = new CreateThreadUseCase(
 )
 const dismissReportUseCase = new DismissReportUseCase(reportRepository)
 const getBoardListUseCase = new GetBoardListUseCase(boardRepository)
+const getBoardByIdUseCase = new GetBoardByIdUseCase(boardRepository)
 const getLatestPostsUseCase = new GetLatestPostsUseCase(postRepository)
 const getPendingReportsUseCase = new GetPendingReportsUseCase(reportRepository, threadRepository, replyRepository, banRepository, boardRepository)
 const getResolvedReportsUseCase = new GetResolvedReportsUseCase(reportRepository, threadRepository, replyRepository, banRepository, boardRepository)
@@ -116,6 +130,14 @@ const updateBanUseCase = new UpdateBanUseCase(banRepository)
 const deletePostWithPasswordUseCase = new DeletePostWithPasswordUseCase(threadRepository, replyRepository, passwordService)
 const bulkResolveReportsUseCase = new BulkResolveReportsUseCase(reportRepository)
 const bulkDismissReportsUseCase = new BulkDismissReportsUseCase(reportRepository)
+const createBoardUseCase = new CreateBoardUseCase(boardRepository)
+const updateBoardUseCase = new UpdateBoardUseCase(boardRepository)
+const deleteBoardUseCase = new DeleteBoardUseCase(boardRepository)
+const createBoardCategoryUseCase = new CreateBoardCategoryUseCase(categoryRepository)
+const updateBoardCategoryUseCase = new UpdateBoardCategoryUseCase(categoryRepository)
+const deleteBoardCategoryUseCase = new DeleteBoardCategoryUseCase(categoryRepository, boardRepository)
+const getBoardCategoriesUseCase = new GetBoardCategoriesUseCase(categoryRepository)
+const reorderBoardCategoryUseCase = new ReorderBoardCategoryUseCase(categoryRepository)
 
 const seedBoardLoadTestUseCase = new SeedBoardLoadTestUseCase(
   threadRepository,
@@ -153,6 +175,21 @@ const moderationController = new ModerationController(
 const replyController = new ReplyController(replyToThreadUseCase)
 const reportController = new ReportController(reportRepository, getReportsUseCase)
 const threadController = new ThreadController(createThreadUseCase, getThreadListUseCase, getThreadDetailUseCase)
+const boardController = new BoardController(
+  createBoardUseCase,
+  updateBoardUseCase,
+  deleteBoardUseCase,
+  getBoardListUseCase,
+  getBoardByIdUseCase,
+  getBoardCategoriesUseCase
+)
+const boardCategoryController = new BoardCategoryController(
+  createBoardCategoryUseCase,
+  updateBoardCategoryUseCase,
+  deleteBoardCategoryUseCase,
+  getBoardCategoriesUseCase,
+  reorderBoardCategoryUseCase
+)
 const seedController = new SeedController(seedBoardLoadTestUseCase)
 
 // Export container
@@ -162,8 +199,11 @@ export const container = {
   replyController,
   reportController,
   threadController,
+  boardController,
+  boardCategoryController,
   seedController,
   createReportUseCase,
   deletePostWithPasswordUseCase,
   boardRepository, // Export repository for actions
+  categoryRepository,
 }

@@ -84,7 +84,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "baseline-browser-mapping": "^2.10.0",
-    "drizzle-kit": "^0.18.1",
+    "drizzle-kit": "^0.31.10",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tsx": "^4.21.0",

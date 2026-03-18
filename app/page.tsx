@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   getBoardList,
+  getBoardCategories, // NEW
   getLatestPosts,
   getRecentImages,
   getSystemStats,
@@ -10,6 +11,7 @@ import { FormattedText } from "@/components/formatted-text";
 import { getThumbnailUrl } from "@/lib/utils/image";
 import { LatestPosts } from "@/components/latest-posts";
 import type { Metadata } from "next";
+import { BoardEntity, BoardCategoryEntity } from "@/lib/entities/board.entity";
 
 export const metadata: Metadata = {
   title: "62chan",
@@ -20,36 +22,37 @@ export const metadata: Metadata = {
 export const revalidate = 60; // Cache halaman selama 60 detik
 
 // Group boards by category based on fscchan structure
-function groupBoards(boards: any[]) {
-  const popkultur = ["wibu", "gim", "sass", "oc", "cb", "med", "rj"];
-  const kekinian = [
-    "pol",
-    "mipa",
-    "pew",
-    "omni",
-    "jas",
-    "wang",
-    "kul",
-    "oto",
-    "ac",
-    "tre",
-  ];
-  const bebas = ["b", "dio", "mis", "sjrh", "tlg"];
+function groupBoards(boards: BoardEntity[], categories: BoardCategoryEntity[]) {
+  const groups: Map<string, BoardEntity[]> = new Map();
 
-  return {
-    popkultur: boards.filter((b) => popkultur.includes(b.code)),
-    kekinian: boards.filter((b) => kekinian.includes(b.code)),
-    bebas: boards.filter((b) => bebas.includes(b.code)),
-  };
+  // Initialize ordered categories from DB
+  categories.forEach(cat => {
+    groups.set(cat.name, []);
+  });
+
+  // Handle board sorting
+  boards.forEach(board => {
+    const key = board.categoryName || "Lainnya";
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key)!.push(board);
+  });
+
+  return groups;
 }
 
 export default async function HomePage() {
-  const boards = await getBoardList();
-  const latestPosts = await getLatestPosts(10);
-  const recentImages = await getRecentImages(25);
-  const stats = await getSystemStats();
+  const [boards, categories, latestPosts, recentImages, stats] = await Promise.all([
+    getBoardList(),
+    getBoardCategories(),
+    getLatestPosts(10),
+    getRecentImages(25),
+    getSystemStats()
+  ]);
 
-  const groupedBoards = groupBoards(boards);
+  const groupedBoards = groupBoards(boards, categories);
+  const categoryNames = Array.from(groupedBoards.keys()).filter(name => groupedBoards.get(name)!.length > 0);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -79,14 +82,13 @@ export default async function HomePage() {
       <main className="container mx-auto px-4 py-8 flex-1 max-w-6xl">
         {/* Board List - 4chan style with columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 md:gap-y-10">
-          {/* Popkultur */}
-          {groupedBoards.popkultur.length > 0 && (
-            <section className="bg-card/30 p-4 rounded-lg border border-border/50 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none">
+          {categoryNames.map(categoryName => (
+            <section key={categoryName} className="bg-card/30 p-4 rounded-lg border border-border/50 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none">
               <h2 className="text-xl font-bold mb-3 text-accent border-b pb-1">
-                Popkultur
+                {categoryName}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-2 md:gap-y-1 text-sm">
-                {groupedBoards.popkultur.map((board) => (
+                {groupedBoards.get(categoryName)!.map((board) => (
                   <div key={board.id} className="leading-relaxed">
                     <Link
                       href={`/${board.code}`}
@@ -107,67 +109,7 @@ export default async function HomePage() {
                 ))}
               </div>
             </section>
-          )}
-
-          {/* Kekinian */}
-          {groupedBoards.kekinian.length > 0 && (
-            <section className="bg-card/30 p-4 rounded-lg border border-border/50 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none">
-              <h2 className="text-xl font-bold mb-3 text-accent border-b pb-1">
-                Kekinian
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-2 md:gap-y-1 text-sm">
-                {groupedBoards.kekinian.map((board) => (
-                  <div key={board.id} className="leading-relaxed">
-                    <Link
-                      href={`/${board.code}`}
-                      className="hover:underline hover:text-accent group flex flex-col md:inline text-left"
-                    >
-                      <span className="text-accent font-bold leading-none">
-                        /{board.code}/
-                      </span>
-                      <span className="text-foreground/90 md:hidden text-[11px] leading-tight mt-0.5 font-medium break-words">
-                        {board.name}
-                      </span>
-                      <span className="text-foreground md:inline hidden md:ml-1">
-                        {" "}
-                        - {board.name}
-                      </span>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Bebas */}
-          {groupedBoards.bebas.length > 0 && (
-            <section className="bg-card/30 p-4 rounded-lg border border-border/50 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none">
-              <h2 className="text-xl font-bold mb-3 text-accent border-b pb-1">
-                Bebas
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-2 md:gap-y-1 text-sm">
-                {groupedBoards.bebas.map((board) => (
-                  <div key={board.id} className="leading-relaxed">
-                    <Link
-                      href={`/${board.code}`}
-                      className="hover:underline hover:text-accent group flex flex-col md:inline text-left"
-                    >
-                      <span className="text-accent font-bold leading-none">
-                        /{board.code}/
-                      </span>
-                      <span className="text-foreground/90 md:hidden text-[11px] leading-tight mt-0.5 font-medium break-words">
-                        {board.name}
-                      </span>
-                      <span className="text-foreground md:inline hidden md:ml-1">
-                        {" "}
-                        - {board.name}
-                      </span>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          ))}
         </div>
 
         {/* Activity Section */}

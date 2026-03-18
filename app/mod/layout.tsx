@@ -6,6 +6,7 @@ import {
   History, 
   ShieldAlert, 
   ShieldX, 
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -41,9 +42,11 @@ export default function ModerationLayout({
             </Link>
             
             <nav className="hidden md:flex items-center gap-1">
-               <TabLink href="/mod" active={pathname === "/mod"} icon={<ShieldAlert className="h-4 w-4" />}>Antrian</TabLink>
-               <TabLink href="/mod/history" active={pathname === "/mod/history"} icon={<History className="h-4 w-4" />}>Riwayat</TabLink>
-               <TabLink href="/mod/bans" active={pathname === "/mod/bans"} icon={<ShieldX className="h-4 w-4" />}>Cekal IP</TabLink>
+                <TabLink href="/mod" active={pathname === "/mod"} icon={<ShieldAlert className="h-4 w-4" />}>Antrian</TabLink>
+                <TabLink href="/mod/boards" active={pathname.startsWith("/mod/boards")} icon={<Settings className="h-4 w-4" />}>Board</TabLink>
+                <TabLink href="/mod/categories" active={pathname.startsWith("/mod/categories")} icon={<Settings className="h-4 w-4" />}>Kategori</TabLink>
+                <TabLink href="/mod/history" active={pathname === "/mod/history"} icon={<History className="h-4 w-4" />}>Riwayat</TabLink>
+                <TabLink href="/mod/bans" active={pathname === "/mod/bans"} icon={<ShieldX className="h-4 w-4" />}>Cekal IP</TabLink>
             </nav>
           </div>
 
