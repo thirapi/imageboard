@@ -129,6 +129,7 @@ import { NavProvider } from "@/components/nav-provider";
 import { BoardNav } from "@/components/board-nav";
 import { AgeVerificationDialog } from "@/components/age-verification-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ScrollButtons } from "@/components/scroll-buttons";
 
 export default function RootLayout({
   children,
@@ -159,6 +160,7 @@ export default function RootLayout({
               <SonnerToaster />
               <Analytics />
               <AgeVerificationDialog />
+              <ScrollButtons />
             </TooltipProvider>
           </NavProvider>
         </ThemeProvider>

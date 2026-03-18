@@ -85,15 +85,16 @@ function TextLine({
 }) {
   // Check if it's greentext
   const isPostQuote = /^>>\d+/.test(text);
-  const isGreentext = text.startsWith(">") && !isPostQuote;
+  const isCrossBoardLink = /^>>>\/[a-zA-Z0-9_-]+\/?/.test(text);
+  const isGreentext = text.startsWith(">") && !isPostQuote && !isCrossBoardLink;
 
   // Parse for quotes, spoilers, and URLs
   const parts = [];
   let lastIndex = 0;
 
-  // Regex for >>123, [spoiler]...[/spoiler], and URLs
+  // Regex for >>>/board/, >>123, [spoiler]...[/spoiler], and URLs
   const regex =
-    />>(\d+)|\[spoiler\](.*?)\[\/spoiler\]|(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+    />>>\/([a-zA-Z0-9_-]+)\/?|>>(\d+)|\[spoiler\](.*?)\[\/spoiler\]|(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
   let match;
 
   while ((match = regex.exec(text)) !== null) {
@@ -103,8 +104,21 @@ function TextLine({
     }
 
     if (match[1]) {
+      // It's a cross-board link: >>>/board/
+      const boardCode = match[1];
+      const linkText = match[0];
+      parts.push(
+        <Link
+          key={match.index}
+          href={`/${boardCode}`}
+          className="quote-link"
+        >
+          {linkText}
+        </Link>
+      );
+    } else if (match[2]) {
       // It's a quote >>(\d+)
-      const postNumber = parseInt(match[1]);
+      const postNumber = parseInt(match[2]);
       parts.push(
         <PostQuote
           key={match.index}
@@ -113,7 +127,7 @@ function TextLine({
           className={preview ? "opacity-70" : ""}
         />,
       );
-    } else if (match[2]) {
+    } else if (match[3]) {
       // It's a spoiler
       if (preview) {
         parts.push(
@@ -124,13 +138,13 @@ function TextLine({
       } else {
         parts.push(
           <span key={match.index} className="spoiler">
-            {match[2]}
+            {match[3]}
           </span>,
         );
       }
-    } else if (match[3]) {
+    } else if (match[4]) {
       // It's a URL with http:// or https://
-      const url = match[3];
+      const url = match[4];
       const videoId = getYouTubeId(url);
 
       if (videoId && !disableEmbeds && !preview) {
@@ -154,9 +168,9 @@ function TextLine({
           </a>,
         );
       }
-    } else if (match[4]) {
+    } else if (match[5]) {
       // It's a URL starting with www.
-      const url = match[4];
+      const url = match[5];
       const fullUrl = `https://${url}`;
       const videoId = getYouTubeId(fullUrl);
 
