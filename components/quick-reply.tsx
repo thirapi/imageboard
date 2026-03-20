@@ -12,6 +12,7 @@ interface QuickReplyProps {
   isOpen: boolean;
   onClose: () => void;
   initialContent?: string;
+  userRole?: string;
 }
 
 export function QuickReply({
@@ -20,6 +21,7 @@ export function QuickReply({
   isOpen,
   onClose,
   initialContent = "",
+  userRole,
 }: QuickReplyProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -167,7 +169,12 @@ export function QuickReply({
           isMinimized ? "scale-y-0 h-0 p-0 overflow-hidden" : "scale-y-100",
         )}
       >
-        <ReplyForm threadId={threadId} boardCode={boardCode} idPrefix="qr" />
+        <ReplyForm 
+          threadId={threadId} 
+          boardCode={boardCode} 
+          idPrefix="qr" 
+          userRole={userRole}
+        />
       </div>
     </div>
   );

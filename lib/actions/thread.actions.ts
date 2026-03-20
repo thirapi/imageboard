@@ -2,6 +2,8 @@
 
 import { container } from "@/lib/di/container"
 import { revalidatePath } from "next/cache"
+import { lucia } from "@/lib/auth"
+import { cookies } from "next/headers"
 
 import { getClientIp } from "@/lib/utils/get-ip"
 import { CaptchaService } from "@/lib/services/captcha.service"
@@ -28,6 +30,22 @@ export async function createThread(formData: FormData) {
     const deletionPassword = formData.get("deletionPassword") as string
     const isNsfw = formData.get("isNsfw") === "on"
     const isSpoiler = formData.get("isSpoiler") === "on"
+    const withCapcode = formData.get("withCapcode") === "on"
+
+    let userRole: string | undefined
+    if (withCapcode) {
+      const sessionId = (await cookies()).get(lucia.sessionCookieName)?.value || null
+      if (sessionId) {
+        const { user } = await lucia.validateSession(sessionId)
+        if (user && (user.role === "admin" || user.role === "moderator")) {
+          userRole = user.role
+        } else {
+          throw new Error("Anda tidak memiliki izin untuk menggunakan capcode.")
+        }
+      } else {
+        throw new Error("Anda harus login untuk menggunakan capcode.")
+      }
+    }
 
     const result = await threadController.createThread({
       boardId,
@@ -39,6 +57,7 @@ export async function createThread(formData: FormData) {
       isNsfw,
       isSpoiler,
       ipAddress,
+      capcode: userRole,
     })
 
     revalidatePath("/")

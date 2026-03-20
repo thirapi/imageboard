@@ -16,6 +16,7 @@ export interface ThreadEntity {
   deletionPassword?: string | null
   postNumber: number
   ipAddress?: string | null
+  capcode?: string | null
 }
 
 export interface CreateThreadCommand {
@@ -28,6 +29,7 @@ export interface CreateThreadCommand {
   isNsfw?: boolean
   isSpoiler?: boolean
   ipAddress?: string
+  capcode?: string | null
 }
 
 export interface CreateThreadInput {
@@ -44,6 +46,7 @@ export interface CreateThreadInput {
   ipAddress?: string
   createdAt?: Date
   bumpedAt?: Date
+  capcode?: string | null
 }
 
 export interface ThreadUI {
@@ -63,4 +66,5 @@ export interface ThreadUI {
   imageMetadata?: string | null
   postNumber: number
   posterId?: string
+  capcode?: string | null
 }

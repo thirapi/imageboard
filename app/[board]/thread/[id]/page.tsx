@@ -129,6 +129,7 @@ export default async function ThreadPage({
           thread={thread}
           replies={replies || []}
           boardCode={boardCode}
+          userRole={user?.role}
         />
       </main>
 

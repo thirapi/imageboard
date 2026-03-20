@@ -12,6 +12,7 @@ export interface CreateThreadRequest {
   isNsfw?: boolean
   isSpoiler?: boolean
   ipAddress?: string
+  capcode?: string | null
 }
 
 export class ThreadController {
@@ -42,6 +43,7 @@ export class ThreadController {
       isNsfw: request.isNsfw,
       isSpoiler: request.isSpoiler,
       ipAddress: request.ipAddress,
+      capcode: request.capcode
     })
 
     return { threadId }

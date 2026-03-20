@@ -19,6 +19,7 @@ export class ReplyRepository {
         isSpoiler: input.isSpoiler ?? false,
         postNumber: input.postNumber,
         ipAddress: input.ipAddress ?? null,
+        capcode: input.capcode ?? null,
       })
       .returning()
 
@@ -45,6 +46,7 @@ export class ReplyRepository {
       postNumber: input.postNumber,
       ipAddress: input.ipAddress ?? null,
       createdAt: input.createdAt, // Optional overwrite
+      capcode: input.capcode ?? null,
     }))
 
     return await db.insert(replies).values(values).returning({ id: replies.id })
@@ -134,6 +136,7 @@ export class ReplyRepository {
       deletionPassword: row.deletionPassword,
       postNumber: row.postNumber!,
       ipAddress: row.ipAddress,
+      capcode: row.capcode,
     }
   }
 

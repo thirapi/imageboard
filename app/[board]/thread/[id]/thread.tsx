@@ -17,17 +17,20 @@ import { QuickReply } from "@/components/quick-reply";
 import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
 import { ReplyProvider, useReply } from "@/components/reply-context";
+import { cn } from "@/lib/utils";
 
 interface ThreadClientProps {
   thread: ThreadUI;
   replies: ReplyUI[];
   boardCode: string;
+  userRole?: string;
 }
 
 export function ThreadClient({
   thread,
   replies,
   boardCode,
+  userRole,
 }: ThreadClientProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
@@ -90,6 +93,41 @@ export function ThreadClient({
     });
   };
 
+  const CapcodeMarker = ({
+    type,
+    className,
+  }: {
+    type: string | null | undefined;
+    className?: string;
+  }) => {
+    if (!type) return null;
+    if (type === "mod" || type === "moderator") {
+      return (
+        <span
+          className={cn(
+            "text-purple-600 dark:text-purple-400 font-bold leading-none",
+            className,
+          )}
+        >
+          ## Mod
+        </span>
+      );
+    }
+    if (type === "admin") {
+      return (
+        <span
+          className={cn(
+            "text-red-600 dark:text-red-400 font-bold leading-none",
+            className,
+          )}
+        >
+          ## Admin
+        </span>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <div className="flex items-center gap-4 mb-8">
@@ -121,10 +159,14 @@ export function ThreadClient({
           {thread.subject && (
             <h1 className="ib-subject text-lg mr-2 inline">{thread.subject}</h1>
           )}
-          <TripcodeDisplay
-            author={thread.author || "Awanama"}
-            className="ib-author text-base"
-          />
+          <div className="flex items-baseline gap-1">
+            <TripcodeDisplay
+              author={thread.author || "Awanama"}
+              className="ib-author text-base"
+              hideTrip={!!thread.capcode}
+            />
+            <CapcodeMarker type={thread.capcode} className="text-base" />
+          </div>
           {thread.posterId && (
             <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
               ID: {thread.posterId}
@@ -183,10 +225,14 @@ export function ThreadClient({
                   DIHAPUS
                 </span>
               )}
-              <TripcodeDisplay
-                author={reply.author || "Awanama"}
-                className="ib-author"
-              />
+              <div className="flex items-baseline gap-1">
+                <TripcodeDisplay
+                  author={reply.author || "Awanama"}
+                  className="ib-author"
+                  hideTrip={!!reply.capcode}
+                />
+                <CapcodeMarker type={reply.capcode} />
+              </div>
               {reply.posterId && (
                 <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
                   ID: {reply.posterId}
@@ -251,7 +297,11 @@ export function ThreadClient({
           </h3>
 
           {!thread.isLocked ? (
-            <ReplyForm threadId={thread.id} boardCode={boardCode} />
+            <ReplyForm 
+              threadId={thread.id} 
+              boardCode={boardCode} 
+              userRole={userRole}
+            />
           ) : (
             <div className="py-8 text-center bg-muted/20 rounded-lg">
               <Lock className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
@@ -275,6 +325,7 @@ export function ThreadClient({
         boardCode={boardCode}
         isOpen={qrOpen}
         onClose={() => setQrOpen(false)}
+        userRole={userRole}
       />
     </>
   );

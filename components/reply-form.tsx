@@ -20,12 +20,14 @@ interface ReplyFormProps {
   threadId: number;
   boardCode: string;
   idPrefix?: string;
+  userRole?: string;
 }
 
 export function ReplyForm({
   threadId,
   boardCode,
   idPrefix = "",
+  userRole,
 }: ReplyFormProps) {
   const prefix = idPrefix ? `${idPrefix}-` : "";
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -188,36 +190,48 @@ export function ReplyForm({
               resetTrigger={resetTrigger}
             />
 
-            <div className="flex items-center space-x-2 bg-destructive/5 p-2 rounded border border-destructive/10 mt-2">
-              <Checkbox
-                id={`${prefix}isNsfw`}
-                name="isNsfw"
-                checked={state.isNsfw}
-                onCheckedChange={(val) => setIsNsfw(!!val)}
-              />
-              <Label
-                htmlFor={`${prefix}isNsfw`}
-                className="text-[10px] font-bold text-destructive flex items-center gap-1 cursor-pointer"
-              >
-                <ShieldAlert className="h-3 w-3" />
-                NSFW
-              </Label>
-            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
+              <div className="flex items-center space-x-2.5">
+                <Checkbox
+                  id={`${prefix}isNsfw`}
+                  name="isNsfw"
+                  checked={state.isNsfw}
+                  onCheckedChange={(val) => setIsNsfw(!!val)}
+                />
+                <Label
+                  htmlFor={`${prefix}isNsfw`}
+                  className="text-xs text-destructive flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  NSFW
+                </Label>
+              </div>
 
-            <div className="flex items-center space-x-2 bg-yellow-500/5 p-2 rounded border border-yellow-500/10 mt-2">
-              <Checkbox
-                id={`${prefix}isSpoiler`}
-                name="isSpoiler"
-                checked={state.isSpoiler}
-                onCheckedChange={(val) => setIsSpoiler(!!val)}
-              />
-              <Label
-                htmlFor={`${prefix}isSpoiler`}
-                className="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer"
-              >
-                <AlertTriangle className="h-3 w-3" />
-                SPOILER
-              </Label>
+              <div className="flex items-center space-x-2.5">
+                <Checkbox
+                  id={`${prefix}isSpoiler`}
+                  name="isSpoiler"
+                  checked={state.isSpoiler}
+                  onCheckedChange={(val) => setIsSpoiler(!!val)}
+                />
+                <Label
+                  htmlFor={`${prefix}isSpoiler`}
+                  className="text-xs text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  Spoiler
+                </Label>
+              </div>
+
+              {userRole && (userRole === "admin" || userRole === "moderator") && (
+                <div className="flex items-center space-x-2.5">
+                  <Checkbox id={`${prefix}withCapcode`} name="withCapcode" />
+                  <Label
+                    htmlFor={`${prefix}withCapcode`}
+                    className="text-xs text-accent flex items-center gap-1 cursor-pointer font-medium"
+                  >
+                    Capcode ({userRole})
+                  </Label>
+                </div>
+              )}
             </div>
           </div>
 

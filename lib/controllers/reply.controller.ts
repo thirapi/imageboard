@@ -9,6 +9,7 @@ export interface CreateReplyRequest {
   isNsfw?: boolean
   isSpoiler?: boolean
   ipAddress?: string
+  capcode?: string | null
 }
 
 export class ReplyController {
@@ -34,6 +35,7 @@ export class ReplyController {
       isNsfw: request.isNsfw,
       isSpoiler: request.isSpoiler,
       ipAddress: request.ipAddress,
+      capcode: request.capcode
     })
 
     return { replyId }

@@ -38,6 +38,7 @@ export const threads = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
     bumpedAt: timestamp('bumped_at', { withTimezone: true }).defaultNow(),
     ipAddress: varchar('ip_address', { length: 45 }),
+    capcode: varchar('capcode', { length: 20 }),
   },
   (t) => ({
     boardIdx: index('idx_threads_board_id').on(t.boardId),

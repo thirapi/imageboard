@@ -42,7 +42,8 @@ export class GetThreadDetailUseCase {
       image: thread.image,
       imageMetadata: thread.imageMetadata,
       postNumber: thread.postNumber,
-      posterId: generatePosterId(thread.ipAddress, thread.id)
+      posterId: generatePosterId(thread.ipAddress, thread.id),
+      capcode: thread.capcode
     }
 
     const repliesUI: ReplyUI[] = replies.map(r => ({
@@ -57,7 +58,8 @@ export class GetThreadDetailUseCase {
       image: r.image,
       imageMetadata: r.imageMetadata,
       postNumber: r.postNumber,
-      posterId: generatePosterId(r.ipAddress, thread.id)
+      posterId: generatePosterId(r.ipAddress, thread.id),
+      capcode: r.capcode
     }))
 
     return {

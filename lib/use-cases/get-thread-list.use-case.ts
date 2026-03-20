@@ -40,6 +40,7 @@ export class GetThreadListUseCase {
       imageMetadata: t.imageMetadata,
       postNumber: t.postNumber,
       posterId: generatePosterId(t.ipAddress, t.id),
+      capcode: t.capcode,
       replyCount: t.replyCount,
       replies: t.replies.map(r => ({
         id: r.id,
@@ -53,7 +54,8 @@ export class GetThreadListUseCase {
         image: r.image,
         imageMetadata: r.imageMetadata,
         postNumber: r.postNumber,
-        posterId: generatePosterId(r.ipAddress, t.id)
+        posterId: generatePosterId(r.ipAddress, t.id),
+        capcode: r.capcode
       }))
     }))
 

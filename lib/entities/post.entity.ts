@@ -5,7 +5,8 @@ export interface LatestPostEntity {
   excerpt: string
   createdAt: Date
   boardCode: string
-  threadId: number
+  threadId: number | null
+  capcode?: string | null
 }
 
 export interface RecentImageEntity {
@@ -30,4 +31,5 @@ export interface PostInfoEntity {
   boardCode: string
   isNsfw?: boolean
   isSpoiler?: boolean
+  capcode?: string | null
 }

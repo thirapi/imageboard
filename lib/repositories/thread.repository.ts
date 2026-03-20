@@ -19,6 +19,7 @@ export class ThreadRepository {
         isSpoiler: input.isSpoiler ?? false,
         postNumber: input.postNumber,
         ipAddress: input.ipAddress ?? null,
+        capcode: input.capcode ?? null,
       })
       .returning()
 
@@ -45,6 +46,7 @@ export class ThreadRepository {
       ipAddress: input.ipAddress ?? null,
       createdAt: input.createdAt, // Optional overwrite if provided in entity input, else defaultNow
       bumpedAt: input.bumpedAt, // Optional overwrite
+      capcode: input.capcode ?? null,
     }))
 
     return await db.insert(threads).values(values).returning({ id: threads.id })
@@ -226,7 +228,8 @@ export class ThreadRepository {
         imageMetadata: row.imageMetadata,
         deletionPassword: row.deletionPassword,
         postNumber: row.postNumber!,
-        ipAddress: row.ipAddress
+        ipAddress: row.ipAddress,
+        capcode: row.capcode
       }))
       repliesMap.set(p.id, mapped.reverse()) // Reverse to show chronological order in preview
     })
@@ -281,6 +284,7 @@ export class ThreadRepository {
       deletionPassword: row.deletionPassword,
       postNumber: row.postNumber!,
       ipAddress: row.ipAddress,
+      capcode: row.capcode,
     }
   }
 }

@@ -104,7 +104,8 @@ export class CreateThreadUseCase {
       isNsfw: input.isNsfw ?? false,
       isSpoiler: input.isSpoiler ?? false,
       postNumber: postNumber,
-      ipAddress: input.ipAddress
+      ipAddress: input.ipAddress,
+      capcode: input.capcode
     })
 
     if (imageUrl && input.imageFile) {

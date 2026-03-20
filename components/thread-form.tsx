@@ -17,9 +17,10 @@ import { ShieldAlert, AlertTriangle } from "lucide-react";
 interface ThreadFormProps {
   boardId: number;
   boardCode: string;
+  userRole?: string;
 }
 
-export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
+export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -193,28 +194,40 @@ export function ThreadForm({ boardId, boardCode }: ThreadFormProps) {
               />
             </div>
 
-            <div className="flex items-center space-x-2 bg-destructive/5 p-2 rounded border border-destructive/10">
-              <Checkbox id="isNsfw" name="isNsfw" />
-              <Label
-                htmlFor="isNsfw"
-                className="text-xs font-bold text-destructive flex items-center gap-1 cursor-pointer"
-              >
-                <ShieldAlert className="h-3 w-3" />
-                KONTEN NSFW / NSFL
-              </Label>
-            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              <div className="flex items-center space-x-2.5">
+                <Checkbox id="isNsfw" name="isNsfw" />
+                <Label
+                  htmlFor="isNsfw"
+                  className="text-xs text-destructive flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  NSFW
+                </Label>
+              </div>
 
-            <div className="flex items-center space-x-2 bg-yellow-500/5 p-2 rounded border border-yellow-500/10">
-              <Checkbox id="isSpoiler" name="isSpoiler" />
-              <Label
-                htmlFor="isSpoiler"
-                className="text-xs font-bold text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer"
-              >
-                <AlertTriangle className="h-3 w-3" />
-                GAMBAR SPOILER
-              </Label>
-            </div>
+              <div className="flex items-center space-x-2.5">
+                <Checkbox id="isSpoiler" name="isSpoiler" />
+                <Label
+                  htmlFor="isSpoiler"
+                  className="text-xs text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  Spoiler
+                </Label>
+              </div>
 
+              {userRole && (userRole === "admin" || userRole === "moderator") && (
+                <div className="flex items-center space-x-2.5">
+                  <Checkbox id="withCapcode" name="withCapcode" />
+                  <Label
+                    htmlFor="withCapcode"
+                    className="text-xs text-accent flex items-center gap-1 cursor-pointer font-medium"
+                  >
+                    Capcode ({userRole})
+                  </Label>
+                </div>
+              )}
+            </div>
+            
             <div className="space-y-1.5">
               <Label
                 htmlFor="deletionPassword"

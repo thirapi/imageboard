@@ -12,6 +12,7 @@ export interface ReplyEntity {
   deletionPassword?: string | null
   postNumber: number
   ipAddress?: string | null
+  capcode?: string | null
 }
 
 export interface CreateReplyCommand {
@@ -23,6 +24,7 @@ export interface CreateReplyCommand {
   isNsfw?: boolean
   isSpoiler?: boolean
   ipAddress?: string
+  capcode?: string | null
 }
 
 export interface CreateReplyInput {
@@ -37,6 +39,7 @@ export interface CreateReplyInput {
   postNumber: number
   ipAddress?: string
   createdAt?: Date
+  capcode?: string | null
 }
 
 export interface ReplyUI {
@@ -52,4 +55,5 @@ export interface ReplyUI {
   imageMetadata?: string | null
   postNumber: number
   posterId?: string
+  capcode?: string | null
 }

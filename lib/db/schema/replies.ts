@@ -33,6 +33,7 @@ export const replies = pgTable(
 
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
     ipAddress: varchar('ip_address', { length: 45 }),
+    capcode: varchar('capcode', { length: 20 }),
   },
   (t) => ({
     threadIdx: index('idx_replies_thread_id').on(t.threadId),

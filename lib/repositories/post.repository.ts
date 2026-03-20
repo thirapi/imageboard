@@ -17,6 +17,7 @@ export class PostRepository {
         content: threads.content,
         createdAt: threads.createdAt,
         boardCode: boards.code,
+        capcode: threads.capcode,
       })
       .from(threads)
       .innerJoin(boards, eq(threads.boardId, boards.id))
@@ -42,6 +43,7 @@ export class PostRepository {
         createdAt: replies.createdAt,
         threadId: replies.threadId,
         boardCode: boards.code,
+        capcode: replies.capcode,
       })
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
@@ -61,6 +63,7 @@ export class PostRepository {
         createdAt: t.createdAt!,
         boardCode: t.boardCode,
         threadId: t.id,
+        capcode: t.capcode,
       })
     }
 
@@ -73,6 +76,7 @@ export class PostRepository {
         createdAt: r.createdAt!,
         boardCode: r.boardCode,
         threadId: r.threadId,
+        capcode: r.capcode,
       })
     }
 
@@ -170,6 +174,7 @@ export class PostRepository {
         boardCode: boards.code,
         isNsfw: threads.isNsfw,
         isSpoiler: threads.isSpoiler,
+        capcode: threads.capcode,
       })
       .from(threads)
       .innerJoin(boards, eq(threads.boardId, boards.id))
@@ -194,6 +199,7 @@ export class PostRepository {
         threadId: thread[0].id,
         isNsfw: thread[0].isNsfw ?? false,
         isSpoiler: thread[0].isSpoiler ?? false,
+        capcode: thread[0].capcode,
       }
     }
 
@@ -210,6 +216,7 @@ export class PostRepository {
         boardCode: boards.code,
         isNsfw: replies.isNsfw,
         isSpoiler: replies.isSpoiler,
+        capcode: replies.capcode,
       })
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
@@ -236,6 +243,7 @@ export class PostRepository {
         type: "reply",
         isNsfw: reply[0].isNsfw ?? false,
         isSpoiler: reply[0].isSpoiler ?? false,
+        capcode: reply[0].capcode,
       }
     }
 

@@ -99,6 +99,13 @@
       "when": 1773839037436,
       "tag": "0013_seed_board_categories",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1773991531122,
+      "tag": "0014_military_hellfire_club",
+      "breakpoints": true
     }
   ]
 }

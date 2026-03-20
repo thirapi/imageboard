@@ -19,6 +19,17 @@ import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
 import { Pagination } from "@/components/pagination";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { lucia } from "@/lib/auth";
+
+async function getAuthUser() {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get(lucia.sessionCookieName)?.value || null;
+  if (!sessionId) return null;
+  const { session, user } = await lucia.validateSession(sessionId);
+  if (!session) return null;
+  return user;
+}
 
 export const revalidate = 60; // Cache halaman board selama 60 detik
 
@@ -83,6 +94,8 @@ export default async function BoardPage({
   const threadRepository = new ThreadRepository();
   const getThreadListUseCase = new GetThreadListUseCase(threadRepository);
 
+  const user = await getAuthUser();
+
   let { threads, totalPages } = await getThreadListUseCase.execute(
     board.id,
     limit,
@@ -102,6 +115,41 @@ export default async function BoardPage({
   }
 
   const isCatalog = view === "catalog";
+ 
+  const CapcodeMarker = ({
+    type,
+    className,
+  }: {
+    type: string | null | undefined;
+    className?: string;
+  }) => {
+    if (!type) return null;
+    if (type === "mod" || type === "moderator") {
+      return (
+        <span
+          className={cn(
+            "text-purple-600 dark:text-purple-400 font-bold leading-none",
+            className,
+          )}
+        >
+          ## Mod
+        </span>
+      );
+    }
+    if (type === "admin") {
+      return (
+        <span
+          className={cn(
+            "text-red-600 dark:text-red-400 font-bold leading-none",
+            className,
+          )}
+        >
+          ## Admin
+        </span>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -129,7 +177,11 @@ export default async function BoardPage({
       >
         <div className="flex flex-col items-center mb-12">
           <div className="w-full max-w-2xl">
-            <ThreadForm boardId={board.id} boardCode={board.code} />
+            <ThreadForm 
+              boardId={board.id} 
+              boardCode={board.code} 
+              userRole={user?.role}
+            />
           </div>
         </div>
 
@@ -151,10 +203,14 @@ export default async function BoardPage({
                     {thread.subject && (
                       <span className="ib-subject">{thread.subject}</span>
                     )}
-                    <TripcodeDisplay
-                      author={thread.author || "Awanama"}
-                      className="ib-author"
-                    />
+                    <div className="flex items-baseline gap-1">
+                      <TripcodeDisplay
+                        author={thread.author || "Awanama"}
+                        className="ib-author"
+                        hideTrip={!!thread.capcode}
+                      />
+                      <CapcodeMarker type={thread.capcode} />
+                    </div>
                     <span className="text-muted-foreground text-xs">
                       <FormattedDate date={thread.createdAt} />
                     </span>
@@ -215,10 +271,14 @@ export default async function BoardPage({
                             className="ib-reply shadow-sm border border-muted/20 w-fit max-w-full"
                           >
                             <div className="ib-post-metaline text-xs px-2 pt-1 border-b border-muted/5 bg-muted/5">
-                              <TripcodeDisplay
-                                author={reply.author || "Awanama"}
-                                className="ib-author"
-                              />
+                              <div className="flex items-baseline gap-1">
+                                <TripcodeDisplay
+                                  author={reply.author || "Awanama"}
+                                  className="ib-author"
+                                  hideTrip={!!reply.capcode}
+                                />
+                                <CapcodeMarker type={reply.capcode} />
+                              </div>
                               <span className="text-muted-foreground opacity-70">
                                 <FormattedDate date={reply.createdAt} />
                               </span>
