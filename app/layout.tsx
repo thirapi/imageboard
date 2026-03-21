@@ -1,4 +1,5 @@
 import type React from "react";
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
@@ -154,13 +155,15 @@ export default function RootLayout({
         >
           <NavProvider>
             <TooltipProvider>
-              <BoardNav />
-              {children}
-              <Toaster />
-              <SonnerToaster />
-              <Analytics />
-              <AgeVerificationDialog />
-              <ScrollButtons />
+              <Suspense fallback={null}>
+                <BoardNav />
+                {children}
+                <Toaster />
+                <SonnerToaster />
+                <Analytics />
+                <AgeVerificationDialog />
+                <ScrollButtons />
+              </Suspense>
             </TooltipProvider>
           </NavProvider>
         </ThemeProvider>

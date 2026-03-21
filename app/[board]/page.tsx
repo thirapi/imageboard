@@ -17,19 +17,7 @@ import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
 import { Pagination } from "@/components/pagination";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import { lucia } from "@/lib/auth";
-
-async function getAuthUser() {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get(lucia.sessionCookieName)?.value || null;
-  if (!sessionId) return null;
-  const { session, user } = await lucia.validateSession(sessionId);
-  if (!session) return null;
-  return user;
-}
-
-export const revalidate = 60; // Cache halaman board selama 60 detik
+import { getAuthUser } from "@/lib/actions/user.actions";
 
 export async function generateMetadata({
   params,

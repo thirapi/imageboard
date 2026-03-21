@@ -7,8 +7,10 @@ const { moderationController, createReportUseCase } = container
 
 import { lucia } from "@/lib/auth"
 import { cookies } from "next/headers"
+import { connection } from "next/server"
 
 export async function getModeratorAuthorizer() {
+  await connection()
   const cookieStore = await cookies()
   const sessionId = cookieStore.get(lucia.sessionCookieName)?.value || null
 
@@ -95,23 +97,13 @@ export async function createReport(contentType: "thread" | "reply", contentId: n
 }
 
 export async function getPendingReports(limit?: number, offset?: number, boardId?: number) {
-  try {
-    const user = await getModeratorAuthorizer()
-    return await moderationController.getPendingReports(user, { limit, offset, boardId })
-  } catch (error) {
-    console.error("Error fetching pending reports:", error)
-    return { reports: [], total: 0 }
-  }
+  const user = await getModeratorAuthorizer()
+  return await moderationController.getPendingReports(user, { limit, offset, boardId })
 }
 
 export async function getResolvedReports(limit?: number, offset?: number, boardId?: number) {
-  try {
-    const user = await getModeratorAuthorizer()
-    return await moderationController.getResolvedReports(user, { limit, offset, boardId })
-  } catch (error) {
-    console.error("Error fetching resolved reports:", error)
-    return { reports: [], total: 0 }
-  }
+  const user = await getModeratorAuthorizer()
+  return await moderationController.getResolvedReports(user, { limit, offset, boardId })
 }
 
 export async function banUser(ipAddress: string, reason?: string, durationHours?: number) {
@@ -127,13 +119,8 @@ export async function markAsNsfw(contentType: "thread" | "reply", contentId: num
 }
 
 export async function getBans() {
-  try {
-    const user = await getModeratorAuthorizer()
-    return await moderationController.getBans(user)
-  } catch (error) {
-    console.error("Error fetching bans:", error)
-    return []
-  }
+  const user = await getModeratorAuthorizer()
+  return await moderationController.getBans(user)
 }
 
 export async function updateBan(id: number, reason?: string, durationHours?: number | null) {

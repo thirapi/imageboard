@@ -2,13 +2,12 @@
 
 import { container } from "@/lib/di/container"
 import { revalidatePath, updateTag, cacheTag, cacheLife } from "next/cache"
-import { lucia } from "@/lib/auth"
-import { cookies } from "next/headers"
+import { getAuthUser } from "./user.actions"
 
 import { getClientIp } from "@/lib/utils/get-ip"
 import { CaptchaService } from "@/lib/services/captcha.service"
 
-const { threadController } = container
+const { threadController, homeController } = container
 
 export async function createThread(formData: FormData) {
   try {
@@ -34,16 +33,13 @@ export async function createThread(formData: FormData) {
 
     let userRole: string | undefined
     if (withCapcode) {
-      const sessionId = (await cookies()).get(lucia.sessionCookieName)?.value || null
-      if (sessionId) {
-        const { user } = await lucia.validateSession(sessionId)
-        if (user && (user.role === "admin" || user.role === "moderator")) {
-          userRole = user.role
-        } else {
-          throw new Error("Anda tidak memiliki izin untuk menggunakan capcode.")
-        }
-      } else {
+      const user = await getAuthUser()
+      if (user && (user.role === "admin" || user.role === "moderator")) {
+        userRole = user.role
+      } else if (!user) {
         throw new Error("Anda harus login untuk menggunakan capcode.")
+      } else {
+        throw new Error("Anda tidak memiliki izin untuk menggunakan capcode.")
       }
     }
 
@@ -94,6 +90,32 @@ export async function getThreadDetail(threadId: number) {
   } catch (error) {
     console.error(`Error fetching thread detail for thread ${threadId}:`, error)
     return null
+  }
+}
+
+export async function getLatestPosts(limit: number = 10, beforeDate?: Date) {
+  'use cache';
+  cacheLife('minutes');
+  cacheTag("threads");
+
+  try {
+    return await homeController.getLatestPosts(limit, beforeDate)
+  } catch (error) {
+    console.error("Error fetching latest posts:", error)
+    return []
+  }
+}
+
+export async function getRecentImages(limit: number = 25) {
+  'use cache';
+  cacheLife('minutes');
+  cacheTag("threads");
+  
+  try {
+    return await homeController.getRecentImages(limit)
+  } catch (error) {
+    console.error("Error fetching recent images:", error)
+    return []
   }
 }
 

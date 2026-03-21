@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { lucia } from "@/lib/auth";
 import { NavControls } from "./nav-controls";
 import { NavWrapper } from "./nav-wrapper";
+import { connection } from "next/server";
 import {
   Tooltip,
   TooltipContent,
@@ -14,6 +15,7 @@ import { Home } from "lucide-react";
 import { BoardSwitcher } from "./board-switcher";
 
 export async function BoardNav() {
+  await connection();
   const boards = await getBoardList();
   const sessionId =
     (await cookies()).get(lucia.sessionCookieName)?.value ?? null;

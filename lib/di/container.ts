@@ -9,6 +9,7 @@ import { ReportRepository } from "@/lib/repositories/report.repository"
 import { ThreadRepository } from "@/lib/repositories/thread.repository"
 import { BanRepository } from "@/lib/repositories/ban.repository"
 import { BoardCategoryRepository } from "@/lib/repositories/board-category.repository"
+import { UserRepository } from "@/lib/repositories/user.repository"
 
 // Services
 import { CloudinaryService } from "@/lib/services/cloudinary.service"
@@ -56,6 +57,7 @@ import { UpdateBoardCategoryUseCase } from "@/lib/use-cases/update-board-categor
 import { DeleteBoardCategoryUseCase } from "@/lib/use-cases/delete-board-category.use-case"
 import { GetBoardCategoriesUseCase } from "@/lib/use-cases/get-board-categories.use-case"
 import { ReorderBoardCategoryUseCase } from "@/lib/use-cases/reorder-board-category.use-case"
+import { LoginUseCase } from "@/lib/use-cases/login.use-case"
 
 // Controllers
 import { HomeController } from "@/lib/controllers/home.controller"
@@ -66,6 +68,7 @@ import { ReplyController } from "@/lib/controllers/reply.controller"
 import { ReportController } from "@/lib/controllers/report.controller"
 import { ThreadController } from "@/lib/controllers/thread.controller"
 import { SeedController } from "@/lib/controllers/seed.controller"
+import { AuthController } from "@/lib/controllers/auth.controller"
 import { SequenceService } from "../services/sequence.service"
 
 // Instantiate Repositories
@@ -77,6 +80,7 @@ const reportRepository = new ReportRepository()
 const threadRepository = new ThreadRepository()
 const banRepository = new BanRepository()
 const categoryRepository = new BoardCategoryRepository()
+const userRepository = new UserRepository()
 
 // Instantiate Services
 const cloudinaryService = new CloudinaryService()
@@ -140,6 +144,7 @@ const updateBoardCategoryUseCase = new UpdateBoardCategoryUseCase(categoryReposi
 const deleteBoardCategoryUseCase = new DeleteBoardCategoryUseCase(categoryRepository, boardRepository)
 const getBoardCategoriesUseCase = new GetBoardCategoriesUseCase(categoryRepository)
 const reorderBoardCategoryUseCase = new ReorderBoardCategoryUseCase(categoryRepository)
+const loginUseCase = new LoginUseCase(userRepository, passwordService)
 
 const seedBoardLoadTestUseCase = new SeedBoardLoadTestUseCase(
   threadRepository,
@@ -194,6 +199,7 @@ const boardCategoryController = new BoardCategoryController(
   reorderBoardCategoryUseCase
 )
 const seedController = new SeedController(seedBoardLoadTestUseCase)
+const authController = new AuthController(loginUseCase)
 
 // Export container
 export const container = {
@@ -209,4 +215,6 @@ export const container = {
   deletePostWithPasswordUseCase,
   boardRepository, // Export repository for actions
   categoryRepository,
+  userRepository,
+  authController,
 }

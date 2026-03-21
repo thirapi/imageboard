@@ -8,7 +8,6 @@ const { boardCategoryController } = container
 
 export async function getAllCategories() {
   try {
-    await getModeratorAuthorizer()
     const getCached = async () => {
       'use cache';
       cacheLife('hours');

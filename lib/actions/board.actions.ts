@@ -8,7 +8,6 @@ const { boardController } = container
 
 export async function getAllBoards() {
   try {
-    await getModeratorAuthorizer()
     const getCached = async () => {
       'use cache';
       cacheLife('hours');
@@ -24,7 +23,6 @@ export async function getAllBoards() {
 
 export async function getBoardCategories() {
   try {
-    await getModeratorAuthorizer()
     const getCached = async () => {
       'use cache';
       cacheLife('hours');
@@ -40,7 +38,6 @@ export async function getBoardCategories() {
 
 export async function getBoardById(id: number) {
   try {
-    await getModeratorAuthorizer()
     const getCached = async (boardId: number) => {
       'use cache';
       cacheLife('hours');

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "62chan: Forum papan gambar (imageboard) anonim Indonesia. Beritahu kami jika Anda menemukan masalah yang disebabkan oleh pembaruan sistem di /tlg/",
 };
 
-export const revalidate = 60; // Cache halaman selama 60 detik
+
 
 // Group boards by category based on fscchan structure
 function groupBoards(boards: BoardEntity[], categories: BoardCategoryEntity[]) {

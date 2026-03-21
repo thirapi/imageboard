@@ -7,11 +7,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  cacheComponents: true,
   experimental: {
     serverActions: { bodySizeLimit: "10mb" },
     optimizePackageImports: ['lucide-react', 'date-fns', '@radix-ui/react-icons', 'recharts'],
-    dynamicIO: true,
-    cacheComponents: true,
   },
 };
 

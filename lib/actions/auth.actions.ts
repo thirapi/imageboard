@@ -1,10 +1,8 @@
 'use server'
 
 import { lucia } from '@/lib/auth';
-import { AuthController } from '@/lib/controllers/auth.controller';
-import { UserRepository } from '@/lib/repositories/user.repository';
-import { LoginUseCase } from '@/lib/use-cases/login.use-case';
 import { PasswordService } from '../services/password.service';
+import { container } from '@/lib/di/container';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -13,11 +11,8 @@ import { redirect } from 'next/navigation';
  * Bertindak sebagai Composition Root dan menangani interaksi dengan framework.
  */
 export async function login(prevState: any, formData: FormData) {
-  // 1. Dependency Injection (Composition Root)
-  const userRepository = new UserRepository();
-  const passwordService = new PasswordService();
-  const loginUseCase = new LoginUseCase(userRepository, passwordService);
-  const authController = new AuthController(loginUseCase);
+  // 1. Get from DI Container
+  const { authController } = container;
 
   try {
     // 2. Teruskan permintaan ke Controller

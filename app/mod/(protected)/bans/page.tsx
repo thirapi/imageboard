@@ -3,7 +3,7 @@ import { BanList } from "@/components/ban-list";
 import { ShieldX } from "lucide-react";
 import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
+
 
 export default async function BansManagementPage() {
 
