@@ -16,11 +16,14 @@ export class CloudinaryService {
     this.uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || ""
 
     if (!this.cloudName || !this.uploadPreset) {
-      throw new Error("Cloudinary credentials are not configured")
+      console.warn("[CloudinaryService] Warning: Cloudinary credentials are not configured. Uploads will fail.")
     }
   }
 
   async uploadImage(file: File): Promise<UploadResult> {
+    if (!this.cloudName || !this.uploadPreset) {
+      throw new Error("Cloudinary credentials are not configured. Please check your environment variables.")
+    }
     // Business rule: Validate file type
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"]
     if (!allowedTypes.includes(file.type)) {
