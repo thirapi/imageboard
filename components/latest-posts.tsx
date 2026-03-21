@@ -80,7 +80,7 @@ export function LatestPosts({ initialPosts }: LatestPostsProps) {
         {posts.map((post) => (
           <Link
             key={`latest-${post.id}-${post.type}`}
-            href={`/${post.boardCode}/thread/${post.threadId}`}
+            href={`/${post.boardCode}/thread/${post.threadId}#p${post.postNumber}`}
             className="block text-sm hover:bg-accent/5 p-2 rounded transition-colors"
           >
             <div className="flex items-start justify-between gap-2">

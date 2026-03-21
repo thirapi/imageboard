@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MessageSquare, ImageIcon, Pin, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbnailUrl } from "@/lib/utils/image";
+import { FormattedText } from "@/components/formatted-text";
 
 interface CatalogViewProps {
   threads: any[];
@@ -62,33 +63,23 @@ export function CatalogView({ threads, boardCode }: CatalogViewProps) {
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Statistics Overlay */}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 translate-y-1 group-hover:translate-y-0 transition-transform">
-              <div className="flex items-center justify-between text-white font-mono text-xs font-bold">
-                <span className="flex items-center gap-1 drop-shadow-sm">
-                  R: {thread.replyCount}
-                </span>
-                <span className="flex items-center gap-1 opacity-90 text-[10px] font-light">
-                  {new Date(thread.createdAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-              </div>
-            </div>
+          {/* Statistics below image */}
+          <div className="mt-1 w-full text-center text-[10px] font-bold text-muted-foreground/80 font-mono">
+            R: {thread.replyCount} / I: {thread.imageCount ?? 0}
           </div>
 
           {/* Metadata / Text */}
-          <div className="mt-2 w-full text-center space-y-0.5 px-1 font-sans">
+          <div className="mt-0.5 w-full text-center px-1 font-sans">
             {thread.subject && (
-              <h3 className="text-sm font-bold line-clamp-2 leading-snug text-accent group-hover:underline decoration-1 underline-offset-2">
+              <h3 className="text-[12px] font-bold line-clamp-2 leading-snug text-accent group-hover:underline decoration-1 underline-offset-2 mb-0.5 break-words">
                 {thread.subject}
               </h3>
             )}
-            <p className="text-[13px] text-muted-foreground line-clamp-3 leading-snug font-medium opacity-90 group-hover:opacity-100 transition-opacity">
-              {thread.content}
-            </p>
+            <div className="text-[11px] text-muted-foreground line-clamp-4 overflow-hidden leading-snug font-medium opacity-90 group-hover:opacity-100 transition-opacity break-words text-center">
+              <FormattedText content={thread.content} preview={true} disableEmbeds={true} />
+            </div>
           </div>
         </Link>
       ))}

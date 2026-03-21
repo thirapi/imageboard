@@ -134,7 +134,7 @@ export class ThreadRepository {
     limit: number = 50,
     offset: number = 0,
   ): Promise<
-    (ThreadEntity & { replyCount: number; replies: any[] })[]
+    (ThreadEntity & { replyCount: number; imageCount: number; replies: any[] })[]
   > {
     // 1. Fetch threads
     const threadsRows = await db.query.threads.findMany({
@@ -161,7 +161,8 @@ export class ThreadRepository {
     const counts = await db
       .select({
         threadId: replies.threadId,
-        count: sql<number>`cast(count(*) as int)`,
+        replyCount: sql<number>`cast(count(*) as int)`,
+        imageCount: sql<number>`cast(count(${replies.image}) as int)`,
       })
       .from(replies)
       .where(
@@ -172,7 +173,7 @@ export class ThreadRepository {
       )
       .groupBy(replies.threadId)
 
-    const countMap = new Map(counts.map((c) => [c.threadId, c.count]))
+    const countMap = new Map(counts.map((c) => [c.threadId, c]))
 
     // 3. Fetch latest 3 replies for each thread
     // Ideally use window functions, but for simplicity and safety with current setup, 
@@ -234,11 +235,15 @@ export class ThreadRepository {
       repliesMap.set(p.id, mapped.reverse()) // Reverse to show chronological order in preview
     })
 
-    return threadEntities.map((thread) => ({
-      ...thread,
-      replyCount: countMap.get(thread.id) || 0,
-      replies: repliesMap.get(thread.id) || [],
-    }))
+    return threadEntities.map((thread) => {
+      const c = countMap.get(thread.id);
+      return {
+        ...thread,
+        replyCount: c?.replyCount || 0,
+        imageCount: (c?.imageCount || 0) + (thread.image ? 1 : 0),
+        replies: repliesMap.get(thread.id) || [],
+      };
+    })
   }
 
   async countByBoardId(boardId: number): Promise<number> {

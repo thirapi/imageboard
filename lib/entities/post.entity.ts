@@ -1,5 +1,6 @@
 export interface LatestPostEntity {
   id: number
+  postNumber: number
   type: "thread" | "reply"
   title: string | null
   excerpt: string
@@ -11,6 +12,7 @@ export interface LatestPostEntity {
 
 export interface RecentImageEntity {
   id: number
+  postNumber: number
   imageUrl: string
   createdAt: Date
   boardCode: string

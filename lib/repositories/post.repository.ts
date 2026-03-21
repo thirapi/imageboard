@@ -13,6 +13,7 @@ export class PostRepository {
     const latestThreads = await db
       .select({
         id: threads.id,
+        postNumber: threads.postNumber,
         subject: threads.subject,
         content: threads.content,
         createdAt: threads.createdAt,
@@ -39,6 +40,7 @@ export class PostRepository {
     const latestReplies = await db
       .select({
         id: replies.id,
+        postNumber: replies.postNumber,
         content: replies.content,
         createdAt: replies.createdAt,
         threadId: replies.threadId,
@@ -57,6 +59,7 @@ export class PostRepository {
     for (const t of latestThreads) {
       posts.push({
         id: t.id,
+        postNumber: t.postNumber as number,
         type: "thread",
         title: t.subject,
         excerpt: t.content.substring(0, 200),
@@ -70,6 +73,7 @@ export class PostRepository {
     for (const r of latestReplies) {
       posts.push({
         id: r.id,
+        postNumber: r.postNumber as number,
         type: "reply",
         title: null,
         excerpt: r.content.substring(0, 200),
@@ -89,6 +93,7 @@ export class PostRepository {
     const threadImages = await db
       .select({
         id: threads.id,
+        postNumber: threads.postNumber,
         imageUrl: threads.image,
         createdAt: threads.createdAt,
         boardCode: boards.code,
@@ -110,6 +115,7 @@ export class PostRepository {
     const replyImages = await db
       .select({
         id: replies.id,
+        postNumber: replies.postNumber,
         imageUrl: replies.image,
         createdAt: replies.createdAt,
         boardCode: boards.code,
@@ -135,6 +141,7 @@ export class PostRepository {
     for (const t of threadImages) {
       images.push({
         id: t.id,
+        postNumber: t.postNumber as number,
         imageUrl: t.imageUrl!,
         createdAt: t.createdAt!,
         boardCode: t.boardCode,
@@ -147,6 +154,7 @@ export class PostRepository {
     for (const r of replyImages) {
       images.push({
         id: r.id,
+        postNumber: r.postNumber as number,
         imageUrl: r.imageUrl!,
         createdAt: r.createdAt!,
         boardCode: r.boardCode,

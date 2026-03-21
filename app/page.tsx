@@ -131,7 +131,7 @@ export default async function HomePage() {
                     {recentImages.map((image) => (
                       <Link
                         key={`${image.id}-${image.imageUrl}`}
-                        href={`/${image.boardCode}/thread/${image.threadId}`}
+                        href={`/${image.boardCode}/thread/${image.threadId}#p${image.postNumber}`}
                         className="group"
                       >
                         <div className="aspect-square flex items-center justify-center overflow-hidden rounded border border-muted/50 group-hover:border-accent transition-all bg-muted/20 relative">

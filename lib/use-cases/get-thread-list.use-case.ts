@@ -5,6 +5,7 @@ import { generatePosterId } from "../utils/poster-id"
 
 export interface ThreadWithReplyCount extends ThreadUI {
   replyCount: number
+  imageCount: number
   replies?: ReplyUI[]
 }
 
@@ -42,6 +43,7 @@ export class GetThreadListUseCase {
       posterId: generatePosterId(t.ipAddress, t.id),
       capcode: t.capcode,
       replyCount: t.replyCount,
+      imageCount: t.imageCount,
       replies: t.replies.map(r => ({
         id: r.id,
         threadId: r.threadId,
