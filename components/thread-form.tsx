@@ -150,7 +150,7 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
             <Input
               id="author"
               name="author"
-              placeholder="Anonim"
+              placeholder="Awanama"
               maxLength={100}
               className="bg-muted/30 focus-visible:ring-accent"
             />
