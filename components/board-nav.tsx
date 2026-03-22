@@ -45,7 +45,15 @@ export async function BoardNav() {
           <span className="text-muted-foreground/50 flex-shrink-0">]</span>
         </div>
 
-        <div className="flex items-center pl-4 flex-shrink-0">
+        <div className="flex items-center gap-2 pl-2 sm:pl-4 flex-shrink-0">
+          <Link 
+            href="/donasi" 
+            className="text-accent hover:underline font-bold"
+            title="Dukung operasional server"
+          >
+            <span className="hidden sm:inline">[ donasi ]</span>
+            <span className="sm:hidden">[ $$$ ]</span>
+          </Link>
           <NavControls user={user} />
         </div>
       </div>
