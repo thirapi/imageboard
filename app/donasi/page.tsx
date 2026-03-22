@@ -11,9 +11,7 @@ export default function DonasiPage() {
     <div className="min-h-[calc(100svh-48px)] bg-background text-foreground flex flex-col">
       <header className="py-6 text-center border-b border-border/40">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-accent mb-2">
-            Donasi
-          </h1>
+          <h1 className="text-3xl font-bold text-accent mb-2">Donasi</h1>
           <p className="text-sm text-muted-foreground">
             Dukung kami agar server tetap berjalan
           </p>
@@ -29,12 +27,12 @@ export default function DonasiPage() {
             </h2>
             <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
               <p>
-                62chan dikelola secara nirlaba dan independen. Seluruh operasional
-                website ini (server, domain, dan infrastruktur lainnya) dibiayai
-                secara mandiri.
+                62chan dijalankan secara mandiri, dan saat ini butuh sekitar{" "}
+                <b>$9/bulan (~150 ribuan)</b> untuk biaya server.
               </p>
               <p>
-                Bantuan Anda sangat berarti untuk memastikan website ini terus online.
+                Bantuan Anda sangat berarti untuk memastikan website ini terus
+                online.
               </p>
             </div>
           </section>
@@ -50,7 +48,7 @@ export default function DonasiPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Dukung kami menggunakan GoPay, OVO, Dana, LinkAja, atau QRIS.
                 </p>
-                <a 
+                <a
                   href="https://saweria.co/support62chan"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -71,11 +69,12 @@ export default function DonasiPage() {
 
           {/* Transparansi */}
           <section className="border-t border-border/40 pt-8">
-            <h2 className="text-2xl font-bold mb-4 text-accent">Transparansi</h2>
+            <h2 className="text-2xl font-bold mb-4 text-accent">
+              Transparansi
+            </h2>
             <div className="text-sm leading-relaxed space-y-3 text-muted-foreground">
               <p>
-                Seluruh dana yang terkumpul akan 100% digunakan untuk menutupi biaya 
-                operasional dan pengembangan fitur baru.
+                semua donasi dipakai untuk biaya server dan pengembangan 62chan.
               </p>
             </div>
           </section>
