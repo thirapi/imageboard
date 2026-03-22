@@ -10,6 +10,7 @@ import { footerLinks, footerText } from "@/constants/footer";
 import { FormattedText } from "@/components/formatted-text";
 import { getThumbnailUrl } from "@/lib/utils/image";
 import { LatestPosts } from "@/components/latest-posts";
+import { BoardLink } from "@/components/board-link";
 import type { Metadata } from "next";
 import { BoardEntity, BoardCategoryEntity } from "@/lib/entities/board.entity";
 
@@ -90,8 +91,8 @@ export default async function HomePage() {
               <div className="grid grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-2 md:gap-y-1 text-sm">
                 {groupedBoards.get(categoryName)!.map((board) => (
                   <div key={board.id} className="leading-relaxed">
-                    <Link
-                      href={`/${board.code}`}
+                    <BoardLink
+                      boardCode={board.code}
                       className="hover:underline hover:text-accent group flex flex-col md:inline text-left"
                     >
                       <span className="text-accent font-bold leading-none">
@@ -104,7 +105,7 @@ export default async function HomePage() {
                         {" "}
                         - {board.name}
                       </span>
-                    </Link>
+                    </BoardLink>
                   </div>
                 ))}
               </div>

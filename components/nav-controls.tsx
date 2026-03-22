@@ -39,7 +39,12 @@ interface NavControlsProps {
 
 export function NavControls({ user }: NavControlsProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const { position, togglePosition } = useNav();
+  const { 
+    position, 
+    togglePosition, 
+    defaultBoardView, 
+    toggleDefaultBoardView 
+  } = useNav();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -124,6 +129,17 @@ export function NavControls({ user }: NavControlsProps) {
             <span>Navigasi Melayang</span>
             <span className="ml-auto opacity-50 font-bold">
               {position === "sticky" ? "✔" : "✘"}
+            </span>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={toggleDefaultBoardView}
+            onSelect={(e) => e.preventDefault()}
+            className="cursor-pointer h-[26px] py-0"
+          >
+            <span>Katalog sebagai Default</span>
+            <span className="ml-auto opacity-50 font-bold">
+              {defaultBoardView === "catalog" ? "✔" : "✘"}
             </span>
           </DropdownMenuItem>
 

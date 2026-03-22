@@ -14,6 +14,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { BoardLink } from "./board-link";
+
 interface BoardSwitcherProps {
   boards: any[];
 }
@@ -36,14 +38,14 @@ export function BoardSwitcher({ boards }: BoardSwitcherProps) {
             className="max-h-[70vh] overflow-y-auto font-mono text-[11px]"
           >
             {boards.map((board) => (
-              <Link key={board.code} href={`/${board.code}`}>
+              <BoardLink key={board.code} boardCode={board.code}>
                 <DropdownMenuItem className="cursor-pointer h-[26px] py-0">
                   <span className="font-bold text-accent mr-2">
                     /{board.code}/
                   </span>
                   <span className="opacity-80">{board.name}</span>
                 </DropdownMenuItem>
-              </Link>
+              </BoardLink>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -53,13 +55,13 @@ export function BoardSwitcher({ boards }: BoardSwitcherProps) {
       <div className="hidden sm:flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap min-w-0">
         {boards.map((board, index) => (
           <span key={board.code} className="flex items-center">
-            <Link
-              href={`/${board.code}`}
+            <BoardLink
+              boardCode={board.code}
               className="px-0.5 hover:underline text-accent font-bold"
               title={board.name}
             >
               {board.code}
-            </Link>
+            </BoardLink>
             {index < boards.length - 1 && (
               <span className="mx-0.5 text-muted-foreground/30">/</span>
             )}

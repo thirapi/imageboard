@@ -3,21 +3,30 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type NavPosition = "static" | "sticky";
+type BoardView = "list" | "catalog";
 
 interface NavContextType {
   position: NavPosition;
   togglePosition: () => void;
+  defaultBoardView: BoardView;
+  toggleDefaultBoardView: () => void;
 }
 
 const NavContext = createContext<NavContextType | undefined>(undefined);
 
 export function NavProvider({ children }: { children: React.ReactNode }) {
   const [position, setPosition] = useState<NavPosition>("static");
+  const [defaultBoardView, setDefaultBoardView] = useState<BoardView>("list");
 
   useEffect(() => {
-    const saved = localStorage.getItem("ib-nav-position") as NavPosition;
-    if (saved === "sticky") {
+    const savedPos = localStorage.getItem("ib-nav-position") as NavPosition;
+    if (savedPos === "sticky") {
       setPosition("sticky");
+    }
+    
+    const savedView = localStorage.getItem("ib-default-board-view") as BoardView;
+    if (savedView === "catalog") {
+      setDefaultBoardView("catalog");
     }
   }, []);
 
@@ -27,8 +36,21 @@ export function NavProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("ib-nav-position", newPos);
   };
 
+  const toggleDefaultBoardView = () => {
+    const newView = defaultBoardView === "list" ? "catalog" : "list";
+    setDefaultBoardView(newView);
+    localStorage.setItem("ib-default-board-view", newView);
+  };
+
   return (
-    <NavContext.Provider value={{ position, togglePosition }}>
+    <NavContext.Provider 
+      value={{ 
+        position, 
+        togglePosition, 
+        defaultBoardView, 
+        toggleDefaultBoardView 
+      }}
+    >
       {children}
     </NavContext.Provider>
   );
