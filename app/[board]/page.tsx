@@ -13,7 +13,6 @@ import { BoardViewToggle } from "@/components/board-view-toggle";
 import { BoardSearch } from "@/components/board-search";
 import { CatalogView } from "@/components/catalog-view";
 import { cn } from "@/lib/utils";
-import { footerText } from "@/constants/footer";
 import { FormattedDate } from "@/components/formatted-date";
 import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
@@ -21,6 +20,7 @@ import { Pagination } from "@/components/pagination";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { lucia } from "@/lib/auth";
+import { SiteFooter } from "@/components/site-footer";
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -327,11 +327,7 @@ export default async function BoardPage({
         </div>
       </main>
 
-      <footer className="border-t py-8 bg-muted/20">
-        <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          <p>{footerText}</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

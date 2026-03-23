@@ -5,10 +5,10 @@ import { ThreadRepository } from "@/lib/repositories/thread.repository";
 import { ReplyRepository } from "@/lib/repositories/reply.repository";
 import { GetThreadDetailUseCase } from "@/lib/use-cases/get-thread-detail.use-case";
 import ThreadPageWrapper from "./thread";
-import { footerText } from "@/constants/footer";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { lucia } from "@/lib/auth";
+import { SiteFooter } from "@/components/site-footer";
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -143,24 +143,7 @@ export default async function ThreadPage({
         />
       </main>
 
-      <footer className="mt-12 border-t py-8 bg-muted/20">
-        <div className="container mx-auto px-4 text-center space-y-4">
-          <div className="flex justify-center gap-4 text-xs font-mono">
-            <Link href="/" className="text-accent hover:underline">
-              [ Home ]
-            </Link>
-            <Link
-              href={`/${boardCode}`}
-              className="text-accent hover:underline"
-            >
-              [ /{boardCode}/ ]
-            </Link>
-          </div>
-          <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-            {footerText}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

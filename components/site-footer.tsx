@@ -11,7 +11,7 @@ interface SiteStats {
   activeThreads24h: number;
 }
 
-export function SiteFooter({ stats }: { stats: SiteStats }) {
+export function SiteFooter({ stats }: { stats?: SiteStats }) {
   const [showStats, setShowStats] = useState(false);
 
   return (
@@ -21,24 +21,38 @@ export function SiteFooter({ stats }: { stats: SiteStats }) {
         <div className="container mx-auto px-4 text-center space-y-2">
           <div className="flex items-center justify-center gap-3 text-xs font-mono">
             <Link href="/" className="text-accent hover:underline">
-              Beranda
+              beranda
             </Link>
             <span className="text-muted-foreground">•</span>
             <Link href="/rules" className="text-accent hover:underline">
-              Peraturan
+              peraturan
             </Link>
             <span className="text-muted-foreground">•</span>
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className="text-accent hover:underline focus:outline-none"
+            <Link
+              href="/donasi"
+              className="text-accent hover:underline"
+              title="Dukung operasional server"
             >
-              Statistik Situs
-            </button>
+              <span className="hidden sm:inline">donasi</span>
+              <span className="sm:hidden">$$$</span>
+            </Link>
+            {stats && (
+              <>
+                <span className="text-muted-foreground">•</span>
+                <button
+                  onClick={() => setShowStats(!showStats)}
+                  className="text-accent hover:underline focus:outline-none"
+                >
+                statistik situs
+              </button>
+              </>
+            )}
           </div>
           <div className="space-y-1">
             {/* <p className="text-xs text-muted-foreground">{footerText}</p> */}
             <p className="text-[10px] text-muted-foreground/60 max-w-2xl mx-auto leading-relaxed">
-              Semua postingan di 62chan adalah tanggung jawab pengunggahnya dan bukan tanggung jawab 62chan.
+              Semua postingan di 62chan adalah tanggung jawab pengunggahnya dan
+              bukan tanggung jawab 62chan.
               <br />
               Untuk keluhan hukum, hak cipta, atau laporan konten ilegal, kirim
               ke:{" "}
@@ -55,7 +69,7 @@ export function SiteFooter({ stats }: { stats: SiteStats }) {
       </footer>
 
       {/* Site Stats - Absolute Bottom */}
-      {showStats && (
+      {stats && showStats && (
         <div className="border-t py-2 bg-muted/5 overflow-hidden group animate-in fade-in slide-in-from-bottom-1 duration-300">
           <div className="relative">
             {/* Mobile: CSS Marquee */}
@@ -151,3 +165,4 @@ export function SiteFooter({ stats }: { stats: SiteStats }) {
     </>
   );
 }
+
