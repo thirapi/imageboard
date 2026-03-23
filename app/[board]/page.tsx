@@ -169,7 +169,7 @@ export default async function BoardPage({
 
       <main
         className={cn(
-          "mx-auto pb-20 flex-1 w-full",
+          "mx-auto pb-2 flex-1 w-full",
           isCatalog
             ? "px-6 md:px-12 lg:px-20 max-w-none"
             : "px-4 md:px-8 max-w-6xl",
@@ -191,7 +191,7 @@ export default async function BoardPage({
           ) : (
             <div className="divide-y divide-muted/30">
               {threads?.map((thread) => (
-                <div key={thread.id} className="ib-post py-8 first:pt-0">
+                <div key={thread.id} className="ib-post py-2 first:pt-0">
                   {/* Meta line */}
                   <div className="ib-post-metaline">
                     {thread.isPinned && (
@@ -318,11 +318,13 @@ export default async function BoardPage({
 
           {/* Pagination */}
           {!query && (
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              baseUrl={`/${boardCode}`}
-            />
+            <div className="mt-12">
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                baseUrl={`/${boardCode}`}
+              />
+            </div>
           )}
         </div>
       </main>

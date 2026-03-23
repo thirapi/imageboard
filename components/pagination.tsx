@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 
@@ -28,61 +26,83 @@ export function Pagination({
     } else {
       params.set("page", page.toString());
     }
-    return `${baseUrl}?${params.toString()}`;
+    const queryString = params.toString();
+    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+  };
+
+  const renderPages = () => {
+    const pages = [];
+    const delta = 2; // Number of pages to show on each side of the current page
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - delta && i <= currentPage + delta)
+      ) {
+        pages.push(i);
+      } else if (i === currentPage - delta - 1 || i === currentPage + delta + 1) {
+        pages.push("...");
+      }
+    }
+
+    // Filter out redundant ellipses
+    return pages.filter((page, index, array) => array[index - 1] !== page);
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-8 mb-12">
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] font-mono select-none">
       {currentPage > 1 && (
-        <Link href={createPageUrl(currentPage - 1)}>
-          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+        <Link
+          href={createPageUrl(currentPage - 1)}
+          className="text-accent hover:underline font-bold"
+        >
+          <span className="hidden sm:inline">[ Sebelumnya ]</span>
+          <span className="sm:hidden">[ &lt; ]</span>
         </Link>
       )}
 
-      <div className="flex items-center gap-1 font-mono text-sm">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-          // Show first 3, last 3, and surrounding current page
-          if (
-            page === 1 ||
-            page === totalPages ||
-            (page >= currentPage - 1 && page <= currentPage + 1)
-          ) {
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        {renderPages().map((page, index) => {
+          if (page === "...") {
             return (
-              <Link key={page} href={createPageUrl(page)}>
-                <Button
-                  variant={currentPage === page ? "default" : "ghost"}
-                  size="sm"
-                  className={cn(
-                    "h-8 w-8 p-0",
-                    currentPage === page && "pointer-events-none",
-                  )}
-                >
-                  {page}
-                </Button>
-              </Link>
-            );
-          }
-
-          // Show ellipse
-          if (page === currentPage - 2 || page === currentPage + 2) {
-            return (
-              <span key={page} className="text-muted-foreground px-1">
+              <span key={`ellipsis-${index}`} className="text-muted-foreground/40 px-0.5">
                 ...
               </span>
             );
           }
 
-          return null;
+          const pageNum = page as number;
+          const isCurrent = currentPage === pageNum;
+          const isExtreme = pageNum === 1 || pageNum === totalPages;
+          const isNeighbor = Math.abs(pageNum - currentPage) <= 1;
+
+          return (
+            <Link
+              key={pageNum}
+              href={createPageUrl(pageNum)}
+              className={cn(
+                "hover:underline min-w-[1rem] sm:min-w-[1.2rem] text-center transition-colors",
+                isCurrent
+                  ? "text-accent font-bold"
+                  : "text-muted-foreground/70 hover:text-accent",
+                !isCurrent && !isExtreme && !isNeighbor && "hidden md:inline-block", // Extra spacing logic
+                !isCurrent && !isExtreme && !isNeighbor && "hidden sm:inline-block"
+              )}
+            >
+              {isCurrent ? `[ ${pageNum} ]` : pageNum}
+            </Link>
+          );
         })}
       </div>
 
       {currentPage < totalPages && (
-        <Link href={createPageUrl(currentPage + 1)}>
-          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+        <Link
+          href={createPageUrl(currentPage + 1)}
+          className="text-accent hover:underline font-bold"
+        >
+          <span className="hidden sm:inline">[ Selanjutnya ]</span>
+          <span className="sm:hidden">[ &gt; ]</span>
         </Link>
       )}
     </div>

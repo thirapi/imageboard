@@ -33,8 +33,7 @@ export function SiteFooter({ stats }: { stats?: SiteStats }) {
               className="text-accent hover:underline"
               title="Dukung operasional server"
             >
-              <span className="hidden sm:inline">donasi</span>
-              <span className="sm:hidden">$$$</span>
+              donasi
             </Link>
             {stats && (
               <>

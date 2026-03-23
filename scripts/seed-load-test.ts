@@ -1,7 +1,4 @@
 import { container } from "../lib/di/container";
-import { config } from "dotenv";
-
-config({ path: ".env" });
 
 async function main() {
     const args = process.argv.slice(2);
