@@ -29,6 +29,12 @@ export async function generateMetadata({
   const { board: boardCode, id } = await params;
   const threadId = Number.parseInt(id);
 
+  if (Number.isNaN(threadId)) {
+    return {
+      title: "Thread Not Found",
+    };
+  }
+
   const threadRepository = new ThreadRepository();
   const getThreadDetailUseCase = new GetThreadDetailUseCase(
     threadRepository,
@@ -77,6 +83,10 @@ export default async function ThreadPage({
 }) {
   const { board: boardCode, id } = await params;
   const threadId = Number.parseInt(id);
+
+  if (Number.isNaN(threadId)) {
+    notFound();
+  }
 
   const threadRepository = new ThreadRepository();
   const replyRepository = new ReplyRepository();
