@@ -19,7 +19,7 @@ export class CreateThreadUseCase {
     private passwordService: PasswordService,
   ) { }
 
-  async execute(input: CreateThreadCommand): Promise<number> {
+  async execute(input: CreateThreadCommand): Promise<{ id: number; postNumber: number }> {
     // Business rule: Check for IP ban
     if (input.ipAddress) {
       const ban = await this.banRepository.findByIp(input.ipAddress)
@@ -120,6 +120,6 @@ export class CreateThreadUseCase {
       }
     }
 
-    return thread.id
+    return { id: thread.id, postNumber: thread.postNumber }
   }
 }

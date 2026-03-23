@@ -33,7 +33,7 @@ export class ThreadController {
     }
 
     // Call use case
-    const threadId = await this.createThreadUseCase.execute({
+    const { id, postNumber } = await this.createThreadUseCase.execute({
       boardId: request.boardId,
       subject: request.subject,
       content: request.content,
@@ -46,7 +46,7 @@ export class ThreadController {
       capcode: request.capcode
     })
 
-    return { threadId }
+    return { threadId: id, postNumber }
   }
 
   async getThreadList(boardId: number) {

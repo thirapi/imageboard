@@ -51,7 +51,7 @@ export async function createThread(formData: FormData) {
       }
     }
 
-    const result = await threadController.createThread({
+    const { threadId, postNumber } = await threadController.createThread({
       boardId,
       subject,
       content,
@@ -66,7 +66,7 @@ export async function createThread(formData: FormData) {
 
     revalidatePath("/")
     revalidatePath(`/${boardCode}`)
-    return { success: true, threadId: result.threadId }
+    return { success: true, threadId, postNumber }
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : "Failed to create thread" }
   }

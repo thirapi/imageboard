@@ -131,6 +131,8 @@ import { AgeVerificationDialog } from "@/components/age-verification-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollButtons } from "@/components/scroll-buttons";
 import { PostHogProvider } from "./posthog-provider";
+import { ThreadWatcherProvider } from "@/components/thread-watcher-provider";
+import { ThreadWatcher } from "@/components/thread-watcher";
 
 export default function RootLayout({
   children,
@@ -140,13 +142,6 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        {jsonLd.map((schema, i) => (
-          <script
-            key={i}
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-          />
-        ))}
         <PostHogProvider>
           <ThemeProvider
             attribute="class"
@@ -156,16 +151,26 @@ export default function RootLayout({
           >
             <NavProvider>
               <TooltipProvider>
-                <BoardNav />
-                {children}
-                <Toaster />
-                <SonnerToaster />
-                <Analytics />
-                <AgeVerificationDialog />
-                <ScrollButtons />
+                <ThreadWatcherProvider>
+                  <BoardNav />
+                  {children}
+                  <Toaster />
+                  <SonnerToaster />
+                  <ThreadWatcher />
+                  <Analytics />
+                  <AgeVerificationDialog />
+                  <ScrollButtons />
+                </ThreadWatcherProvider>
               </TooltipProvider>
             </NavProvider>
           </ThemeProvider>
+          {jsonLd.map((schema, i) => (
+            <script
+              key={i}
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            />
+          ))}
         </PostHogProvider>
       </body>
     </html>

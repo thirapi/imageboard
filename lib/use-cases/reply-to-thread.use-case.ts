@@ -19,7 +19,7 @@ export class ReplyToThreadUseCase {
     private passwordService: PasswordService,
   ) { }
 
-  async execute(input: CreateReplyCommand): Promise<number> {
+  async execute(input: CreateReplyCommand): Promise<{ id: number; postNumber: number }> {
     // Business rule: Check for IP ban
     if (input.ipAddress) {
       const ban = await this.banRepository.findByIp(input.ipAddress)
@@ -120,6 +120,6 @@ export class ReplyToThreadUseCase {
     // Business rule: Bump thread when reply is added
     await this.threadRepository.updateBumpTime(input.threadId)
 
-    return reply.id
+    return { id: reply.id, postNumber: reply.postNumber }
   }
 }

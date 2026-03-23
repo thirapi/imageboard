@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShieldAlert, AlertTriangle } from "lucide-react";
 import { useReply } from "./reply-context";
+import { useThreadWatcher } from "./thread-watcher-provider";
 import posthog from "posthog-js";
 
 interface ReplyFormProps {
@@ -50,6 +51,7 @@ export function ReplyForm({
     setIsSpoiler,
     resetForm,
   } = useReply();
+  const { watchThread, addMyPost } = useThreadWatcher();
 
   const refreshCaptcha = async () => {
     const data = await getCaptcha();
@@ -82,6 +84,19 @@ export function ReplyForm({
         resetForm();
         setError(null);
         setResetTrigger((prev) => prev + 1); // Trigger image uploader reset
+        
+        // Update thread watcher
+        if (result.postNumber) {
+          addMyPost(result.postNumber);
+        }
+        watchThread({
+          id: threadId,
+          boardCode: boardCode,
+          subject: null,
+          lastReadReplyCount: 0,
+          snippet: state.content.substring(0, 50) + (state.content.length > 50 ? "..." : ""),
+        });
+
         router.refresh();
 
         // Track reply creation

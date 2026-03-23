@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Lock, Pin } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ReplyForm } from "@/components/reply-form";
 import { ReportButton } from "@/components/report-button";
 import { ImageLightbox } from "@/components/image-lightbox";
@@ -16,7 +17,10 @@ import { QuickReply } from "@/components/quick-reply";
 import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
 import { ReplyProvider, useReply } from "@/components/reply-context";
+import { useThreadWatcher } from "@/components/thread-watcher-provider";
+import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -36,6 +40,13 @@ export function ThreadClient({
   const [qrOpen, setQrOpen] = useState(false);
   const router = useRouter();
   const { state, setContent } = useReply();
+  const { watchedThreads, watchThread, unwatchThread, markAsRead } = useThreadWatcher();
+
+  const isWatched = watchedThreads.some(t => t.id === thread.id);
+
+  useEffect(() => {
+    markAsRead(thread.id, replies.length);
+  }, [thread.id, replies.length, markAsRead]);
 
   const handleImageClick = (src: string) => {
     setSelectedImage(src);
@@ -168,6 +179,31 @@ export function ThreadClient({
           >
             No.{thread.postNumber}
           </span>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "h-6 w-6 ml-2",
+              isWatched ? "text-accent" : "text-muted-foreground"
+            )}
+            onClick={() => {
+              if (isWatched) {
+                unwatchThread(thread.id);
+              } else {
+                watchThread({
+                  id: thread.id,
+                  boardCode: boardCode,
+                  subject: thread.subject,
+                  lastReadReplyCount: replies.length,
+                  snippet: thread.content.substring(0, 50) + (thread.content.length > 50 ? "..." : "")
+                });
+              }
+            }}
+            title={isWatched ? "Berhenti pantau thread" : "Pantau thread ini"}
+          >
+            {isWatched ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+          </Button>
 
           <div className="flex items-center gap-1 ml-auto">
             <DeletePostButton
@@ -314,6 +350,7 @@ export function ThreadClient({
         onClose={() => setQrOpen(false)}
         userRole={userRole}
       />
+      <div id="bottom" />
     </>
   );
 }

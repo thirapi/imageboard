@@ -134,7 +134,7 @@ export function QuickReply({
       >
         <div className="flex items-center gap-2">
           <GripHorizontal className="h-4 w-4 text-muted-foreground" />
-          <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+          <span className="text-[10px] font-bold opacity-70">
             Balasan Cepat
           </span>
         </div>

@@ -13,10 +13,13 @@ import {
   LogOut,
   Gavel,
   RefreshCw,
+  Eye,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 import { useNav } from "./nav-provider";
 import { useRouter } from "next/navigation";
+import { useThreadWatcher } from "./thread-watcher-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +48,7 @@ export function NavControls({ user }: NavControlsProps) {
     defaultBoardView, 
     toggleDefaultBoardView 
   } = useNav();
+  const { toggleWatcher, watchedThreads } = useThreadWatcher();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -72,6 +76,27 @@ export function NavControls({ user }: NavControlsProps) {
           </button>
         </TooltipTrigger>
         <TooltipContent side="bottom">Segarkan halaman</TooltipContent>
+      </Tooltip>
+      <span className="text-muted-foreground/50">/</span>
+      
+      {/* Thread Watcher Toggle */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={toggleWatcher}
+            className="relative opacity-80 hover:opacity-100 transition-opacity cursor-pointer p-0.5"
+            title="Thread Watcher"
+          >
+            <Eye className="size-3.5" />
+            {watchedThreads.some(t => t.currentReplyCount > t.lastReadReplyCount) && (
+              <span className={cn(
+                "absolute -top-1 -right-1 size-2 rounded-full border border-background",
+                watchedThreads.some(t => t.hasNewReplyToMe) ? "bg-red-500" : "bg-primary"
+              )} />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Utas yang diikuti</TooltipContent>
       </Tooltip>
       <span className="text-muted-foreground/50">/</span>
 

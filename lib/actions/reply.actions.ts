@@ -50,7 +50,7 @@ export async function createReply(formData: FormData) {
       }
     }
 
-    const result = await replyController.createReply({
+    const { replyId, postNumber } = await replyController.createReply({
       threadId,
       content,
       author,
@@ -65,7 +65,7 @@ export async function createReply(formData: FormData) {
     revalidatePath("/")
     revalidatePath(`/${boardCode}`)
     revalidatePath(`/${boardCode}/thread/${threadId}`)
-    return { success: true, replyId: result.replyId }
+    return { success: true, replyId, postNumber }
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : "Failed to create reply" }
   }

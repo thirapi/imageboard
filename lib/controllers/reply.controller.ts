@@ -26,7 +26,7 @@ export class ReplyController {
     }
 
     // Call use case
-    const replyId = await this.replyToThreadUseCase.execute({
+    const { id, postNumber } = await this.replyToThreadUseCase.execute({
       threadId: request.threadId,
       content: request.content,
       author: request.author,
@@ -38,6 +38,6 @@ export class ReplyController {
       capcode: request.capcode
     })
 
-    return { replyId }
+    return { replyId: id, postNumber }
   }
 }

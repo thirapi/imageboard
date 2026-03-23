@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShieldAlert, AlertTriangle } from "lucide-react";
 import posthog from "posthog-js";
+import { useThreadWatcher } from "./thread-watcher-provider";
 
 interface ThreadFormProps {
   boardId: number;
@@ -31,6 +32,7 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
   const [showTips, setShowTips] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const { watchThread, addMyPost } = useThreadWatcher();
 
   const [content, setContent] = useState("");
 
@@ -72,6 +74,19 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
         setContent(""); // Reset content
         setResetTrigger((prev) => prev + 1); // Trigger image uploader reset
         setIsOpen(false);
+
+        // Update thread watcher
+        if (result.postNumber) {
+          addMyPost(result.postNumber);
+        }
+        watchThread({
+          id: result.threadId,
+          boardCode: boardCode,
+          subject: (formData.get("subject") as string) || null,
+          lastReadReplyCount: 0,
+          snippet: content.substring(0, 50) + (content.length > 50 ? "..." : "")
+        });
+
         router.push(`/${boardCode}/thread/${result.threadId}`);
         router.refresh();
         
