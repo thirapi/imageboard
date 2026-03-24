@@ -13,6 +13,7 @@ import { LatestPosts } from "@/components/latest-posts";
 import { ThreadPreview } from "@/components/thread-preview";
 import { BoardLink } from "@/components/board-link";
 import { SiteFooter } from "@/components/site-footer";
+import { RecentImage } from "@/components/recent-image";
 import type { Metadata } from "next";
 import { BoardEntity, BoardCategoryEntity } from "@/lib/entities/board.entity";
 
@@ -144,25 +145,12 @@ export default async function HomePage() {
                           href={`/${image.boardCode}/thread/${image.threadId}#p${image.postNumber}`}
                           className="group"
                         >
-                          <div className="aspect-square flex items-center justify-center overflow-hidden rounded border border-muted/50 group-hover:border-accent transition-all bg-muted/20 relative">
-                            <img
-                              src={getThumbnailUrl(image.imageUrl, 200, 200)}
-                              alt={`Gambar terbaru di 62chan - ${image.boardCode}`}
-                              className={`w-full h-full object-cover transition-all ${
-                                image.isSpoiler || image.isNsfw
-                                  ? "blur-xl scale-110 opacity-60"
-                                  : "grayscale-[0.2] group-hover:grayscale-0"
-                              }`}
-                              loading="lazy"
-                            />
-                            {(image.isSpoiler || image.isNsfw) && (
-                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <span className="text-[10px] font-bold text-white bg-black/60 px-2 py-1 rounded">
-                                  {image.isSpoiler ? "SPOILER" : "NSFW"}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                          <RecentImage 
+                            imageUrl={image.imageUrl}
+                            isNsfw={image.isNsfw}
+                            isSpoiler={image.isSpoiler}
+                            boardCode={image.boardCode}
+                          />
                         </Link>
                       </ThreadPreview>
                     ))}

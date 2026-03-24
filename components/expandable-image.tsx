@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Maximize2, Minimize2, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbnailUrl } from "@/lib/utils/image";
+import { useNav } from "./nav-provider";
+import { Play } from "lucide-react";
 
 interface ExpandableImageProps {
   src: string;
@@ -29,8 +31,11 @@ export function ExpandableImage({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showNsfw, setShowNsfw] = useState(!isNsfw);
   const [showSpoiler, setShowSpoiler] = useState(!isSpoiler);
+  const { autoPlayGif } = useNav();
 
   const isHidden = !showNsfw || !showSpoiler;
+  const isGif = src.toLowerCase().endsWith(".gif");
+  const isStaticGif = isGif && !autoPlayGif && !isExpanded;
 
   // Helper to parse metadata
   let fileInfo = {
@@ -116,7 +121,7 @@ export function ExpandableImage({
           src={
             isExpanded
               ? src
-              : getThumbnailUrl(src, isOP ? 300 : 250, isOP ? 300 : 250, "fit")
+              : getThumbnailUrl(src, isOP ? 300 : 250, isOP ? 300 : 250, "fit", !autoPlayGif)
           }
           alt={alt}
           className={cn(
@@ -152,6 +157,15 @@ export function ExpandableImage({
                 [ SPOILER ]
               </div>
             )}
+          </div>
+        )}
+
+        {/* GIF Indicator */}
+        {isStaticGif && !isHidden && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] font-bold px-1 rounded border border-white/20">
+              GIF
+            </div>
           </div>
         )}
 

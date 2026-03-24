@@ -6,12 +6,15 @@ export function getThumbnailUrl(
     url: string | null | undefined,
     width = 250,
     height = 250,
-    mode = 'fill'
+    mode = 'fill',
+    staticGif = false
 ): string {
     if (!url) return "/placeholder.svg";
 
     // If not a cloudinary URL, return as is
     if (!url.includes("cloudinary.com")) return url;
+
+    const isGif = url.toLowerCase().endsWith(".gif");
 
     // Cloudinary URL structure: .../upload/v12345/public_id.jpg
     const parts = url.split("/upload/");
@@ -30,6 +33,7 @@ export function getThumbnailUrl(
         hasGravity ? "g_auto" : "",
         "q_auto",
         "f_auto",
+        (staticGif && isGif) ? "pg_1" : ""
     ].filter(Boolean).join(",");
 
     return `${base}/upload/${transformations}/${rest}`;

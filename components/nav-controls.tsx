@@ -46,7 +46,9 @@ export function NavControls({ user }: NavControlsProps) {
     position, 
     togglePosition, 
     defaultBoardView, 
-    toggleDefaultBoardView 
+    toggleDefaultBoardView,
+    autoPlayGif,
+    toggleAutoPlayGif
   } = useNav();
   const { toggleWatcher, watchedThreads } = useThreadWatcher();
   const router = useRouter();
@@ -165,6 +167,17 @@ export function NavControls({ user }: NavControlsProps) {
             <span>Katalog sebagai Default</span>
             <span className="ml-auto opacity-50 font-bold">
               {defaultBoardView === "catalog" ? "✔" : "✘"}
+            </span>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={toggleAutoPlayGif}
+            onSelect={(e) => e.preventDefault()}
+            className="cursor-pointer h-[26px] py-0"
+          >
+            <span>Putar GIF Otomatis</span>
+            <span className="ml-auto opacity-50 font-bold">
+              {autoPlayGif ? "✔" : "✘"}
             </span>
           </DropdownMenuItem>
 

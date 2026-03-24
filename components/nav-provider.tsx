@@ -10,6 +10,8 @@ interface NavContextType {
   togglePosition: () => void;
   defaultBoardView: BoardView;
   toggleDefaultBoardView: () => void;
+  autoPlayGif: boolean;
+  toggleAutoPlayGif: () => void;
 }
 
 const NavContext = createContext<NavContextType | undefined>(undefined);
@@ -17,6 +19,7 @@ const NavContext = createContext<NavContextType | undefined>(undefined);
 export function NavProvider({ children }: { children: React.ReactNode }) {
   const [position, setPosition] = useState<NavPosition>("static");
   const [defaultBoardView, setDefaultBoardView] = useState<BoardView>("list");
+  const [autoPlayGif, setAutoPlayGif] = useState<boolean>(true);
 
   useEffect(() => {
     const savedPos = localStorage.getItem("ib-nav-position") as NavPosition;
@@ -27,6 +30,11 @@ export function NavProvider({ children }: { children: React.ReactNode }) {
     const savedView = localStorage.getItem("ib-default-board-view") as BoardView;
     if (savedView === "catalog") {
       setDefaultBoardView("catalog");
+    }
+
+    const savedAutoPlay = localStorage.getItem("ib-autoplay-gif");
+    if (savedAutoPlay === "false") {
+      setAutoPlayGif(false);
     }
   }, []);
 
@@ -42,13 +50,21 @@ export function NavProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("ib-default-board-view", newView);
   };
 
+  const toggleAutoPlayGif = () => {
+    const newVal = !autoPlayGif;
+    setAutoPlayGif(newVal);
+    localStorage.setItem("ib-autoplay-gif", String(newVal));
+  };
+
   return (
     <NavContext.Provider 
       value={{ 
         position, 
         togglePosition, 
         defaultBoardView, 
-        toggleDefaultBoardView 
+        toggleDefaultBoardView,
+        autoPlayGif,
+        toggleAutoPlayGif
       }}
     >
       {children}

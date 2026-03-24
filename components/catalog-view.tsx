@@ -5,6 +5,8 @@ import { MessageSquare, ImageIcon, Pin, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbnailUrl } from "@/lib/utils/image";
 import { FormattedText } from "@/components/formatted-text";
+import { useNav } from "./nav-provider";
+import { Play } from "lucide-react";
 
 interface CatalogViewProps {
   threads: any[];
@@ -12,6 +14,7 @@ interface CatalogViewProps {
 }
 
 export function CatalogView({ threads, boardCode }: CatalogViewProps) {
+  const { autoPlayGif } = useNav();
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-x-3 gap-y-6">
       {threads.map((thread) => (
@@ -25,7 +28,7 @@ export function CatalogView({ threads, boardCode }: CatalogViewProps) {
             {thread.image ? (
               <div className="relative w-full h-full">
                 <img
-                  src={getThumbnailUrl(thread.image, 250, 250, "fill")}
+                  src={getThumbnailUrl(thread.image, 250, 250, "fill", !autoPlayGif)}
                   alt={thread.subject || "Thread image"}
                   className={cn(
                     "w-full h-full object-cover transition-all duration-500",
@@ -33,6 +36,13 @@ export function CatalogView({ threads, boardCode }: CatalogViewProps) {
                   )}
                   loading="lazy"
                 />
+                {thread.image.toLowerCase().endsWith(".gif") && !autoPlayGif && !thread.isNsfw && !thread.isSpoiler && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] font-bold px-1 rounded border border-white/20">
+                      GIF
+                    </div>
+                  </div>
+                )}
                 {(thread.isNsfw || thread.isSpoiler) && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                     <span className="bg-black/80 border border-white/20 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-tighter">
