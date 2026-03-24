@@ -66,12 +66,6 @@ export class ThreadController {
     }
 
     // Call use case
-    const result = await this.getThreadDetailUseCase.execute(threadId)
-
-    if (!result) {
-      throw new Error("Thread not found")
-    }
-
-    return result
+    return await this.getThreadDetailUseCase.execute(threadId)
   }
 }
