@@ -134,12 +134,14 @@ export default async function HomePage() {
 
                   <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                     {recentImages.map((image) => (
-                      <ThreadPreview
-                        key={`img-preview-${image.id}`}
-                        subject={image.threadSubject}
-                        excerpt={image.threadExcerpt}
-                        boardCode={image.boardCode}
-                      >
+                        <ThreadPreview
+                          key={`img-preview-${image.id}`}
+                          subject={image.threadSubject}
+                          excerpt={image.threadExcerpt}
+                          boardCode={image.boardCode}
+                          isNsfw={image.isNsfw}
+                          isSpoiler={image.isSpoiler}
+                        >
                         <Link
                           key={`${image.id}-${image.imageUrl}`}
                           href={`/${image.boardCode}/thread/${image.threadId}#p${image.postNumber}`}

@@ -92,6 +92,8 @@ export function LatestPosts({ initialPosts }: LatestPostsProps) {
             excerpt={post.threadExcerpt}
             image={post.threadImage}
             boardCode={post.boardCode}
+            isNsfw={post.isNsfw}
+            isSpoiler={post.isSpoiler}
           >
             <Link
               key={`latest-${post.id}-${post.type}`}

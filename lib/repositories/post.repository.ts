@@ -20,6 +20,8 @@ export class PostRepository {
         createdAt: threads.createdAt,
         boardCode: boards.code,
         capcode: threads.capcode,
+        isNsfw: threads.isNsfw,
+        isSpoiler: threads.isSpoiler,
       })
       .from(threads)
       .innerJoin(boards, eq(threads.boardId, boards.id))
@@ -50,6 +52,10 @@ export class PostRepository {
         threadSubject: threads.subject,
         threadContent: threads.content,
         threadImage: threads.image,
+        isNsfw: replies.isNsfw,
+        isSpoiler: replies.isSpoiler,
+        threadIsNsfw: threads.isNsfw,
+        threadIsSpoiler: threads.isSpoiler,
       })
       .from(replies)
       .innerJoin(threads, eq(replies.threadId, threads.id))
@@ -74,6 +80,8 @@ export class PostRepository {
         threadSubject: t.subject,
         threadExcerpt: t.content.substring(0, 150),
         threadImage: t.image,
+        isNsfw: t.isNsfw ?? false,
+        isSpoiler: t.isSpoiler ?? false,
       })
     }
 
@@ -91,6 +99,8 @@ export class PostRepository {
         threadSubject: r.threadSubject,
         threadExcerpt: r.threadContent ? r.threadContent.substring(0, 150) : null,
         threadImage: r.threadImage,
+        isNsfw: (r.isNsfw || r.threadIsNsfw) ?? false,
+        isSpoiler: (r.isSpoiler || r.threadIsSpoiler) ?? false,
       })
     }
 

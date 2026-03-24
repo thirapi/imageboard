@@ -8,6 +8,10 @@ import {
 import { MessageSquare, Image as ImageIcon } from "lucide-react";
 import { FormattedText } from "./formatted-text";
 import { getThumbnailUrl } from "@/lib/utils/image";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useNav } from "./nav-provider";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface ThreadPreviewProps {
   children: React.ReactNode;
@@ -15,6 +19,8 @@ interface ThreadPreviewProps {
   excerpt?: string | null;
   image?: string | null;
   boardCode: string;
+  isNsfw?: boolean;
+  isSpoiler?: boolean;
 }
 
 export function ThreadPreview({
@@ -23,11 +29,24 @@ export function ThreadPreview({
   excerpt,
   image,
   boardCode,
+  isNsfw = false,
+  isSpoiler = false,
 }: ThreadPreviewProps) {
-  if (!subject && !excerpt && !image) return <>{children}</>;
+  const { autoPlayGif } = useNav();
+  const isMobile = useIsMobile();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // On mobile OR during hydration, don't show the hover card
+  if (!mounted || isMobile || (!subject && !excerpt && !image)) {
+    return <>{children}</>;
+  }
 
   return (
-    <HoverCard openDelay={300} closeDelay={100}>
+    <HoverCard openDelay={500} closeDelay={100}>
       <HoverCardTrigger asChild>
         <div className="inline-block w-full">{children}</div>
       </HoverCardTrigger>
@@ -36,26 +55,41 @@ export function ThreadPreview({
         align="start" 
         className="w-80 p-0 overflow-hidden shadow-2xl border-accent/20 bg-card z-[100]"
       >
-        <div className="p-3 bg-accent/5 border-b border-accent/10 flex items-center gap-2">
-          <MessageSquare className="size-3.5 text-accent" />
-          <span className="text-[11px] font-semibold text-accent">
-            Pratinjau Utas /{boardCode}/
+        <div className="px-3 py-1.5 bg-accent/5 border-b border-accent/10 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <MessageSquare className="size-3 text-accent/70" />
+            <span className="text-[10px] font-bold text-accent/80">
+              Pratinjau Utas
+            </span>
+          </div>
+          <span className="text-[10px] font-mono font-bold text-accent/40 text-right">
+            /{boardCode}/
           </span>
         </div>
         
         <div className="p-4 flex gap-3">
           {image && (
-            <div className="shrink-0 w-20 h-20 bg-muted rounded overflow-hidden border border-muted/50">
+            <div className="shrink-0 w-20 h-20 bg-muted rounded overflow-hidden border border-muted/50 relative">
               <img 
-                src={getThumbnailUrl(image, 200, 200)} 
+                src={getThumbnailUrl(image, 200, 200, "fill", !autoPlayGif)} 
                 alt="Preview" 
-                className="w-full h-full object-cover"
+                className={cn(
+                  "w-full h-full object-cover transition-all",
+                  (isNsfw || isSpoiler) && "blur-xl grayscale-[0.5] scale-110 opacity-70"
+                )}
               />
+              {(isNsfw || isSpoiler) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/5 pointer-events-none">
+                  <span className="text-[7px] font-bold text-white bg-black/60 px-1 py-0.5 rounded border border-white/20 uppercase tracking-tighter">
+                    {isNsfw ? "NSFW" : "Spoiler"}
+                  </span>
+                </div>
+              )}
             </div>
           )}
           <div className="min-w-0 flex-1">
             {subject && (
-              <h3 className="text-xs font-bold text-accent mb-1 truncate">
+              <h3 className="text-xs font-bold text-foreground mb-1.5 line-clamp-1 border-b pb-1 border-dashed border-muted">
                 {subject}
               </h3>
             )}

@@ -12,6 +12,8 @@ export interface LatestPostEntity {
   threadSubject?: string | null
   threadExcerpt?: string | null
   threadImage?: string | null
+  isNsfw?: boolean
+  isSpoiler?: boolean
 }
 
 export interface RecentImageEntity {
