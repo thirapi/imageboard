@@ -14,6 +14,8 @@ import { BoardCategoryRepository } from "@/lib/repositories/board-category.repos
 import { CloudinaryService } from "@/lib/services/cloudinary.service"
 import { ContentFilterService } from "@/lib/services/content-filter.service"
 import { PasswordService } from "@/lib/services/password.service"
+import { AIModerationService } from "@/lib/services/ai-moderation.service"
+
 
 // Use Cases
 import { CreateReportUseCase } from "@/lib/use-cases/create-report.use-case"
@@ -82,6 +84,8 @@ const cloudinaryService = new CloudinaryService()
 const contentFilterService = new ContentFilterService()
 const sequenceService = new SequenceService()
 const passwordService = new PasswordService()
+const aiModerationService = new AIModerationService()
+
 
 // Instantiate Use Cases
 const createReportUseCase = new CreateReportUseCase(reportRepository)
@@ -92,8 +96,11 @@ const createThreadUseCase = new CreateThreadUseCase(
   cloudinaryService,
   sequenceService,
   banRepository,
-  passwordService
+  passwordService,
+  aiModerationService,
+  createReportUseCase
 )
+
 const dismissReportUseCase = new DismissReportUseCase(reportRepository)
 const getBoardListUseCase = new GetBoardListUseCase(boardRepository)
 const getBoardByIdUseCase = new GetBoardByIdUseCase(boardRepository)
@@ -115,8 +122,11 @@ const replyToThreadUseCase = new ReplyToThreadUseCase(
   cloudinaryService,
   sequenceService,
   banRepository,
-  passwordService
+  passwordService,
+  aiModerationService,
+  createReportUseCase
 )
+
 const resolveReportUseCase = new ResolveReportUseCase(reportRepository)
 const softDeleteReplyUseCase = new SoftDeleteReplyUseCase(replyRepository)
 const softDeleteThreadUseCase = new SoftDeleteThreadUseCase(threadRepository)

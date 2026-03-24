@@ -7,6 +7,9 @@ import type { BanRepository } from "@/lib/repositories/ban.repository"
 import { SequenceService } from "../services/sequence.service"
 import { generateTripcode } from "../utils/tripcode"
 import { PasswordService } from "../services/password.service"
+import type { AIModerationService } from "../services/ai-moderation.service"
+import type { CreateReportUseCase } from "./create-report.use-case"
+
 
 export class ReplyToThreadUseCase {
   constructor(
@@ -17,7 +20,10 @@ export class ReplyToThreadUseCase {
     private sequenceService: SequenceService,
     private banRepository: BanRepository,
     private passwordService: PasswordService,
+    private aiModerationService: AIModerationService,
+    private createReportUseCase: CreateReportUseCase,
   ) { }
+
 
   async execute(input: CreateReplyCommand): Promise<{ id: number; postNumber: number }> {
     // Business rule: Check for IP ban
@@ -120,6 +126,26 @@ export class ReplyToThreadUseCase {
     // Business rule: Bump thread when reply is added
     await this.threadRepository.updateBumpTime(input.threadId)
 
+    // AI Moderation (Async)
+    // Run this in the background to not slow down the user
+    this.aiModerationService.evaluateText(input.content).then(async (result) => {
+      if (result.isViolation) {
+        console.log(`[AIModeration] Violation detected in reply #${reply.postNumber}: ${result.reason}`);
+        try {
+          await this.createReportUseCase.execute({
+            contentType: "reply",
+            contentId: reply.id,
+            reason: `[AI DETECTION] Berpotensi melanggar: ${result.reason}`,
+          });
+        } catch (reportError) {
+          console.error("[AIModeration] Failed to create AI report for reply:", reportError);
+        }
+      }
+    }).catch(err => {
+      console.error("[AIModeration] Error in background moderation check for reply:", err);
+    });
+
     return { id: reply.id, postNumber: reply.postNumber }
+
   }
 }

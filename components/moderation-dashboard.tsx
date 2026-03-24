@@ -16,8 +16,10 @@ import {
   Columns,
   MessageSquare,
   History,
-  ShieldAlert
+  ShieldAlert,
+  Bot
 } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -214,9 +216,11 @@ export function ModerationDashboard({
               className={cn(
                 "group relative border rounded-lg transition-all cursor-pointer overflow-hidden",
                 selectedIds.includes(report.id) ? "border-primary ring-1 ring-primary/20" : "hover:border-muted-foreground/30",
-                activeReportId === report.id ? "bg-primary/5 border-primary/50 shadow-sm" : "bg-card",
+                activeReportId === report.id ? "bg-primary/5 border-primary/50 shadow-sm" : 
+                report.reason.includes("[AI DETECTION]") ? "bg-orange-500/5 dark:bg-orange-500/10 border-orange-500/20" : "bg-card",
                 isCompact ? "p-2" : "p-4"
               )}
+
             >
               <div className="flex gap-4 items-start">
                  <div className="pt-1" onClick={(e) => e.stopPropagation()}>
@@ -244,7 +248,13 @@ export function ModerationDashboard({
                           )}>
                             #{report.contentId}
                           </span>
+                          {report.reason.includes("[AI DETECTION]") && (
+                            <Badge variant="outline" className="text-[9px] h-4 bg-orange-500/10 text-orange-600 border-orange-500/30 gap-1 px-1">
+                              <Bot className="h-2.5 w-2.5" /> AI
+                            </Badge>
+                          )}
                           {report.boardCode && (
+
                             <Badge variant="secondary" className="text-[10px] h-4 bg-primary/10 text-primary border-none">/{report.boardCode}/</Badge>
                           )}
                        </div>
