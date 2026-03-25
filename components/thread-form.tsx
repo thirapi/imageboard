@@ -79,13 +79,6 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
         if (result.postNumber) {
           addMyPost(result.postNumber);
         }
-        watchThread({
-          id: result.threadId,
-          boardCode: boardCode,
-          subject: (formData.get("subject") as string) || null,
-          lastReadReplyCount: 0,
-          snippet: content.substring(0, 50) + (content.length > 50 ? "..." : "")
-        });
 
         router.push(`/${boardCode}/thread/${result.threadId}`);
         router.refresh();

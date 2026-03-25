@@ -89,13 +89,6 @@ export function ReplyForm({
         if (result.postNumber) {
           addMyPost(result.postNumber);
         }
-        watchThread({
-          id: threadId,
-          boardCode: boardCode,
-          subject: null,
-          lastReadReplyCount: 0,
-          snippet: state.content.substring(0, 50) + (state.content.length > 50 ? "..." : ""),
-        });
 
         router.refresh();
 

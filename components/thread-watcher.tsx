@@ -182,7 +182,7 @@ export function ThreadWatcher() {
                     onClick={() => markAsRead(thread.id, thread.currentReplyCount)}
                     className={cn(
                       "truncate hover:underline",
-                      thread.hasNewReplyToMe ? "text-red-600 font-bold" : (hasNew ? "text-accent font-medium" : "")
+                      thread.hasNewReplyToMe ? "text-red-600 font-bold" : ""
                     )}
                   >
                     {thread.subject || thread.snippet || thread.id}
@@ -192,7 +192,9 @@ export function ThreadWatcher() {
                 <div className="flex items-center gap-2 shrink-0">
                   <span className={cn(
                     "font-mono px-1 rounded",
-                    hasNew ? "bg-accent/10 text-accent font-bold" : "text-muted-foreground opacity-60"
+                    thread.hasNewReplyToMe 
+                      ? "bg-red-600/10 text-red-600 font-bold" 
+                      : (hasNew ? "text-muted-foreground font-bold" : "text-muted-foreground opacity-60")
                   )}>
                     {thread.currentReplyCount}{hasNew && `(+${newCount})`}
                   </span>
