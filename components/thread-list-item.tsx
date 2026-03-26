@@ -143,38 +143,42 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
               .slice(0, 3)
               .reverse()
               .map((reply: any) => (
-                <div
-                  key={reply.id}
-                  className="ib-reply shadow-sm border border-muted/20 table max-w-none"
-                >
-                  <div className="ib-post-metaline text-xs px-2 pt-1 border-b border-muted/5 bg-muted/5">
-                    <div className="flex items-baseline gap-1">
-                      <TripcodeDisplay
-                        author={reply.author || "Awanama"}
-                        className="ib-author"
-                        hideTrip={!!reply.capcode}
-                      />
-                      <CapcodeMarker type={reply.capcode} />
+                <div key={reply.id} className="flex items-start gap-1">
+                  <span className="text-muted-foreground/20 font-serif select-none mt-2 hidden lg:inline-block">
+                    &gt;&gt;
+                  </span>
+                  <div
+                    className="ib-reply shadow-sm border border-muted/20 table max-w-none"
+                  >
+                    <div className="ib-post-metaline text-xs px-2 pt-1 border-b border-muted/5 bg-muted/5">
+                      <div className="flex items-baseline gap-1">
+                        <TripcodeDisplay
+                          author={reply.author || "Awanama"}
+                          className="ib-author"
+                          hideTrip={!!reply.capcode}
+                        />
+                        <CapcodeMarker type={reply.capcode} />
+                      </div>
+                      <span className="text-muted-foreground opacity-70">
+                        <FormattedDate date={reply.createdAt} />
+                      </span>
+                      <span className="ib-post-number opacity-80">
+                        No.{reply.postNumber}
+                      </span>
                     </div>
-                    <span className="text-muted-foreground opacity-70">
-                      <FormattedDate date={reply.createdAt} />
-                    </span>
-                    <span className="ib-post-number opacity-80">
-                      No.{reply.postNumber}
-                    </span>
-                  </div>
-                  <div className="p-2 block overflow-hidden">
-                    {reply.image && (
-                      <ExpandableImage
-                        src={reply.image}
-                        alt="Reply thumbnail"
-                        metadata={reply.imageMetadata || undefined}
-                        isNsfw={reply.isNsfw}
-                        isSpoiler={reply.isSpoiler}
-                      />
-                    )}
-                    <div className="text-sm leading-snug">
-                      <FormattedText content={reply.content} />
+                    <div className="p-2 block overflow-hidden">
+                      {reply.image && (
+                        <ExpandableImage
+                          src={reply.image}
+                          alt="Reply thumbnail"
+                          metadata={reply.imageMetadata || undefined}
+                          isNsfw={reply.isNsfw}
+                          isSpoiler={reply.isSpoiler}
+                        />
+                      )}
+                      <div className="text-sm leading-snug">
+                        <FormattedText content={reply.content} />
+                      </div>
                     </div>
                   </div>
                 </div>

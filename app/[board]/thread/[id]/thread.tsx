@@ -259,63 +259,68 @@ export function ThreadClient({
           }
 
           return (
-            <div
-              key={reply.id}
-              id={`p${reply.postNumber}`}
-              className={`ib-reply border border-muted/20 shadow-sm relative group table max-w-none ${reply.isDeleted ? 'opacity-70 grayscale-[50%]' : ''}`}
-            >
-              <div className={`ib-post-metaline px-2 pt-1 border-b ${reply.isDeleted ? 'bg-red-500/5' : 'bg-muted/5'}`}>
-                {reply.isDeleted && (
-                  <span className="text-[10px] bg-red-500/10 text-red-500 px-1 mr-1 rounded font-bold border border-red-500/20">
-                    DIHAPUS
+            <div className="flex items-start gap-1">
+              <span className="text-muted-foreground/20 font-serif select-none mt-2 hidden lg:inline-block">
+                &gt;&gt;
+              </span>
+              <div
+                key={reply.id}
+                id={`p${reply.postNumber}`}
+                className={`ib-reply border border-muted/20 shadow-sm relative group table max-w-none ${reply.isDeleted ? 'opacity-70 grayscale-[50%]' : ''}`}
+              >
+                <div className={`ib-post-metaline px-2 pt-1 border-b ${reply.isDeleted ? 'bg-red-500/5' : 'bg-muted/5'}`}>
+                  {reply.isDeleted && (
+                    <span className="text-[10px] bg-red-500/10 text-red-500 px-1 mr-1 rounded font-bold border border-red-500/20">
+                      DIHAPUS
+                    </span>
+                  )}
+                  <div className="flex items-baseline gap-1">
+                    <TripcodeDisplay
+                      author={reply.author || "Awanama"}
+                      className="ib-author"
+                      hideTrip={!!reply.capcode}
+                    />
+                    <CapcodeMarker type={reply.capcode} />
+                  </div>
+                  {reply.posterId && (
+                    <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
+                      ID: {reply.posterId}
+                    </span>
+                  )}
+                  <span className="text-muted-foreground opacity-70 text-xs">
+                    <FormattedDate date={reply.createdAt} />
                   </span>
-                )}
-                <div className="flex items-baseline gap-1">
-                  <TripcodeDisplay
-                    author={reply.author || "Awanama"}
-                    className="ib-author"
-                    hideTrip={!!reply.capcode}
-                  />
-                  <CapcodeMarker type={reply.capcode} />
+                  <span className="flex items-center">
+                    <span
+                      className="ib-post-number font-bold cursor-pointer hover:underline"
+                      onClick={() => handleQuote(reply.postNumber)}
+                    >
+                      No.{reply.postNumber}
+                    </span>
+                    <PostActions 
+                      postId={reply.id} 
+                      postType="reply" 
+                      boardCode={boardCode} 
+                      onHide={() => hideReply(reply.id)}
+                    />
+                  </span>
                 </div>
-                {reply.posterId && (
-                  <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
-                    ID: {reply.posterId}
-                  </span>
-                )}
-                <span className="text-muted-foreground opacity-70 text-xs">
-                  <FormattedDate date={reply.createdAt} />
-                </span>
-                <span className="flex items-center">
-                  <span
-                    className="ib-post-number font-bold cursor-pointer hover:underline"
-                    onClick={() => handleQuote(reply.postNumber)}
-                  >
-                    No.{reply.postNumber}
-                  </span>
-                  <PostActions 
-                    postId={reply.id} 
-                    postType="reply" 
-                    boardCode={boardCode} 
-                    onHide={() => hideReply(reply.id)}
-                  />
-                </span>
-              </div>
 
-              <div className="p-3 block overflow-hidden">
-                {reply.image && (
-                  <ExpandableImage
-                    src={reply.image}
-                    alt="Reply image"
-                    metadata={reply.imageMetadata || undefined}
-                    isNsfw={reply.isNsfw}
-                    isSpoiler={reply.isSpoiler}
-                    onFullScreen={() => handleImageClick(reply.image!)}
-                  />
-                )}
-                <div className="whitespace-pre-wrap break-words leading-relaxed text-sm lg:text-base">
-                  <FormattedText content={reply.content} />
-                  <Backlinks links={getBacklinks(reply.postNumber)} />
+                <div className="p-3 block overflow-hidden">
+                  {reply.image && (
+                    <ExpandableImage
+                      src={reply.image}
+                      alt="Reply image"
+                      metadata={reply.imageMetadata || undefined}
+                      isNsfw={reply.isNsfw}
+                      isSpoiler={reply.isSpoiler}
+                      onFullScreen={() => handleImageClick(reply.image!)}
+                    />
+                  )}
+                  <div className="whitespace-pre-wrap break-words leading-relaxed text-sm lg:text-base">
+                    <FormattedText content={reply.content} />
+                    <Backlinks links={getBacklinks(reply.postNumber)} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -323,8 +328,13 @@ export function ThreadClient({
         })}
 
         {replies.length === 0 && (
-          <div className="py-12 text-center text-muted-foreground italic border border-dashed rounded-lg">
-            Belum ada balasan. Jadilah yang pertama memberikan tanggapan!
+          <div className="flex items-start gap-1">
+            <span className="text-muted-foreground/20 font-serif select-none mt-2 hidden lg:inline-block">
+              &gt;&gt;
+            </span>
+            <div className="px-6 py-8 text-center text-muted-foreground italic border border-dashed border-muted/50 rounded-lg table max-w-none">
+              Belum ada balasan. Jadilah yang pertama memberikan tanggapan!
+            </div>
           </div>
         )}
       </div>
