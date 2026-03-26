@@ -8,6 +8,7 @@ import { ExpandableImage } from "@/components/expandable-image";
 import { TripcodeDisplay } from "@/components/tripcode-display";
 import { useHiding } from "@/hooks/use-hiding";
 import { cn } from "@/lib/utils";
+import { PostActions } from "@/components/post-actions";
 
 interface ThreadListItemProps {
   thread: any;
@@ -92,21 +93,22 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
         <span className="text-muted-foreground text-xs">
           <FormattedDate date={thread.createdAt} />
         </span>
-        <Link
-          href={`/${boardCode}/thread/${thread.id}`}
-          className="ib-post-number"
-        >
-          No.{thread.postNumber}
-        </Link>
+        <span className="flex items-center">
+          <Link
+            href={`/${boardCode}/thread/${thread.id}`}
+            className="ib-post-number"
+          >
+            No.{thread.postNumber}
+          </Link>
 
-        {/* Hide Button */}
-        <button 
-          onClick={() => hideThread(thread.id)}
-          className="text-[11px] hover:underline flex items-center gap-1 text-muted-foreground"
-          title="Sembunyikan"
-        >
-          [X]
-        </button>
+          <PostActions 
+            postId={thread.id} 
+            postType="thread" 
+            boardCode={boardCode} 
+            onHide={() => hideThread(thread.id)}
+          />
+        </span>
+        
         <Link
           href={`/${boardCode}/thread/${thread.id}`}
           className="text-[11px] hover:underline flex items-center gap-1 text-muted-foreground"

@@ -21,17 +21,26 @@ interface DeletePostButtonProps {
   postId: number;
   postType: "thread" | "reply";
   boardCode: string;
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function DeletePostButton({
   postId,
   postType,
   boardCode,
+  trigger,
+  open: controlledOpen,
+  onOpenChange: setControlledOpen,
 }: DeletePostButtonProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setIsOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,18 +82,24 @@ export function DeletePostButton({
     }
   }
 
+  const defaultTrigger = (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+    >
+      <Trash className="h-4 w-4 mr-2" />
+      Hapus
+    </Button>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
-        >
-          <Trash className="h-4 w-4 mr-2" />
-          Hapus
-        </Button>
-      </DialogTrigger>
+      {trigger !== null && (
+        <DialogTrigger asChild>
+          {trigger || defaultTrigger}
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Hapus Postingan</DialogTitle>

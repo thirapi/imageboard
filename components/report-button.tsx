@@ -22,13 +22,25 @@ import { useToast } from "@/hooks/use-toast"
 interface ReportButtonProps {
   contentType: "thread" | "reply"
   contentId: number
+  trigger?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function ReportButton({ contentType, contentId }: ReportButtonProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export function ReportButton({ 
+  contentType, 
+  contentId,
+  trigger,
+  open: controlledOpen,
+  onOpenChange: setControlledOpen,
+}: ReportButtonProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setIsOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -67,14 +79,20 @@ export function ReportButton({ contentType, contentId }: ReportButtonProps) {
     }
   }
 
+  const defaultTrigger = (
+    <Button variant="ghost" size="sm">
+      <Flag className="h-4 w-4 mr-2" />
+      Laporkan
+    </Button>
+  )
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
-          <Flag className="h-4 w-4 mr-2" />
-          Laporkan
-        </Button>
-      </DialogTrigger>
+      {trigger !== null && (
+        <DialogTrigger asChild>
+          {trigger || defaultTrigger}
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Laporkan Konten</DialogTitle>

@@ -4,11 +4,9 @@ import { useState } from "react";
 import { Lock, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReplyForm } from "@/components/reply-form";
-import { ReportButton } from "@/components/report-button";
 import { ImageLightbox } from "@/components/image-lightbox";
 import { FormattedText } from "@/components/formatted-text";
 import { Backlinks } from "@/components/backlinks";
-import { DeletePostButton } from "@/components/delete-post-button";
 import { ThreadUI } from "@/lib/entities/thread.entity";
 import { ReplyUI } from "@/lib/entities/reply.entity";
 import { useRouter } from "next/navigation";
@@ -22,7 +20,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { useHiding } from "@/hooks/use-hiding";
-import { X, Plus } from "lucide-react";
+import { X, Plus, MoreHorizontal } from "lucide-react";
+import { PostActions } from "@/components/post-actions";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -41,9 +40,9 @@ export function ThreadClient({
   const [selectedImage, setSelectedImage] = useState("");
   const [qrOpen, setQrOpen] = useState(false);
   const router = useRouter();
-  const { state, setContent } = useReply();
+  const { setContent } = useReply();
   const { watchedThreads, watchThread, unwatchThread, markAsRead } = useThreadWatcher();
-  const { isThreadHidden, isReplyHidden, hideThread, hideReply, unhideThread, unhideReply, isLoaded } = useHiding();
+  const { isReplyHidden, hideThread, hideReply, unhideReply, isLoaded } = useHiding();
 
   const isWatched = watchedThreads.some(t => t.id === thread.id);
 
@@ -68,7 +67,6 @@ export function ThreadClient({
     const quoteText = `>>${postNumber}\n`;
     setContent((prev: string) => prev + quoteText);
 
-    // Suggest focus after a short delay to allow QR to render if it wasn't
     setTimeout(() => {
       const textarea =
         document.getElementById("qr-reply-content") ||
@@ -77,7 +75,6 @@ export function ThreadClient({
     }, 50);
   };
 
-  // Backlink calculation
   const allPosts = [
     {
       type: "thread" as const,
@@ -145,10 +142,33 @@ export function ThreadClient({
     <>
       {/* OP Post */}
       <div id={`p${thread.postNumber}`} className="ib-post mb-12">
-        <div className="ib-post-metaline border-b border-muted/20 pb-1">
+        <div className="ib-post-metaline border-b border-muted/20 pb-1">          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "h-6 w-6 ml-2",
+              isWatched ? "text-accent" : "text-muted-foreground"
+            )}
+            onClick={() => {
+              if (isWatched) {
+                unwatchThread(thread.id);
+              } else {
+                watchThread({
+                  id: thread.id,
+                  boardCode: boardCode,
+                  subject: thread.subject,
+                  lastReadReplyCount: replies.length,
+                  snippet: thread.content.substring(0, 50) + (thread.content.length > 50 ? "..." : "")
+                });
+              }
+            }}
+            title={isWatched ? "Berhenti pantau thread" : "Pantau thread ini"}
+          >
+            {isWatched ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+          </Button>
           {thread.isDeleted && (
             <span className="text-[10px] bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded mr-2 font-bold border border-red-500/20">
-              POSTINGAN DIHAPUS
+              Postingan dihapus
             </span>
           )}
           {thread.isPinned && (
@@ -176,46 +196,23 @@ export function ThreadClient({
           <span className="text-muted-foreground text-xs">
             <FormattedDate date={thread.createdAt} />
           </span>
-          <span
-            className="ib-post-number font-bold ml-1 cursor-pointer hover:underline"
-            onClick={() => handleQuote(thread.postNumber)}
-          >
-            No.{thread.postNumber}
+          <span className="flex items-center">
+            <span
+              className="ib-post-number font-bold ml-1 cursor-pointer hover:underline"
+              onClick={() => handleQuote(thread.postNumber)}
+            >
+              No.{thread.postNumber}
+            </span>
+            <PostActions 
+              postId={thread.id} 
+              postType="thread" 
+              boardCode={boardCode} 
+              onHide={() => hideThread(thread.id)}
+              isOP={true}
+            />
           </span>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "h-6 w-6 ml-2",
-              isWatched ? "text-accent" : "text-muted-foreground"
-            )}
-            onClick={() => {
-              if (isWatched) {
-                unwatchThread(thread.id);
-              } else {
-                watchThread({
-                  id: thread.id,
-                  boardCode: boardCode,
-                  subject: thread.subject,
-                  lastReadReplyCount: replies.length,
-                  snippet: thread.content.substring(0, 50) + (thread.content.length > 50 ? "..." : "")
-                });
-              }
-            }}
-            title={isWatched ? "Berhenti pantau thread" : "Pantau thread ini"}
-          >
-            {isWatched ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-          </Button>
 
-          <div className="flex items-center gap-1 ml-auto">
-            <DeletePostButton
-              postId={thread.id}
-              postType="thread"
-              boardCode={boardCode}
-            />
-            <ReportButton contentType="thread" contentId={thread.id} />
-          </div>
         </div>
 
         <div className="mt-4 block">
@@ -289,29 +286,20 @@ export function ThreadClient({
                 <span className="text-muted-foreground opacity-70 text-xs">
                   <FormattedDate date={reply.createdAt} />
                 </span>
-                <span
-                  className="ib-post-number font-bold cursor-pointer hover:underline"
-                  onClick={() => handleQuote(reply.postNumber)}
-                >
-                  No.{reply.postNumber}
-                </span>
-
-                <button
-                  onClick={() => hideReply(reply.id)}
-                  className="text-[11px] hover:underline flex items-center gap-1 text-muted-foreground ml-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
-                  title="Sembunyikan post"
-                >
-                  [X]
-                </button>
-
-                <div className="flex items-center gap-1 ml-auto opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                  <DeletePostButton
-                    postId={reply.id}
-                    postType="reply"
-                    boardCode={boardCode}
+                <span className="flex items-center">
+                  <span
+                    className="ib-post-number font-bold cursor-pointer hover:underline"
+                    onClick={() => handleQuote(reply.postNumber)}
+                  >
+                    No.{reply.postNumber}
+                  </span>
+                  <PostActions 
+                    postId={reply.id} 
+                    postType="reply" 
+                    boardCode={boardCode} 
+                    onHide={() => hideReply(reply.id)}
                   />
-                  <ReportButton contentType="reply" contentId={reply.id} />
-                </div>
+                </span>
               </div>
 
               <div className="p-3 block overflow-hidden">
@@ -388,6 +376,7 @@ export function ThreadClient({
     </>
   );
 }
+
 
 export default function ThreadPageWrapper(props: ThreadClientProps) {
   return (
