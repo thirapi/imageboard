@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Lock, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -141,7 +142,7 @@ export function ThreadClient({
   return (
     <>
       {/* OP Post */}
-      <div id={`p${thread.postNumber}`} className="ib-post mb-12">
+      <div id={`p${thread.postNumber}`} className="ib-post mb-1 scroll-mt-14">
         <div className="ib-post-metaline border-b border-muted/20 pb-1">          <Button
             variant="ghost"
             size="icon"
@@ -197,11 +198,19 @@ export function ThreadClient({
             <FormattedDate date={thread.createdAt} />
           </span>
           <span className="flex items-center">
-            <span
-              className="ib-post-number font-bold ml-1 cursor-pointer hover:underline"
-              onClick={() => handleQuote(thread.postNumber)}
+            <Link
+              href={`/${boardCode}/thread/${thread.id}#p${thread.postNumber}`}
+              className="ib-post-number"
+              title="Tautan Postingan"
             >
-              No.{thread.postNumber}
+              No.
+            </Link>
+            <span
+              className="ib-post-number cursor-pointer"
+              onClick={() => handleQuote(thread.postNumber)}
+              title="Balas postingan ini"
+            >
+              {thread.postNumber}
             </span>
             <PostActions 
               postId={thread.id} 
@@ -215,7 +224,7 @@ export function ThreadClient({
 
         </div>
 
-        <div className="mt-4 block">
+        <div className="mt-1 block">
           {thread.image && (
             <ExpandableImage
               src={thread.image}
@@ -235,7 +244,7 @@ export function ThreadClient({
       </div>
 
       {/* Replies */}
-      <div className="space-y-4 mb-12">
+      <div className="space-y-1 mb-8">
         {replies.map((reply) => {
           const hidden = isLoaded && isReplyHidden(reply.id);
           
@@ -266,7 +275,7 @@ export function ThreadClient({
               <div
                 key={reply.id}
                 id={`p${reply.postNumber}`}
-                className={`ib-reply border border-muted/20 shadow-sm relative group sm:table block w-fit max-w-full ${reply.isDeleted ? 'opacity-70 grayscale-[50%]' : ''}`}
+                className={`ib-reply border border-muted/20 shadow-sm relative group sm:table block w-fit max-w-full scroll-mt-14 ${reply.isDeleted ? 'opacity-70 grayscale-[50%]' : ''}`}
               >
                 <div className={`ib-post-metaline px-2 pt-1 border-b ${reply.isDeleted ? 'bg-red-500/5' : 'bg-muted/5'}`}>
                   {reply.isDeleted && (
@@ -291,11 +300,19 @@ export function ThreadClient({
                     <FormattedDate date={reply.createdAt} />
                   </span>
                   <span className="flex items-center">
-                    <span
-                      className="ib-post-number font-bold cursor-pointer hover:underline"
-                      onClick={() => handleQuote(reply.postNumber)}
+                    <Link
+                      href={`/${boardCode}/thread/${thread.id}#p${reply.postNumber}`}
+                      className="ib-post-number"
+                      title="Tautan Postingan"
                     >
-                      No.{reply.postNumber}
+                      No.
+                    </Link>
+                    <span
+                      className="ib-post-number cursor-pointer"
+                      onClick={() => handleQuote(reply.postNumber)}
+                      title="Balas postingan ini"
+                    >
+                      {reply.postNumber}
                     </span>
                     <PostActions 
                       postId={reply.id} 
@@ -306,7 +323,7 @@ export function ThreadClient({
                   </span>
                 </div>
 
-                <div className="p-3 block overflow-hidden">
+                <div className="p-1 px-2 block overflow-hidden">
                   {reply.image && (
                     <ExpandableImage
                       src={reply.image}
@@ -340,7 +357,7 @@ export function ThreadClient({
       </div>
 
       {/* Reply Form Section */}
-      <div className="mt-20 border-t pt-12 flex justify-center">
+      <div className="mt-12 border-t pt-8 flex justify-center">
         <div className="w-full max-w-2xl bg-card p-6 rounded-xl border shadow-xl">
           <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
             <span className="text-accent underline decoration-2">

@@ -139,7 +139,7 @@ export function LatestPosts({ initialPosts, isMobile }: LatestPostsProps) {
         
         {!hasMore && posts.length > 0 && (
           <div className="py-4 text-center text-[10px] font-mono text-muted-foreground/50">
-            [ Akhir dari postingan terbaru ]
+            [ akhir dari postingan terbaru wan]
           </div>
         )}
         </div>

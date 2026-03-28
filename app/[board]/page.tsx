@@ -186,7 +186,7 @@ export default async function BoardPage({
           </div>
         </div>
 
-        <div className="border-t pt-8">
+        <div className="border-t pt-4">
           {isCatalog ? (
             <CatalogView threads={threads || []} boardCode={boardCode} />
           ) : (
@@ -211,7 +211,7 @@ export default async function BoardPage({
 
           {/* Pagination */}
           {!query && (
-            <div className="mt-12">
+            <div className="mt-8">
               <Pagination
                 totalPages={totalPages}
                 currentPage={currentPage}

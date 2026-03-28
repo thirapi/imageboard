@@ -94,7 +94,6 @@ export function NavControls({ user }: NavControlsProps) {
           <button
             onClick={toggleWatcher}
             className="relative opacity-80 hover:opacity-100 transition-opacity cursor-pointer p-0.5"
-            title="Thread Watcher"
           >
             <Eye className="size-3.5" />
             {watchedThreads.some(t => t.currentReplyCount > t.lastReadReplyCount) && (

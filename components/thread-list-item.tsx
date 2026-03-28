@@ -70,7 +70,7 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
   };
 
   return (
-    <div className="ib-post py-2 first:pt-0">
+    <div id={`p${thread.postNumber}`} className="ib-post py-1 first:pt-0 scroll-mt-14">
       {/* Meta line */}
       <div className="ib-post-metaline items-center">
         {thread.isPinned && (
@@ -97,8 +97,16 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
           <Link
             href={`/${boardCode}/thread/${thread.id}`}
             className="ib-post-number"
+            title="Tautan Postingan"
           >
-            No.{thread.postNumber}
+            No.
+          </Link>
+          <Link
+            href={`/${boardCode}/thread/${thread.id}`}
+            className="ib-post-number"
+            title="Balas postingan ini"
+          >
+            {thread.postNumber}
           </Link>
 
           <PostActions 
@@ -119,7 +127,7 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
       </div>
 
       {/* Content area */}
-      <div className="mt-2 block">
+      <div className="mt-1 block">
         {thread.image && (
           <ExpandableImage
             src={thread.image}
@@ -136,7 +144,7 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
 
         {/* Reply Previews - Moved inside to allow flow around OP image */}
         {thread.replies && thread.replies.length > 0 && (
-          <div className="mt-4 space-y-3">
+          <div className="mt-1 space-y-1">
             {thread.replies
               .slice()
               .reverse()
@@ -148,7 +156,8 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
                     &gt;&gt;
                   </span>
                   <div
-                    className="ib-reply shadow-sm border border-muted/20 table max-w-none"
+                    id={`p${reply.postNumber}`}
+                    className="ib-reply shadow-sm border border-muted/20 table max-w-none scroll-mt-14"
                   >
                     <div className="ib-post-metaline text-xs px-2 pt-1 border-b border-muted/5 bg-muted/5">
                       <div className="flex items-baseline gap-1">
@@ -162,11 +171,24 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
                       <span className="text-muted-foreground opacity-70">
                         <FormattedDate date={reply.createdAt} />
                       </span>
-                      <span className="ib-post-number opacity-80">
-                        No.{reply.postNumber}
+                      <span className="flex items-center opacity-80">
+                        <Link
+                          href={`/${boardCode}/thread/${thread.id}#p${reply.postNumber}`}
+                          className="ib-post-number"
+                          title="Tautan Postingan"
+                        >
+                          No.
+                        </Link>
+                        <Link
+                          href={`/${boardCode}/thread/${thread.id}#p${reply.postNumber}`}
+                          className="ib-post-number"
+                          title="Balas postingan ini"
+                        >
+                          {reply.postNumber}
+                        </Link>
                       </span>
                     </div>
-                    <div className="p-2 block overflow-hidden">
+                    <div className="p-1 px-2 block overflow-hidden">
                       {reply.image && (
                         <ExpandableImage
                           src={reply.image}
@@ -187,7 +209,7 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
         )}
 
         {thread.replyCount > (thread.replies?.length || 0) && (
-          <div className="mt-4 text-xs text-muted-foreground italic lg:clear-none clear-both">
+          <div className="mt-1 text-xs text-muted-foreground italic lg:clear-none clear-both">
             {thread.replyCount - (thread.replies?.length || 0)}{" "}
             balasan diabaikan.
             <Link

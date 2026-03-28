@@ -17,7 +17,7 @@ export function Backlinks({ links }: BacklinksProps) {
 
   return (
     <div className="flex flex-wrap gap-2 mt-2 pt-2 border-t border-muted">
-      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
+      <span className="text-[10px] text-muted-foreground">
         Balasan:
       </span>
       {links.map((link) => (
