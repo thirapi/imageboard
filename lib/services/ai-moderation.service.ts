@@ -1,4 +1,5 @@
 // lib/services/ai-moderation.service.ts
+import crypto from "crypto";
 
 export interface AIModerationResult {
   isViolation: boolean;
@@ -25,8 +26,30 @@ const VIOLATION_THRESHOLDS: Record<keyof AICategoryScores, number> = {
   narkoba:    0.70,
 };
 
+const MAX_ATTEMPTS = 5;
+const RETRY_DELAY_MS = 100;
+const CACHE_TTL_MS = 3600_000 * 2; // 2 Hours
+const MAX_CACHE_SIZE = 2000;
+
+interface CacheEntry {
+  result: AIModerationResult;
+  expiresAt: number;
+}
+
 export class AIModerationService {
-  private apiKey: string | undefined;
+  private apiKeys: string[] = [];
+  private models: string[] = [
+    "gemini-3.1-flash-lite",
+    "gemini-3-flash",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+  ];
+
+  // Store cooldown as "model:apiKey" -> timestamp
+  private cooldowns = new Map<string, number>();
+  // Result cache with TTL and size tracking
+  private cache = new Map<string, CacheEntry>();
 
   // Keywords that are almost certainly spam or illegal advertisements
   private highPriorityKeywords: string[] = [
@@ -36,7 +59,6 @@ export class AIModerationService {
   ];
 
   // Keywords that are sensitive but often used in banter/jokes.
-  // These are forwarded to the AI as context hints, not instant flags.
   private contextKeywords: string[] = [
     "bokep", "openbo", "vcs", "lendir", "bugil", "telanjang", "porno",
     "seks", "masturbasi", "onlyfans", "abgnakal", "jablay", "mesum",
@@ -47,13 +69,34 @@ export class AIModerationService {
   ];
 
   constructor() {
-    this.apiKey = process.env.GEMINI_API_KEY;
+    const singleKey = process.env.GEMINI_API_KEY;
+    const multiKeys = process.env.GEMINI_API_KEYS?.split(",").map(k => k.trim()).filter(Boolean);
+    
+    if (multiKeys && multiKeys.length > 0) {
+      this.apiKeys = multiKeys;
+    } else if (singleKey) {
+      this.apiKeys = [singleKey];
+    }
+
+    if (process.env.GEMINI_MODELS) {
+      this.models = process.env.GEMINI_MODELS.split(",").map(m => m.trim()).filter(Boolean);
+    }
+  }
+
+  /**
+   * Fisher-Yates shuffle for better randomness.
+   */
+  private shuffle<T>(array: T[]): T[] {
+    const result = [...array];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
   }
 
   /**
    * Normalizes text for keyword matching.
-   * Replaces common leet-speak substitutions but preserves spaces
-   * so that multi-word keyword detection stays accurate.
    */
   private normalizeText(text: string): string {
     return text
@@ -64,21 +107,27 @@ export class AIModerationService {
       .replace(/4/g, "a")
       .replace(/5/g, "s")
       .replace(/8/g, "b")
-      .replace(/[^a-z ]/g, ""); // Pertahankan spasi agar frasa multi-kata tetap bisa dideteksi
+      .replace(/[^a-z ]/g, "");
   }
 
   /**
-   * Evaluates text content for potential violations of rules and Indonesian laws.
-   * Laws considered:
-   * - UU ITE (Pornography, Gambling, Hate Speech, Information manipulation)
-   * - UU Pornografi
-   * - KUHP (Violence threats, Drugs)
-   *
-   * Returns immediately if a high-priority keyword is matched (no AI call needed).
-   * Context keywords are passed to the AI as hints rather than instant flags.
-   * If keyword check passes, the text is sent to Gemini for context-aware analysis.
+   * Evaluates text content for potential violations.
    */
   async evaluateText(content: string): Promise<AIModerationResult> {
+    // --- Step 0: Cache Check (with TTL Management) ---
+    const hash = crypto.createHash("sha1").update(content).digest("hex");
+    const cached = this.cache.get(hash);
+    const now = Date.now();
+
+    if (cached) {
+      if (cached.expiresAt > now) {
+        console.log(`[AIModeration][Cache] HIT — ${hash.slice(0, 8)}`);
+        return cached.result;
+      } else {
+        this.cache.delete(hash); // Cleanup expired entry
+      }
+    }
+
     const normalizedContent = this.normalizeText(content);
 
     // --- Step 1: High-priority keyword check (instant flag) ---
@@ -91,33 +140,27 @@ export class AIModerationService {
     }
 
     if (matchedHighPriority) {
-      console.warn(
-        `[AIModeration][HighPriority] ✗ FLAGGED — matched: "${matchedHighPriority}"`
-      );
-      return {
+      const result: AIModerationResult = {
         isViolation: true,
         reason: `Terdeteksi konten terlarang/spam (High Priority): "${matchedHighPriority}"`,
         flaggedBy: "keyword",
       };
+      this.saveToCache(hash, result);
+      return result;
     }
 
-    console.log("[AIModeration][Keyword] ✓ PASSED — no high-priority keywords found.");
-
-    // --- Step 2: Collect context keyword hints for the AI ---
+    // --- Step 2: Context keyword hints ---
     const detectedContextWords = this.contextKeywords.filter((kw) =>
       normalizedContent.includes(this.normalizeText(kw))
     );
 
-    if (detectedContextWords.length > 0) {
-      console.log(
-        `[AIModeration][Context] Detected context words: [${detectedContextWords.join(", ")}] — forwarding to AI.`
-      );
+    // --- Step 2.1: Early-exit for low-risk content ---
+    if (content.length < 20 && detectedContextWords.length === 0) {
+      return { isViolation: false, reason: "", flaggedBy: "none" };
     }
 
-    if (!this.apiKey) {
-      console.warn(
-        "[AIModeration][AI] GEMINI_API_KEY is not set. Skipping AI check."
-      );
+    if (this.apiKeys.length === 0) {
+      console.warn("[AIModeration][AI] No GEMINI_API_KEY found. Skipping AI check.");
       return { isViolation: false, reason: "", flaggedBy: "none" };
     }
 
@@ -128,144 +171,131 @@ export class AIModerationService {
       .replace(/\[INST\]/gi, "[INST_BLOCKED]")
       .replace(/###/g, "##");
 
-    const contextHint =
-      detectedContextWords.length > 0
-        ? `\nKata sensitif yang terdeteksi dalam teks: [${detectedContextWords.join(", ")}]. Gunakan ini sebagai petunjuk konteks — bukan bukti pelanggaran.`
-        : "";
+    const contextHint = detectedContextWords.length > 0
+      ? `\nKata sensitif terdeteksi (Hanya petunjuk): [${detectedContextWords.join(", ")}].`
+      : "";
 
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [
-                {
-                  text: `Anda adalah sistem moderasi otomatis untuk forum imageboard (seperti 4chan/lainchan) versi Indonesia.
-Teks yang dimoderasi sebagian besar dalam Bahasa Indonesia, termasuk slang, bahasa gaul, dan campuran bahasa daerah.
-Tugas Anda adalah membedakan antara "Banter/Shitposting" yang kasar namun tidak melanggar hukum, dengan "Pelanggaran Nyata" yang harus dihapus.
+    // --- Step 3: AI Rotation Logic (Model Priority > Key Rotation) ---
+    let attempts = 0;
+    let lastError: any = null;
 
-PRINSIP MODERASI:
-1. TOLERANSI TINGGI terhadap bahasa kasar, slang, ejekan, dan topik sensitif selama itu adalah bagian dari budaya imageboard (banter).
-2. JANGAN FLAG jika teks hanya berisi kata-kata kotor atau umpatan (misal: "anjing", "babi", "tolol") tanpa maksud melakukan kejahatan atau ancaman nyata.
-3. JANGAN FLAG jika teks hanya menyebutkan topik dewasa (seperti "bokep", "sara", "narkoba") dalam konteks diskusi atau lelucon, BUKAN promosi/jualan/distribusi.
-4. JANGAN FLAG ekspresi frustrasi umum seperti "gua bunuh lo", "mati aja lo" — ini hampir selalu banter, bukan ancaman nyata.
-5. FLAG DENGAN KERAS (Skor > 0.8) jika:
-   - Jualan/Promosi (Judi, Narkoba, Obat Ilegal, Phishing).
-   - Distribusi materi pornografi nyata atau link ilegal.
-   - Ancaman pembunuhan atau terorisme yang terdengar serius dan spesifik.
-   - Ujaran kebencian yang sangat ekstrem dan menghasut kekerasan fisik (bukan sekadar ejekan antar anonim).
+    for (const model of this.models) {
+      const keys = this.shuffle(this.apiKeys);
 
-Kategori yang dinilai (0.0 - 1.0):
-1. pornografi  — Fokus pada jualan/distribusi/link, bukan sekadar obrolan mesum.
-2. perjudian   — Fokus pada promosi/iklan/link judi.
-3. sara        — Hanya flag jika sangat ekstrem dan mengajak kekerasan/genosida.
-4. kekerasan   — Ancaman fisik nyata dan spesifik, rencana teroris, atau instruksi pembuatan senjata.
-5. penipuan    — Scam, phishing, link pinjol ilegal, penyebaran data pribadi (doxxing).
-6. narkoba     — Jual/beli atau instruksi pembuatan narkotika.
-${contextHint}
-Format output WAJIB (JSON saja):
-{
-  "scores": {
-    "pornografi": number,
-    "perjudian": number,
-    "sara": number,
-    "kekerasan": number,
-    "penipuan": number,
-    "narkoba": number
-  },
-  "reasoning": "string (penjelasan singkat: apakah ini banter biasa atau pelanggaran nyata?)"
-}`,
-                },
-              ],
-            },
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  {
-                    text: sanitizedContent,
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              responseMimeType: "application/json",
-            },
-          }),
-        }
-      );
+      for (const key of keys) {
+        if (attempts >= MAX_ATTEMPTS) break;
 
-      if (!response.ok) {
-        if (response.status === 429) {
-          const errorBody = await response.text().catch(() => "(failed to read body)");
-          console.warn(
-            `[AIModeration][AI] Rate limit exceeded (429). Skipping AI check for this post. Body: ${errorBody}`
-          );
-          return { isViolation: false, reason: "", flaggedBy: "none" };
-        }
-        throw new Error(
-          `Gemini API error: ${response.status} ${response.statusText}`
-        );
-      }
+        const currentLoopNow = Date.now();
+        const cooldownKey = `${model}:${key}`;
+        const cooldownUntil = this.cooldowns.get(cooldownKey);
+        if (cooldownUntil && cooldownUntil > currentLoopNow) continue;
 
-      const data = await response.json();
-      const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        attempts++;
+        if (attempts > 1) await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
 
-      if (resultText) {
-        let result: { scores?: Partial<AICategoryScores>; reasoning?: string };
-
-        // Wrap JSON.parse to handle malformed AI responses gracefully
         try {
-          result = JSON.parse(resultText);
-        } catch (parseError) {
-          console.error(
-            "[AIModeration][AI] Failed to parse JSON response from Gemini:",
-            parseError,
-            "Raw response:",
-            resultText
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                system_instruction: {
+                  parts: [{
+                    text: `Anda adalah sistem moderasi otomatis untuk forum imageboard (seperti 4chan) versi Indonesia.
+Tugas Anda adalah membedakan antara "Banter/Shitposting" kasar dengan "Pelanggaran Nyata" (Ilegal).
+
+PRINSIP UTAMA:
+1. TOLERANSI TINGGI pada bahasa kasar, slang, ejekan, dan teks "toxic" selama itu adalah banter anonim.
+2. JANGAN FLAG kata umpatan ("anjing", "babi", dsb) jika tidak ada ancaman/kejahatan nyata.
+3. JANGAN FLAG diskusi topik dewasa (bokep, sara, narkoba) SELAMA itu diskusi/lelucon, BUKAN promosi/jualan/distribusi link.
+4. FLAG KERAS (> 0.8) pada: Jualan Judi/Narkoba, Link Pornografi Nyata, Phishing/Scam, dan Ancaman Fisik Serius.
+
+Kategori (0.0-1.0):
+- pornografi (Fokus: jualan/distribusi)
+- perjudian (Fokus: iklan/link)
+- sara (Fokus: hasutan kekerasan fisik)
+- kekerasan (Fokus: ancaman nyata/spesifik)
+- penipuan (Fokus: scam/phishing/doxxing)
+- narkoba (Fokus: jual/beli)
+${contextHint}
+Format output (JSON): {"scores": {...}, "reasoning": "..."}`
+                  }],
+                },
+                contents: [{ role: "user", parts: [{ text: sanitizedContent }] }],
+                generationConfig: { responseMimeType: "application/json" },
+              }),
+            }
           );
-          return { isViolation: false, reason: "", flaggedBy: "none" };
+
+          if (!response.ok) {
+            if (response.status === 429) {
+              console.warn(`[AIModeration][AI] 429 Limit for ${model}:${key.slice(-5)}. Cooling down...`);
+              this.cooldowns.set(cooldownKey, Date.now() + 60_000); 
+              continue;
+            }
+            throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!resultText) throw new Error("Empty response from AI");
+
+          let result: { scores?: Partial<AICategoryScores>; reasoning?: string };
+          try {
+            result = JSON.parse(resultText);
+          } catch {
+            console.warn(`[AIModeration][AI] Invalid JSON from model ${model}, trying next...`);
+            continue;
+          }
+
+          const scores: AICategoryScores = (result.scores ?? {}) as AICategoryScores;
+          const triggeredCategories = (Object.keys(VIOLATION_THRESHOLDS) as (keyof AICategoryScores)[])
+            .filter((cat) => (scores[cat] ?? 0) >= VIOLATION_THRESHOLDS[cat]);
+
+          const isViolation = triggeredCategories.length > 0;
+          
+          if (isViolation) {
+            console.warn(`[AIModeration][AI] ✗ FLAGGED [${model}] — triggered: [${triggeredCategories.join(", ")}]`);
+          } else {
+            console.log(`[AIModeration][AI] ✓ PASSED [${model}] — reason: ${result.reasoning}`);
+          }
+
+          const finalResult: AIModerationResult = {
+            isViolation,
+            reason: isViolation ? `Berpotensi melanggar: ${triggeredCategories.join(", ")}. ${result.reasoning}` : (result.reasoning ?? ""),
+            flaggedBy: isViolation ? "ai" : "none",
+            scores,
+          };
+
+          this.saveToCache(hash, finalResult);
+          return finalResult;
+
+        } catch (error) {
+          lastError = error;
+          console.error(`[AIModeration][AI] Attempt ${attempts} failed with ${model}:`, error);
         }
-
-        const scores: AICategoryScores = (result.scores ?? {}) as AICategoryScores;
-
-        const triggeredCategories = (Object.keys(VIOLATION_THRESHOLDS) as (keyof AICategoryScores)[])
-          .filter((cat) => (scores[cat] ?? 0) >= VIOLATION_THRESHOLDS[cat]);
-
-        const isViolation = triggeredCategories.length > 0;
-
-        if (isViolation) {
-          const scoreLog = triggeredCategories
-            .map((cat) => `${cat}=${(scores[cat] ?? 0).toFixed(2)}`)
-            .join(", ");
-          console.warn(
-            `[AIModeration][AI] ✗ FLAGGED — triggered: [${scoreLog}] | reason: ${result.reasoning}`
-          );
-        } else {
-          const topScore = Math.max(...Object.values(scores).map(Number));
-          console.log(
-            `[AIModeration][AI] ✓ PASSED — top score: ${topScore.toFixed(2)} | reason: ${result.reasoning}`
-          );
-        }
-
-        const reason = isViolation
-          ? `Berpotensi melanggar kategori: ${triggeredCategories.join(", ")}. ${result.reasoning}`
-          : result.reasoning ?? "";
-
-        return {
-          isViolation,
-          reason,
-          flaggedBy: isViolation ? "ai" : "none",
-          scores,
-        };
       }
-    } catch (error) {
-      console.error("[AIModeration][AI] Error evaluating content:", error);
+      if (attempts >= MAX_ATTEMPTS) break;
     }
 
-    return { isViolation: false, reason: "", flaggedBy: "none" };
+    console.error("[AIModeration][AI] All attempts exhausted or failed.", lastError);
+    return { isViolation: false, reason: "AI Moderation exhausted", flaggedBy: "none" };
+  }
+
+  /**
+   * Safely saves a result to the cache with TTL and size management.
+   */
+  private saveToCache(hash: string, result: AIModerationResult) {
+    // Evict oldest entries if cache is full
+    if (this.cache.size >= MAX_CACHE_SIZE) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) this.cache.delete(firstKey);
+    }
+
+    this.cache.set(hash, {
+      result,
+      expiresAt: Date.now() + CACHE_TTL_MS,
+    });
   }
 }
