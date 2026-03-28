@@ -39,10 +39,11 @@ interface CacheEntry {
 export class AIModerationService {
   private apiKeys: string[] = [];
   private models: string[] = [
-    "gemini-3.1-flash-lite",
-    "gemini-3-flash",
+    "gemini-3.1-flash-lite-preview",
+    "gemini-3-flash-preview",
     "gemini-2.5-flash",
     "gemini-2.0-flash",
+    "gemini-1.5-flash-latest",
     "gemini-1.5-flash",
   ];
 
@@ -69,6 +70,7 @@ export class AIModerationService {
   ];
 
   constructor() {
+    // Collect all keys from GEMINI_API_KEY (single) or GEMINI_API_KEYS (comma separated)
     const singleKey = process.env.GEMINI_API_KEY;
     const multiKeys = process.env.GEMINI_API_KEYS?.split(",").map(k => k.trim()).filter(Boolean);
     
@@ -78,6 +80,7 @@ export class AIModerationService {
       this.apiKeys = [singleKey];
     }
 
+    // Support custom model list from env if needed
     if (process.env.GEMINI_MODELS) {
       this.models = process.env.GEMINI_MODELS.split(",").map(m => m.trim()).filter(Boolean);
     }
@@ -180,6 +183,7 @@ export class AIModerationService {
     let lastError: any = null;
 
     for (const model of this.models) {
+      // Rotate keys for each model for fair distribution
       const keys = this.shuffle(this.apiKeys);
 
       for (const key of keys) {
@@ -191,7 +195,10 @@ export class AIModerationService {
         if (cooldownUntil && cooldownUntil > currentLoopNow) continue;
 
         attempts++;
-        if (attempts > 1) await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        if (attempts > 1) {
+          // Small delay before retrying to prevent Hammer Risk
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        }
 
         try {
           const response = await fetch(
@@ -229,6 +236,12 @@ Format output (JSON): {"scores": {...}, "reasoning": "..."}`
           );
 
           if (!response.ok) {
+            // Smart Model Fallback for 404 (Model Not Found)
+            if (response.status === 404) {
+              console.warn(`[AIModeration] Model ${model} returned 404. Trying next version...`);
+              break; // Skip rest of keys for this model, try next model
+            }
+
             if (response.status === 429) {
               console.warn(`[AIModeration][AI] 429 Limit for ${model}:${key.slice(-5)}. Cooling down...`);
               this.cooldowns.set(cooldownKey, Date.now() + 60_000); 
@@ -268,6 +281,7 @@ Format output (JSON): {"scores": {...}, "reasoning": "..."}`
             scores,
           };
 
+          // Cache successful result
           this.saveToCache(hash, finalResult);
           return finalResult;
 
@@ -276,6 +290,7 @@ Format output (JSON): {"scores": {...}, "reasoning": "..."}`
           console.error(`[AIModeration][AI] Attempt ${attempts} failed with ${model}:`, error);
         }
       }
+
       if (attempts >= MAX_ATTEMPTS) break;
     }
 
