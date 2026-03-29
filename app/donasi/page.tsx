@@ -1,93 +1,174 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { formatCurrency } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Donasi",
-  description: "Dukung operasional 62chan.",
+  description: "Dukung operasional 62chan dan pantau milestone donasi kami.",
 };
 
-export default function DonasiPage() {
+interface Milestone {
+  id: number;
+  name: string;
+  target_amount: number;
+  description: string;
+  image_url: string | null;
+  created_at: string;
+  isUnlocked: boolean;
+  progressPercentage: number;
+}
+
+interface DonationStats {
+  totalAmount: number;
+  milestones: Milestone[];
+}
+
+async function getStats(): Promise<DonationStats | null> {
+  try {
+    const res = await fetch(
+      "https://saweria-milestone.vercel.app/api/donations/stats",
+      {
+        next: { revalidate: 600 },
+      },
+    );
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error("Failed to fetch donation stats:", error);
+    return null;
+  }
+}
+
+export default async function DonasiPage() {
+  const stats = await getStats();
+
   return (
-    <div className="min-h-[calc(100svh-48px)] bg-background text-foreground flex flex-col">
-      <header className="py-6 text-center border-b border-border/40">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-accent mb-2">Donasi</h1>
-          <p className="text-sm text-muted-foreground">
-            Dukung kami agar server tetap berjalan
+    <div className="container mx-auto px-4 py-6 max-w-4xl font-sans">
+      <div className="space-y-6">
+        {/* Simple Header */}
+        <header className="border-b border-border pb-3">
+          <h1 className="text-xl font-bold ib-subject">Donasi</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Sharing is caring
           </p>
-        </div>
-      </header>
+        </header>
 
-      <main className="container mx-auto px-4 py-12 flex-1 max-w-4xl">
-        <div className="space-y-8">
-          {/* Alasan Donasi */}
-          <section>
-            <h2 className="text-2xl font-bold mb-4 text-accent border-b border-border/40 pb-2">
-              Mengapa Berdonasi?
-            </h2>
-            <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
-<p>
-  62chan dijalankan secara mandiri, dan biaya server saat ini berkisar sekitar{" "}
-  <b>$5–$10/bulan (~80–160 ribuan)</b>, tergantung traffic.
-</p>
-              <p>
-                Bantuan Anda sangat berarti untuk memastikan website ini terus
-                online.
-              </p>
-            </div>
-          </section>
+        {/* Milestone List */}
+        <section className="space-y-2">
+          {stats && stats.milestones && stats.milestones.length > 0 ? (
+            stats.milestones.map((milestone) => (
+              <div
+                key={milestone.id}
+                className="ib-reply border border-muted/30 space-y-2 px-4 py-3"
+              >
+                <div className="flex items-baseline justify-between">
+                  <span className="font-bold text-accent text-sm">
+                    {milestone.name}
+                  </span>
+                  <span className="font-mono text-[10px] opacity-60">
+                    {milestone.progressPercentage}%
+                  </span>
+                </div>
 
-          {/* Metode Pembayaran */}
-          <section>
-            <h2 className="text-2xl font-bold mb-4 text-accent border-b border-border/40 pb-2">
-              Metode Pembayaran
-            </h2>
-            <div className="space-y-6">
-              <div className="bg-muted/20 p-6 rounded-lg border border-border/40">
-                <h3 className="text-lg font-bold text-accent mb-2">Saweria</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Dukung kami menggunakan GoPay, OVO, Dana, LinkAja, atau QRIS.
+                <p className="text-[11px] text-muted-foreground italic leading-snug">
+                  {milestone.description}
                 </p>
-                <a
-                  href="https://saweria.co/support62chan"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-accent text-accent-foreground px-4 py-2 rounded font-medium hover:bg-accent/90 transition-colors"
-                >
-                  Donasi via Saweria
-                </a>
+
+                <div className="h-2 w-full bg-muted/20 border border-muted/40 overflow-hidden">
+                  <div
+                    className="h-full bg-accent transition-all duration-500"
+                    style={{
+                      width: `${Math.min(milestone.progressPercentage, 100)}%`,
+                    }}
+                  />
+                </div>
+
+                <div className="flex justify-between font-mono text-[10px] opacity-60">
+                  <span>terkumpul {formatCurrency(stats.totalAmount)}</span>
+                  <span>target {formatCurrency(milestone.target_amount)}</span>
+                </div>
               </div>
+            ))
+          ) : (
+            <p className="text-xs text-muted-foreground italic border border-dashed border-border px-3 py-2">
+              ga ada milestone aktif saat ini.
+            </p>
+          )}
+        </section>
 
-              {/* <div className="bg-muted/20 p-6 rounded-lg border border-border/40">
-                <h3 className="text-lg font-bold text-accent mb-2">Crypto</h3>
-                <p className="text-sm text-muted-foreground">
-                  Mungkin nanti akan ditambahkan
-                </p>
-              </div> */}
-            </div>
-          </section>
+        {/* Support Methods */}
+        <section>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Kamu bisa mendukung kami melalui <strong>Saweria</strong> (support
+              pembayaran via QRIS, GoPay, OVO, Dana, LinkAja).
+            </p>
 
-          {/* Transparansi */}
-          <section className="border-t border-border/40 pt-8">
-            <h2 className="text-2xl font-bold mb-4 text-accent">
-              Transparansi
-            </h2>
-            <div className="text-sm leading-relaxed space-y-3 text-muted-foreground">
-              <p>
-                semua donasi dipakai untuk biaya server dan pengembangan 62chan.
-              </p>
-            </div>
-          </section>
-        </div>
-      </main>
+            <a
+              href="https://saweria.co/support62chan"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-accent text-accent-foreground px-4 py-1.5 font-bold text-sm border border-accent hover:bg-accent/90 transition-colors"
+            >
+              Donasi via Saweria
+            </a>
+          </div>
+        </section>
 
-      <footer className="border-t border-border/40 py-6 bg-muted/10">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-xs text-muted-foreground">
-            Terima kasih atas dukungan Anda.
-          </p>
-        </div>
-      </footer>
+        <section className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+          <div className="space-y-1">
+            <p className="font-bold text-foreground">
+              Q: kalau target tidak tercapai gimana?
+            </p>
+            <p>
+              kemungkinan ada dua opsi: kembali ke server dengan plan free yang
+              berarti spesifikasi akan turun cukup signifikan, atau menyisihkan
+              sebagian uangku untuk tetap berada di server sekarang.
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="font-bold text-foreground">
+              Q: apakah biaya server selalu 100k?
+            </p>
+            <p>
+              itu hanya estimasi. jumlahnya bisa berubah, bisa lebih rendah atau
+              lebih tinggi, tapi kemungkinan tidak akan kurang dari $5 per
+              bulan.
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="font-bold text-foreground">
+              Q: apakah ada biaya lain selain hosting?
+            </p>
+            <p>
+              untuk sekarang belum ada wan. beberapa layanan gratis masih cukup
+              untuk kebutuhan sistem ini.
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="font-bold text-foreground">Q: domain pakai apa?</p>
+            <p>
+              kita pakai domain gratis dari{" "}
+              <a
+                href="https://github.com/DigitalPlatDev/FreeDomain"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-dotted hover:text-accent"
+              >
+                DigitalPlatDev/FreeDomain
+              </a>
+              . kalau mau support, bisa kasih star di repo tersebut sebagai
+              bentuk terima kasih.
+            </p>
+          </div>
+        </section>
+
+        <section className="text-muted-foreground">
+          thanks for donating.
+        </section>
+      </div>
     </div>
   );
 }
