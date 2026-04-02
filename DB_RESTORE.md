@@ -44,7 +44,7 @@ Gunakan `pg_restore` untuk memasukkan data dari file `.dump`. Pastikan koneksi s
 Matikan constraint sementara melalui `psql` sebelum menjalankan restorasi.
 
 ```bash
-psql "postgresql://postgres.kjrlskoevhstxkltrnwe:[password]@[host].pooler.supabase.com:6543/postgres" -c "ALTER ROLE postgres SET session_replication_role = 'replica';"
+psql "postgresql://postgres.kjrlskoevhstxkltrnwe:[password]@[host].pooler.supabase.com:6543/postgres" -c "SET session_replication_role = 'replica';"
 ```
 
 ### B. Jalankan `pg_restore`
@@ -64,7 +64,7 @@ pg_restore \
 Setelah restorasi selesai, pastikan untuk mengaktifkan kembali trigger dan constraint.
 
 ```sql
-ALTER ROLE postgres SET session_replication_role = 'origin';
+SET session_replication_role = 'origin';
 ```
 
 ## Langkah 5: Sinkronisasi Sequence
