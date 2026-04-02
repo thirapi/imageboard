@@ -101,7 +101,7 @@ export class ReplyRepository {
         )
       )
 
-    return result[0]?.count ?? 0
+    return Number(result[0]?.count ?? 0)
   }
 
   async findLatestByIp(ipAddress: string): Promise<ReplyEntity | null> {

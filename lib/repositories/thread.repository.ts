@@ -340,7 +340,7 @@ export class ThreadRepository {
         ),
       )
 
-    return result[0]?.count ?? 0
+    return Number(result[0]?.count ?? 0)
   }
 
   async findManyByIds(ids: number[]): Promise<ThreadEntity[]> {
