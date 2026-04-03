@@ -113,6 +113,13 @@
       "when": 1774343743210,
       "tag": "0015_eminent_madelyne_pryor",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1775213949268,
+      "tag": "0016_needy_kitty_pryde",
+      "breakpoints": true
     }
   ]
 }

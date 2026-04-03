@@ -114,6 +114,18 @@ export class CreateThreadUseCase {
       capcode: input.capcode
     })
 
+    // Business rule: Board thread limit (128 threads)
+    // If more than 128, find and delete the oldest non-pinned thread
+    const boardThreadCount = await this.threadRepository.countByBoardId(input.boardId)
+    if (boardThreadCount > 128) {
+      const excess = boardThreadCount - 128
+      const oldestThreads = await this.threadRepository.findOldestNonPinnedByBoardId(input.boardId, excess)
+      
+      for (const t of oldestThreads) {
+        await this.threadRepository.archive(t.id)
+      }
+    }
+
     if (imageUrl && input.imageFile) {
       try {
         await this.imageRepository.create({

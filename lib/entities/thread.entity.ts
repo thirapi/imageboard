@@ -7,6 +7,7 @@ export interface ThreadEntity {
   createdAt: Date
   isPinned: boolean
   isLocked: boolean
+  isArchived: boolean
   isDeleted: boolean
   isNsfw: boolean
   isSpoiler: boolean
@@ -58,6 +59,7 @@ export interface ThreadUI {
   createdAt: Date
   isPinned: boolean
   isLocked: boolean
+  isArchived: boolean
   isDeleted: boolean
   isNsfw: boolean
   isSpoiler: boolean

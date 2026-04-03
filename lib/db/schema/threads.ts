@@ -32,6 +32,7 @@ export const threads = pgTable(
 
     isPinned: boolean('is_pinned').default(false),
     isLocked: boolean('is_locked').default(false),
+    isArchived: boolean('is_archived').default(false),
     isNsfw: boolean('is_nsfw').default(false),
     isSpoiler: boolean('is_spoiler').default(false),
 
@@ -43,6 +44,7 @@ export const threads = pgTable(
   (t) => ({
     boardIdx: index('idx_threads_board_id').on(t.boardId),
     bumpedIdx: index('idx_threads_bumped_at').on(t.bumpedAt),
+    archivedIdx: index('idx_threads_is_archived').on(t.isArchived),
     deletedIdx: index('idx_threads_is_deleted').on(t.isDeleted),
     createdIdx: index('idx_threads_created_at').on(t.createdAt),
   })

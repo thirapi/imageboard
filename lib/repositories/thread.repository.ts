@@ -80,6 +80,7 @@ export class ThreadRepository {
         imageMetadata: threads.imageMetadata,
         isPinned: threads.isPinned,
         isLocked: threads.isLocked,
+        isArchived: threads.isArchived,
         isDeleted: threads.isDeleted,
         isNsfw: threads.isNsfw,
         isSpoiler: threads.isSpoiler,
@@ -90,7 +91,11 @@ export class ThreadRepository {
         capcode: threads.capcode,
       })
       .from(threads)
-      .where(and(eq(threads.boardId, boardId), eq(threads.isDeleted, false)))
+      .where(and(
+        eq(threads.boardId, boardId), 
+        eq(threads.isDeleted, false),
+        eq(threads.isArchived, false)
+      ))
       .orderBy(desc(threads.isPinned), desc(threads.bumpedAt))
 
     return rows.map((row) => ({
@@ -101,6 +106,7 @@ export class ThreadRepository {
       postNumber: row.postNumber!,
       isPinned: row.isPinned ?? false,
       isLocked: row.isLocked ?? false,
+      isArchived: row.isArchived ?? false,
       isDeleted: row.isDeleted ?? false,
       isNsfw: row.isNsfw ?? false,
       isSpoiler: row.isSpoiler ?? false,
@@ -119,6 +125,7 @@ export class ThreadRepository {
         imageMetadata: threads.imageMetadata,
         isPinned: threads.isPinned,
         isLocked: threads.isLocked,
+        isArchived: threads.isArchived,
         isDeleted: threads.isDeleted,
         isNsfw: threads.isNsfw,
         isSpoiler: threads.isSpoiler,
@@ -129,7 +136,10 @@ export class ThreadRepository {
         capcode: threads.capcode,
       })
       .from(threads)
-      .where(eq(threads.isDeleted, false))
+      .where(and(
+        eq(threads.isDeleted, false),
+        eq(threads.isArchived, false)
+      ))
       .orderBy(desc(threads.createdAt))
       .limit(limit)
 
@@ -141,6 +151,7 @@ export class ThreadRepository {
       postNumber: row.postNumber!,
       isPinned: row.isPinned ?? false,
       isLocked: row.isLocked ?? false,
+      isArchived: row.isArchived ?? false,
       isDeleted: row.isDeleted ?? false,
       isNsfw: row.isNsfw ?? false,
       isSpoiler: row.isSpoiler ?? false,
@@ -160,6 +171,13 @@ export class ThreadRepository {
     await db
       .update(threads)
       .set({ isDeleted: true })
+      .where(eq(threads.id, id))
+  }
+
+  async archive(id: number): Promise<void> {
+    await db
+      .update(threads)
+      .set({ isArchived: true, isLocked: true })
       .where(eq(threads.id, id))
   }
 
@@ -219,6 +237,7 @@ export class ThreadRepository {
         imageMetadata: threads.imageMetadata,
         isPinned: threads.isPinned,
         isLocked: threads.isLocked,
+        isArchived: threads.isArchived,
         isDeleted: threads.isDeleted,
         isNsfw: threads.isNsfw,
         isSpoiler: threads.isSpoiler,
@@ -229,7 +248,11 @@ export class ThreadRepository {
         capcode: threads.capcode,
       })
       .from(threads)
-      .where(and(eq(threads.boardId, boardId), eq(threads.isDeleted, false)))
+      .where(and(
+        eq(threads.boardId, boardId), 
+        eq(threads.isDeleted, false),
+        eq(threads.isArchived, false)
+      ))
       .orderBy(...orderBy)
       .limit(limit)
       .offset(offset)
@@ -311,6 +334,7 @@ export class ThreadRepository {
         createdAt: row.createdAt!,
         isPinned: row.isPinned ?? false,
         isLocked: row.isLocked ?? false,
+        isArchived: row.isArchived ?? false,
         isDeleted: row.isDeleted ?? false,
         isNsfw: row.isNsfw ?? false,
         isSpoiler: row.isSpoiler ?? false,
@@ -337,10 +361,60 @@ export class ThreadRepository {
         and(
           eq(threads.boardId, boardId),
           eq(threads.isDeleted, false),
+          eq(threads.isArchived, false),
         ),
       )
 
     return Number(result[0]?.count ?? 0)
+  }
+
+  async findOldestNonPinnedByBoardId(boardId: number, limit: number): Promise<ThreadEntity[]> {
+    const rows = await db
+      .select({
+        id: threads.id,
+        boardId: threads.boardId,
+        subject: threads.subject,
+        content: threads.content,
+        author: threads.author,
+        image: threads.image,
+        imageMetadata: threads.imageMetadata,
+        isPinned: threads.isPinned,
+        isLocked: threads.isLocked,
+        isArchived: threads.isArchived,
+        isDeleted: threads.isDeleted,
+        isNsfw: threads.isNsfw,
+        isSpoiler: threads.isSpoiler,
+        createdAt: threads.createdAt,
+        bumpedAt: threads.bumpedAt,
+        postNumber: threads.postNumber,
+        ipAddress: threads.ipAddress,
+        capcode: threads.capcode,
+      })
+      .from(threads)
+      .where(
+        and(
+          eq(threads.boardId, boardId),
+          eq(threads.isDeleted, false),
+          eq(threads.isArchived, false),
+          eq(threads.isPinned, false)
+        )
+      )
+      .orderBy(asc(threads.bumpedAt))
+      .limit(limit)
+
+    return rows.map((row) => ({
+      ...row,
+      author: row.author ?? "Awanama",
+      createdAt: row.createdAt!,
+      bumpedAt: row.bumpedAt!,
+      postNumber: row.postNumber!,
+      isPinned: row.isPinned ?? false,
+      isLocked: row.isLocked ?? false,
+      isArchived: row.isArchived ?? false,
+      isDeleted: row.isDeleted ?? false,
+      isNsfw: row.isNsfw ?? false,
+      isSpoiler: row.isSpoiler ?? false,
+    }))
   }
 
   async findManyByIds(ids: number[]): Promise<ThreadEntity[]> {
@@ -361,6 +435,7 @@ export class ThreadRepository {
       createdAt: row.createdAt!,
       isPinned: row.isPinned ?? false,
       isLocked: row.isLocked ?? false,
+      isArchived: row.isArchived ?? false,
       isDeleted: row.isDeleted ?? false,
       isNsfw: row.isNsfw ?? false,
       isSpoiler: row.isSpoiler ?? false,

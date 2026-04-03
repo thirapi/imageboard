@@ -123,8 +123,11 @@ export class ReplyToThreadUseCase {
       }
     }
 
-    // Business rule: Bump thread when reply is added
-    await this.threadRepository.updateBumpTime(input.threadId)
+    // Business rule: Bump thread when reply is added (if under bumplimit 450 replies)
+    const replyCount = await this.replyRepository.countByThreadId(input.threadId)
+    if (replyCount <= 450) {
+      await this.threadRepository.updateBumpTime(input.threadId)
+    }
 
     // AI Moderation (Async)
     // Run this in the background to not slow down the user
