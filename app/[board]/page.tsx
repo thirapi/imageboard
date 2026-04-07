@@ -23,6 +23,7 @@ import { cookies } from "next/headers";
 import { lucia } from "@/lib/auth";
 import { SiteFooter } from "@/components/site-footer";
 import { ThreadListItem } from "@/components/thread-list-item";
+import { AdBanner } from "@/components/ad-banner";
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -215,6 +216,8 @@ export default async function BoardPage({
         </p>
       </header>
 
+      <AdBanner />
+
       <main
         className={cn(
           "mx-auto pb-2 flex-1 w-full",
@@ -279,6 +282,7 @@ export default async function BoardPage({
         </div>
       </main>
 
+      <AdBanner />
       <SiteFooter />
     </div>
   );

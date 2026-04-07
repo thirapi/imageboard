@@ -133,12 +133,16 @@ import { ScrollButtons } from "@/components/scroll-buttons";
 import { PostHogProvider } from "./posthog-provider";
 import { ThreadWatcherProvider } from "@/components/thread-watcher-provider";
 import { ThreadWatcher } from "@/components/thread-watcher";
+import { AdBanner } from "@/components/ad-banner";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const publisherId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
+
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
@@ -149,6 +153,14 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
           />
         ))}
+        {publisherId && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
       </head>
       <body className={`font-sans antialiased`}>
         <PostHogProvider>
@@ -163,9 +175,11 @@ export default function RootLayout({
                 <TooltipProvider>
                   <ThreadWatcherProvider>
                     <BoardNav />
+
                     <div className="flex-1 w-full overflow-x-clip min-h-0">
                       {children}
                     </div>
+
                     <Toaster />
                     <SonnerToaster />
                     <ThreadWatcher />

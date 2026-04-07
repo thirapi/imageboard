@@ -18,6 +18,7 @@ import { RecentImage } from "@/components/recent-image";
 import type { Metadata } from "next";
 import { BoardEntity, BoardCategoryEntity } from "@/lib/entities/board.entity";
 import { VerifiedLink } from "@/components/verified-link";
+import { AdBanner } from "@/components/ad-banner";
 
 export const metadata: Metadata = {
   title: "62chan",
@@ -89,6 +90,8 @@ export default async function HomePage() {
           </h1>
         </div>
       </header>
+
+      <AdBanner className="mt-2" />
 
       <main className="container mx-auto px-4 py-8 flex-1 max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 md:gap-y-10">
@@ -173,6 +176,7 @@ export default async function HomePage() {
         )}
       </main>
 
+      <AdBanner />
       <SiteFooter stats={stats} />
     </div>
   );
