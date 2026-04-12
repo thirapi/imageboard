@@ -38,7 +38,7 @@ export function LatestPosts({ initialPosts, isMobile }: LatestPostsProps) {
       const lastPost = posts[posts.length - 1]
       const beforeDate = new Date(lastPost.createdAt)
       
-      const newPosts = await getLatestPosts(10, beforeDate)
+      const newPosts = await getLatestPosts(LIMIT, beforeDate)
       
       if (newPosts && newPosts.length > 0) {
         setPosts((prev) => [...prev, ...newPosts])

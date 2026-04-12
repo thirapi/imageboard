@@ -58,7 +58,7 @@ export default async function HomePage() {
   const isMobile = /mobile/i.test(userAgent);
 
   const postsLimit = isMobile ? 10 : 15;
-  const imagesLimit = isMobile ? 20 : 25;
+  const imagesLimit = isMobile ? 8 : 12;
 
   const [boards, categories, latestPosts, recentImages, stats] =
     await Promise.all([
@@ -139,35 +139,43 @@ export default async function HomePage() {
 
               {/* Recent Images */}
               {recentImages.length > 0 && (
-                <section className="lg:col-span-7">
+                <section className="lg:col-span-7 flex flex-col h-full">
                   <h2 className="text-lg font-semibold mb-3 text-accent border-b pb-1">
                     Gambar Terbaru
                   </h2>
 
-                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                  <div className="relative flex-1">
+                    <div className="overflow-y-auto max-h-[440px] sm:max-h-[642px] pr-2 custom-scrollbar">
+                      <div className="columns-2 sm:columns-3 gap-2">
                     {recentImages.map((image) => (
-                      <ThreadPreview
-                        key={`img-preview-${image.id}`}
-                        subject={image.threadSubject}
-                        excerpt={image.threadExcerpt}
-                        boardCode={image.boardCode}
-                        isNsfw={image.isNsfw}
-                        isSpoiler={image.isSpoiler}
-                      >
-                        <VerifiedLink
-                          key={`${image.id}-${image.imageUrl}`}
-                          href={`/${image.boardCode}/thread/${image.threadId}#p${image.postNumber}`}
-                          className="group"
+                      <div key={`img-wrap-${image.id}`} className="break-inside-avoid mb-2 w-full">
+                        <ThreadPreview
+                          key={`img-preview-${image.id}`}
+                          subject={image.threadSubject}
+                          excerpt={image.threadExcerpt}
+                          boardCode={image.boardCode}
+                          isNsfw={image.isNsfw}
+                          isSpoiler={image.isSpoiler}
                         >
-                          <RecentImage
-                            imageUrl={image.imageUrl}
-                            isNsfw={image.isNsfw}
-                            isSpoiler={image.isSpoiler}
-                            boardCode={image.boardCode}
-                          />
-                        </VerifiedLink>
-                      </ThreadPreview>
+                          <VerifiedLink
+                            key={`${image.id}-${image.imageUrl}`}
+                            href={`/${image.boardCode}/thread/${image.threadId}#p${image.postNumber}`}
+                            className="group block w-full"
+                          >
+                            <RecentImage
+                              imageUrl={image.imageUrl}
+                              isNsfw={image.isNsfw}
+                              isSpoiler={image.isSpoiler}
+                              boardCode={image.boardCode}
+                            />
+                          </VerifiedLink>
+                        </ThreadPreview>
+                      </div>
                     ))}
+                      </div>
+                    </div>
+                    {/* Fade gradient hint */}
+                    <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent" />
                   </div>
                 </section>
               )}

@@ -17,13 +17,13 @@ export function RecentImage({ imageUrl, isSpoiler, isNsfw, boardCode }: RecentIm
   const isStaticGif = isGif && !autoPlayGif;
 
   return (
-    <div className="aspect-square flex items-center justify-center overflow-hidden rounded border border-muted/50 group-hover:border-accent transition-all bg-muted/20 relative">
+    <div className="overflow-hidden rounded border border-muted/50 group-hover:border-accent transition-all bg-muted/20 relative">
       <img
-        src={getThumbnailUrl(imageUrl, 200, 200, 'fill', !autoPlayGif)}
+        src={getThumbnailUrl(imageUrl, 300, 0, 'scale', !autoPlayGif)}
         alt={`Gambar terbaru di 62chan - ${boardCode}`}
-        className={`w-full h-full object-cover transition-all ${
+        className={`w-full h-auto block transition-all ${
           isSpoiler || isNsfw
-            ? "blur-xl scale-110 opacity-60"
+            ? "blur-xl opacity-60"
             : "grayscale-[0.2] group-hover:grayscale-0"
         }`}
         loading="lazy"
