@@ -107,7 +107,7 @@ export function LatestPosts({ initialPosts, isMobile }: LatestPostsProps) {
             >
               <div className="flex items-start gap-1">
                 <div className="min-w-0 flex-1">
-                  <div className="text-[11px] text-muted-foreground line-clamp-2 leading-snug">
+                  <div className="text-[11px] text-foreground/80 dark:text-muted-foreground line-clamp-2 leading-snug">
                     <span className="text-[10px] font-mono font-bold text-accent mr-1">
                       /{post.boardCode}/:
                     </span>
@@ -120,7 +120,7 @@ export function LatestPosts({ initialPosts, isMobile }: LatestPostsProps) {
                         [{post.type === "thread" ? "Utas" : "Balasan"}]
                       </span>
                     )}
-                    <span className="opacity-90">
+                    <span className="dark:opacity-90">
                       <FormattedText content={post.excerpt} preview />
                     </span>
                   </div>

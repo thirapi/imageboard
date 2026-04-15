@@ -149,13 +149,13 @@ export function ExpandableImage({
             }}
           >
             {!showNsfw ? (
-              <div className="border border-destructive bg-black px-4 py-2 text-destructive font-mono text-[12px] font-bold tracking-tight uppercase">
-                [ NSFW ]
-              </div>
+              <span className="text-[10px] font-bold text-white bg-black/60 px-2 py-1 rounded">
+                NSFW
+              </span>
             ) : (
-              <div className="border border-yellow-500 bg-black px-4 py-2 text-yellow-500 font-mono text-[12px] font-bold tracking-tight uppercase">
-                [ SPOILER ]
-              </div>
+              <span className="text-[10px] font-bold text-white bg-black/60 px-2 py-1 rounded">
+                SPOILER
+              </span>
             )}
           </div>
         )}
