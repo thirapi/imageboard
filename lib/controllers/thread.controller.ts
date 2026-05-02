@@ -49,14 +49,19 @@ export class ThreadController {
     return { threadId: id, postNumber }
   }
 
-  async getThreadList(boardId: number) {
+  async getThreadList(
+    boardId: number,
+    limit?: number,
+    offset?: number,
+    sortBy?: "bump" | "new" | "replies" | "images"
+  ) {
     // Input validation only
     if (!boardId) {
       throw new Error("Board ID is required")
     }
 
     // Call use case
-    return await this.getThreadListUseCase.execute(boardId)
+    return await this.getThreadListUseCase.execute(boardId, limit, offset, sortBy)
   }
 
   async getThreadDetail(threadId: number) {

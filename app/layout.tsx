@@ -134,6 +134,7 @@ import { PostHogProvider } from "./posthog-provider";
 import { ThreadWatcherProvider } from "@/components/thread-watcher-provider";
 import { ThreadWatcher } from "@/components/thread-watcher";
 import { AdBanner } from "@/components/ad-banner";
+import { Suspense } from "react";
 
 export default function RootLayout({    
   children,
@@ -169,23 +170,29 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <NavProvider>
-              <AgeVerificationProvider>
-                <TooltipProvider>
-                  <ThreadWatcherProvider>
-                    <BoardNav />
+              <Suspense fallback={null}>
+                <AgeVerificationProvider>
+                  <TooltipProvider>
+                    <ThreadWatcherProvider>
+                      <Suspense fallback={<div className="h-8 bg-muted/5 animate-pulse" />}>
+                        <BoardNav />
+                      </Suspense>
 
-                    <div className="flex-1 w-full overflow-x-clip min-h-0">
-                      {children}
-                    </div>
+                      <div className="flex-1 w-full overflow-x-clip min-h-0">
+                        <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-accent" /></div>}>
+                          {children}
+                        </Suspense>
+                      </div>
 
-                    <Toaster />
-                    <SonnerToaster />
-                    <ThreadWatcher />
-                    <Analytics />
-                    <ScrollButtons />
-                  </ThreadWatcherProvider>
-                </TooltipProvider>
-              </AgeVerificationProvider>
+                      <Toaster />
+                      <SonnerToaster />
+                      <ThreadWatcher />
+                      <Analytics />
+                      <ScrollButtons />
+                    </ThreadWatcherProvider>
+                  </TooltipProvider>
+                </AgeVerificationProvider>
+              </Suspense>
             </NavProvider>
           </ThemeProvider>
 

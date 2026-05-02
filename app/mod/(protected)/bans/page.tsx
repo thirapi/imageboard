@@ -1,15 +1,13 @@
-import { getBans, getModeratorAuthorizer } from "@/lib/actions/moderation.actions";
+import { getBans } from "@/lib/actions/moderation.actions";
 import { BanList } from "@/components/ban-list";
-import { ShieldX } from "lucide-react";
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-export const dynamic = "force-dynamic";
+async function BansListWrapper() {
+  const bans = await getBans();
+  return <BanList initialBans={bans} />;
+}
 
 export default async function BansManagementPage() {
-
-
-  const bans = await getBans();
-
   return (
     <div className="space-y-10">
       <header className="mb-0">
@@ -21,7 +19,9 @@ export default async function BansManagementPage() {
         </p>
       </header>
 
-      <BanList initialBans={bans} />
+      <Suspense fallback={<div className="h-64 animate-pulse bg-muted/5 border rounded-xl" />}>
+        <BansListWrapper />
+      </Suspense>
     </div>
   );
 }

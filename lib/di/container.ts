@@ -20,6 +20,7 @@ import { AIModerationService } from "@/lib/services/ai-moderation.service"
 
 
 // Use Cases
+import { FlagPostUseCase } from "@/lib/use-cases/flag-post.use-case"
 import { CreateReportUseCase } from "@/lib/use-cases/create-report.use-case"
 import { CreateThreadUseCase } from "@/lib/use-cases/create-thread.use-case"
 import { BanUserUseCase } from "@/lib/use-cases/ban-user.use-case"
@@ -30,6 +31,7 @@ import { UpdateBanUseCase } from "@/lib/use-cases/update-ban.use-case"
 import { DismissReportUseCase } from "@/lib/use-cases/dismiss-report.use-case"
 import { GetBoardListUseCase } from "@/lib/use-cases/get-board-list.use-case"
 import { GetBoardByIdUseCase } from "@/lib/use-cases/get-board-by-id.use-case"
+import { GetBoardByCodeUseCase } from "@/lib/use-cases/get-board-by-code.use-case"
 import { GetLatestPostsUseCase } from "@/lib/use-cases/get-latest-posts.use-case"
 import { GetPendingReportsUseCase } from "@/lib/use-cases/get-pending-reports.use-case"
 import { GetResolvedReportsUseCase } from "@/lib/use-cases/get-resolved-reports.use-case"
@@ -99,6 +101,7 @@ const aiModerationService = new AIModerationService()
 
 // Instantiate Use Cases
 const createReportUseCase = new CreateReportUseCase(reportRepository)
+const flagPostUseCase = new FlagPostUseCase(reportRepository)
 const createThreadUseCase = new CreateThreadUseCase(
   threadRepository,
   boardRepository,
@@ -114,6 +117,7 @@ const createThreadUseCase = new CreateThreadUseCase(
 const dismissReportUseCase = new DismissReportUseCase(reportRepository)
 const getBoardListUseCase = new GetBoardListUseCase(boardRepository)
 const getBoardByIdUseCase = new GetBoardByIdUseCase(boardRepository)
+const getBoardByCodeUseCase = new GetBoardByCodeUseCase(boardRepository)
 const getLatestPostsUseCase = new GetLatestPostsUseCase(postRepository)
 const getPendingReportsUseCase = new GetPendingReportsUseCase(reportRepository, threadRepository, replyRepository, banRepository, boardRepository)
 const getResolvedReportsUseCase = new GetResolvedReportsUseCase(reportRepository, threadRepository, replyRepository, banRepository, boardRepository)
@@ -207,6 +211,7 @@ const boardController = new BoardController(
   deleteBoardUseCase,
   getBoardListUseCase,
   getBoardByIdUseCase,
+  getBoardByCodeUseCase,
   getBoardCategoriesUseCase
 )
 const boardCategoryController = new BoardCategoryController(
@@ -236,6 +241,7 @@ export const container = {
   boardCategoryController,
   seedController,
   createReportUseCase,
+  flagPostUseCase,
   deletePostWithPasswordUseCase,
   boardRepository, // Export repository for actions
   categoryRepository,

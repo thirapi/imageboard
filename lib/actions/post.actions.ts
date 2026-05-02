@@ -46,6 +46,7 @@ export async function searchThreads(boardId: number, query: string): Promise<Thr
                 isDeleted: t.isDeleted ?? false,
                 isNsfw: t.isNsfw ?? false,
                 isSpoiler: t.isSpoiler ?? false,
+                isArchived: false,
                 bumpedAt: t.bumpedAt!,
                 image: t.image ?? undefined,
                 imageMetadata: t.imageMetadata,

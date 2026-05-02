@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, CheckCircle, XCircle } from "lucide-react";
-import { redirect } from "next/navigation";
+import { ExternalLink, CheckCircle } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -14,24 +13,21 @@ import { Button } from "@/components/ui/button";
 import { ModerationBoardFilter } from "@/components/moderation-board-filter";
 import { 
   getResolvedReports,
-  getModeratorAuthorizer,
 } from "@/lib/actions/moderation.actions";
 import {
   getBoardList,
 } from "@/lib/actions/home.actions";
 import { cn } from "@/lib/utils";
 import { HistoryDetailDialog } from "@/components/history-detail-dialog";
+import { Suspense } from "react";
 
-export const dynamic = "force-dynamic";
-
-export default async function ModHistoryPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string; board?: string }>;
+async function ModHistoryWrapper({ 
+  page, 
+  boardCode 
+}: { 
+  page: string; 
+  boardCode?: string 
 }) {
-
-
-  const { page = "1", board: boardCode } = await searchParams;
   const currentPage = parseInt(page);
   const limit = 50;
   const offset = (currentPage - 1) * limit;
@@ -44,14 +40,7 @@ export default async function ModHistoryPage({
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="space-y-10">
-      <header className="mb-0">
-        <h1 className="text-2xl font-bold tracking-tight">Riwayat Penanganan</h1>
-        <p className="text-xs text-muted-foreground mt-1 mb-4 opacity-70">
-          Daftar laporan yang telah ditindaklanjuti secara permanen
-        </p>
-      </header>
-
+    <>
       {/* Board Filter Section */}
       <section className="bg-muted/30 p-4 rounded-xl border border-border/50">
         <ModerationBoardFilter 
@@ -129,7 +118,7 @@ export default async function ModHistoryPage({
             {total === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   className="h-64 text-center"
                 >
                   <div className="flex flex-col items-center justify-center space-y-2 opacity-40">
@@ -177,6 +166,32 @@ export default async function ModHistoryPage({
           </Button>
         </div>
       )}
+    </>
+  );
+}
+
+export default async function ModHistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; board?: string }>;
+}) {
+  const { page = "1", board: boardCode } = await searchParams;
+
+  return (
+    <div className="space-y-10">
+      <header className="mb-0">
+        <h1 className="text-2xl font-bold tracking-tight">Riwayat Penanganan</h1>
+        <p className="text-xs text-muted-foreground mt-1 mb-4 opacity-70">
+          Daftar laporan yang telah ditindaklanjuti secara permanen
+        </p>
+      </header>
+
+      <Suspense fallback={<div className="space-y-8 animate-pulse">
+        <div className="h-16 bg-muted/5 rounded-xl border" />
+        <div className="h-96 bg-muted/5 rounded-xl border" />
+      </div>}>
+        <ModHistoryWrapper page={page} boardCode={boardCode} />
+      </Suspense>
     </div>
   );
 }

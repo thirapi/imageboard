@@ -19,8 +19,6 @@ async function getAuthUser() {
   return user;
 }
 
-export const revalidate = 3600; // Cache selama 1 jam, akan di-update instan saat ada balasan baru via revalidatePath
-
 export async function generateMetadata({
   params,
 }: {

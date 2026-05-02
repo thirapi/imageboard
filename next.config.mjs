@@ -1,6 +1,7 @@
 import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  cacheComponents: true, // v16 official flag at root
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -11,6 +12,18 @@ const nextConfig = {
     serverActions: { bodySizeLimit: "10mb" },
     optimizePackageImports: ['lucide-react', 'date-fns', '@radix-ui/react-icons', 'recharts'],
   },
+  cacheLife: {
+    boardList: {
+      stale: 300, // 5 minutes
+      revalidate: 600,
+      expire: 3600,
+    },
+    categories: {
+      stale: 600, // 10 minutes
+      revalidate: 1200,
+      expire: 7200,
+    }
+  }
 };
 
 export default withSentryConfig(nextConfig, {

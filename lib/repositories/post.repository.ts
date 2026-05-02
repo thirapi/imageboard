@@ -6,195 +6,109 @@ import type { SystemStatsEntity } from "@/lib/entities/stats.entity"
 
 export class PostRepository {
   async getLatestPosts(limit = 10, beforeDate?: Date): Promise<LatestPostEntity[]> {
-    const threadWhere = beforeDate 
-      ? and(eq(threads.isDeleted, false), lt(threads.createdAt, beforeDate))
-      : eq(threads.isDeleted, false)
+    // Using raw SQL for UNION ALL to ensure efficiency and correct sorting at DB level
+    const before = beforeDate?.toISOString()
+    const result = await db.execute(sql`
+      WITH combined_posts AS (
+        SELECT 
+          t.id, 
+          t.post_number as "postNumber", 
+          'thread' as "type", 
+          t.subject as "title", 
+          left(t.content, 200) as "excerpt", 
+          t.created_at as "createdAt", 
+          b.code as "boardCode", 
+          t.id as "threadId", 
+          t.capcode, 
+          t.subject as "threadSubject", 
+          left(t.content, 150) as "threadExcerpt", 
+          t.image as "threadImage",
+          COALESCE(t.is_nsfw, false) as "isNsfw",
+          COALESCE(t.is_spoiler, false) as "isSpoiler"
+        FROM ${threads} t
+        INNER JOIN ${boards} b ON t.board_id = b.id
+        WHERE t.is_deleted = false ${before ? sql`AND t.created_at < ${before}` : sql``}
+        
+        UNION ALL
+        
+        SELECT 
+          r.id, 
+          r.post_number as "postNumber", 
+          'reply' as "type", 
+          NULL as "title", 
+          left(r.content, 200) as "excerpt", 
+          r.created_at as "createdAt", 
+          b.code as "boardCode", 
+          r.thread_id as "threadId", 
+          r.capcode, 
+          t.subject as "threadSubject", 
+          left(t.content, 150) as "threadExcerpt", 
+          t.image as "threadImage",
+          COALESCE(r.is_nsfw OR t.is_nsfw, false) as "isNsfw",
+          COALESCE(r.is_spoiler OR t.is_spoiler, false) as "isSpoiler"
+        FROM ${replies} r
+        INNER JOIN ${threads} t ON r.thread_id = t.id
+        INNER JOIN ${boards} b ON t.board_id = b.id
+        WHERE r.is_deleted = false AND t.is_deleted = false ${before ? sql`AND r.created_at < ${before}` : sql``}
+      )
+      SELECT * FROM combined_posts
+      ORDER BY "createdAt" DESC
+      LIMIT ${limit}
+    `)
 
-    const latestThreads = await db
-      .select({
-        id: threads.id,
-        postNumber: threads.postNumber,
-        subject: threads.subject,
-        excerpt: sql<string>`left(${threads.content}, 200)`,
-        image: threads.image,
-        createdAt: threads.createdAt,
-        boardCode: boards.code,
-        capcode: threads.capcode,
-        isNsfw: threads.isNsfw,
-        isSpoiler: threads.isSpoiler,
-      })
-      .from(threads)
-      .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(threadWhere)
-      .orderBy(desc(threads.createdAt))
-      .limit(limit)
-
-    const replyWhere = beforeDate
-      ? and(
-          eq(replies.isDeleted, false),
-          eq(threads.isDeleted, false),
-          lt(replies.createdAt, beforeDate)
-        )
-      : and(
-          eq(replies.isDeleted, false),
-          eq(threads.isDeleted, false)
-        )
-
-    const latestReplies = await db
-      .select({
-        id: replies.id,
-        postNumber: replies.postNumber,
-        excerpt: sql<string>`left(${replies.content}, 200)`,
-        createdAt: replies.createdAt,
-        threadId: replies.threadId,
-        boardCode: boards.code,
-        capcode: replies.capcode,
-        threadSubject: threads.subject,
-        threadExcerpt: sql<string>`left(${threads.content}, 150)`,
-        threadImage: threads.image,
-        isNsfw: replies.isNsfw,
-        isSpoiler: replies.isSpoiler,
-        threadIsNsfw: threads.isNsfw,
-        threadIsSpoiler: threads.isSpoiler,
-      })
-      .from(replies)
-      .innerJoin(threads, eq(replies.threadId, threads.id))
-      .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(replyWhere)
-      .orderBy(desc(replies.createdAt))
-      .limit(limit)
-
-    const posts: LatestPostEntity[] = []
-
-    for (const t of latestThreads) {
-      posts.push({
-        id: t.id,
-        postNumber: t.postNumber as number,
-        type: "thread",
-        title: t.subject,
-        excerpt: t.excerpt,
-        createdAt: t.createdAt!,
-        boardCode: t.boardCode,
-        threadId: t.id,
-        capcode: t.capcode,
-        threadSubject: t.subject,
-        threadExcerpt: t.excerpt.substring(0, 150),
-        threadImage: t.image,
-        isNsfw: t.isNsfw ?? false,
-        isSpoiler: t.isSpoiler ?? false,
-      })
-    }
-
-    for (const r of latestReplies) {
-      posts.push({
-        id: r.id,
-        postNumber: r.postNumber as number,
-        type: "reply",
-        title: null,
-        excerpt: r.excerpt,
-        createdAt: r.createdAt!,
-        boardCode: r.boardCode,
-        threadId: r.threadId,
-        capcode: r.capcode,
-        threadSubject: r.threadSubject,
-        threadExcerpt: r.threadExcerpt,
-        threadImage: r.threadImage,
-        isNsfw: (r.isNsfw || r.threadIsNsfw) ?? false,
-        isSpoiler: (r.isSpoiler || r.threadIsSpoiler) ?? false,
-      })
-    }
-
-    return posts
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, limit)
+    return (result as any).map((row: any) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      postNumber: Number(row.postNumber)
+    }))
   }
 
   async getRecentImages(limit = 12): Promise<RecentImageEntity[]> {
-    const threadImages = await db
-      .select({
-        id: threads.id,
-        postNumber: threads.postNumber,
-        imageUrl: threads.image,
-        createdAt: threads.createdAt,
-        boardCode: boards.code,
-        threadId: threads.id,
-        isNsfw: threads.isNsfw,
-        isSpoiler: threads.isSpoiler,
-        threadSubject: threads.subject,
-        threadExcerpt: sql<string>`left(${threads.content}, 150)`,
-      })
-      .from(threads)
-      .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(
-        and(
-          eq(threads.isDeleted, false),
-          isNotNull(threads.image),
-        )
+    const result = await db.execute(sql`
+      WITH combined_images AS (
+        SELECT 
+          t.id, 
+          t.post_number as "postNumber", 
+          t.image as "imageUrl", 
+          t.created_at as "createdAt", 
+          b.code as "boardCode", 
+          t.id as "threadId", 
+          COALESCE(t.is_nsfw, false) as "isNsfw", 
+          COALESCE(t.is_spoiler, false) as "isSpoiler", 
+          t.subject as "threadSubject", 
+          left(t.content, 150) as "threadExcerpt"
+        FROM ${threads} t
+        INNER JOIN ${boards} b ON t.board_id = b.id
+        WHERE t.is_deleted = false AND t.image IS NOT NULL
+        
+        UNION ALL
+        
+        SELECT 
+          r.id, 
+          r.post_number as "postNumber", 
+          r.image as "imageUrl", 
+          r.created_at as "createdAt", 
+          b.code as "boardCode", 
+          r.thread_id as "threadId", 
+          COALESCE(r.is_nsfw, false) as "isNsfw", 
+          COALESCE(r.is_spoiler, false) as "isSpoiler", 
+          t.subject as "threadSubject", 
+          left(t.content, 150) as "threadExcerpt"
+        FROM ${replies} r
+        INNER JOIN ${threads} t ON r.thread_id = t.id
+        INNER JOIN ${boards} b ON t.board_id = b.id
+        WHERE r.is_deleted = false AND t.is_deleted = false AND r.image IS NOT NULL
       )
-      .orderBy(desc(threads.createdAt))
-      .limit(limit)
+      SELECT * FROM combined_images
+      ORDER BY "createdAt" DESC
+      LIMIT ${limit}
+    `)
 
-    const replyImages = await db
-      .select({
-        id: replies.id,
-        postNumber: replies.postNumber,
-        imageUrl: replies.image,
-        createdAt: replies.createdAt,
-        boardCode: boards.code,
-        threadId: replies.threadId,
-        isNsfw: replies.isNsfw,
-        isSpoiler: replies.isSpoiler,
-        threadSubject: threads.subject,
-        threadExcerpt: sql<string>`left(${threads.content}, 150)`,
-      })
-      .from(replies)
-      .innerJoin(threads, eq(replies.threadId, threads.id))
-      .innerJoin(boards, eq(threads.boardId, boards.id))
-      .where(
-        and(
-          eq(replies.isDeleted, false),
-          eq(threads.isDeleted, false),
-          isNotNull(replies.image),
-        )
-      )
-      .orderBy(desc(replies.createdAt))
-      .limit(limit)
-
-    const images: RecentImageEntity[] = []
-
-    for (const t of threadImages) {
-      images.push({
-        id: t.id,
-        postNumber: t.postNumber as number,
-        imageUrl: t.imageUrl!,
-        createdAt: t.createdAt!,
-        boardCode: t.boardCode,
-        threadId: t.threadId,
-        isNsfw: t.isNsfw ?? false,
-        isSpoiler: t.isSpoiler ?? false,
-        threadSubject: t.threadSubject,
-        threadExcerpt: t.threadExcerpt,
-      })
-    }
-
-    for (const r of replyImages) {
-      images.push({
-        id: r.id,
-        postNumber: r.postNumber as number,
-        imageUrl: r.imageUrl!,
-        createdAt: r.createdAt!,
-        boardCode: r.boardCode,
-        threadId: r.threadId,
-        isNsfw: r.isNsfw ?? false,
-        isSpoiler: r.isSpoiler ?? false,
-        threadSubject: r.threadSubject,
-        threadExcerpt: r.threadExcerpt,
-      })
-    }
-
-    return images
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, limit)
+    return (result as any).map((row: any) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      postNumber: Number(row.postNumber)
+    }))
   }
 
   async findByPostNumber(postNumber: number): Promise<PostInfoEntity | null> {

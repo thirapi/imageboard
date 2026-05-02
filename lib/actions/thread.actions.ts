@@ -72,12 +72,17 @@ export async function createThread(formData: FormData) {
   }
 }
 
-export async function getThreadList(boardId: number) {
+export async function getThreadList(
+  boardId: number,
+  limit?: number,
+  offset?: number,
+  sortBy?: "bump" | "new" | "replies" | "images"
+) {
   try {
-    return await threadController.getThreadList(boardId)
+    return await threadController.getThreadList(boardId, limit, offset, sortBy)
   } catch (error) {
     console.error(`Error fetching thread list for board ${boardId}:`, error)
-    return []
+    return { threads: [], totalPages: 0 }
   }
 }
 

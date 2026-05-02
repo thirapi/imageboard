@@ -14,8 +14,8 @@ const globalForDb = globalThis as unknown as {
 
 const client = globalForDb.client ?? postgres(connectionString, {
   prepare: false,
-  // Kita gunakan limit 5 agar tidak terjadi deadlock saat parallel rendering di build/production
-  max: 5,
+  // Increase max connections to 10 to handle parallel queries better
+  max: 10,
 });
 
 // Selalu simpan di global agar bisa di-reuse saat 'warm start' di serverless/production

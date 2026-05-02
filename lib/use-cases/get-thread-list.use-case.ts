@@ -37,6 +37,7 @@ export class GetThreadListUseCase {
       isDeleted: t.isDeleted,
       isNsfw: t.isNsfw,
       isSpoiler: t.isSpoiler,
+      isArchived: false,
       bumpedAt: t.bumpedAt,
       image: t.image,
       imageMetadata: t.imageMetadata,

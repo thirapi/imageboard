@@ -36,6 +36,16 @@ export async function getBoardById(id: number) {
   }
 }
 
+export async function getBoardByCode(code: string) {
+  try {
+    // Public action, no auth required
+    return await boardController.getBoardByCode(code)
+  } catch (error) {
+    console.error(`Error fetching board with code ${code}:`, error)
+    return null
+  }
+}
+
 export async function createBoard(formData: FormData) {
   try {
     await getAdminOrModeratorAuthorizer()
