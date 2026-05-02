@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface AdBannerProps {
@@ -16,12 +16,17 @@ export function AdBanner({
   format = "auto", 
   responsive = true 
 }: AdBannerProps) {
+  const adRef = useRef<HTMLInsElement>(null);
+
   useEffect(() => {
-    try {
-      // @ts-ignore
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error("AdSense error:", err);
+    const adElement = adRef.current;
+    if (adElement && adElement.dataset.adsbygoogleStatus !== "done") {
+      try {
+        // @ts-ignore
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (err) {
+        console.error("AdSense error:", err);
+      }
     }
   }, []);
 
@@ -56,8 +61,9 @@ export function AdBanner({
     <div className={cn("my-4 mx-auto overflow-hidden text-center", className)}>
       <p className="text-[9px] text-muted-foreground/40 mb-1 hidden sm:block">Advertisement</p>
       <ins
+        ref={adRef}
         className="adsbygoogle"
-        style={{ display: "block" }}
+        style={{ display: "block", minHeight: "50px" }}
         data-ad-client={publisherId}
         data-ad-slot={slot}
         data-ad-format={format}
