@@ -3,6 +3,12 @@
 import React, { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
+declare global {
+  interface Window {
+    adsbygoogle: any[];
+  }
+}
+
 interface AdBannerProps {
   slot?: string;
   className?: string;
@@ -16,17 +22,38 @@ export function AdBanner({
   format = "auto", 
   responsive = true 
 }: AdBannerProps) {
-  const adRef = useRef<HTMLInsElement>(null);
+  const adRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const adElement = adRef.current;
-    if (adElement && adElement.dataset.adsbygoogleStatus !== "done") {
+    if (!adElement || adElement.dataset.adsbygoogleStatus === "done") return;
+
+    const pushAd = () => {
       try {
-        // @ts-ignore
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        if (adElement.offsetWidth > 0) {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          return true;
+        }
       } catch (err) {
-        console.error("AdSense error:", err);
+        // Suppress errors related to push or double initialization
       }
+      return false;
+    };
+
+    if (!pushAd()) {
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentRect.width > 0) {
+            if (pushAd()) {
+              observer.unobserve(adElement);
+              observer.disconnect();
+              break;
+            }
+          }
+        }
+      });
+      observer.observe(adElement);
+      return () => observer.disconnect();
     }
   }, []);
 
@@ -35,13 +62,12 @@ export function AdBanner({
   const publisherId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
 
   if (!publisherId && !slot) {
-    // Only show placeholder in development mode to help with layout planning
     if (isDev) {
       return (
         <div 
           className={cn(
             "my-4 mx-auto flex items-center justify-center rounded-sm overflow-hidden",
-            "w-full max-w-[728px] h-[90px] sm:h-[90px] h-[50px]", 
+            "w-full max-w-[728px] h-[50px] sm:h-[90px]", 
             className
           )}
         >
@@ -52,8 +78,6 @@ export function AdBanner({
         </div>
       );
     }
-    
-    // Hide completely in production if no credentials are set
     return null;
   }
 
@@ -61,7 +85,7 @@ export function AdBanner({
     <div className={cn("my-4 mx-auto overflow-hidden text-center", className)}>
       <p className="text-[9px] text-muted-foreground/40 mb-1 hidden sm:block">Advertisement</p>
       <ins
-        ref={adRef}
+        ref={adRef as React.RefObject<HTMLModElement>}
         className="adsbygoogle"
         style={{ display: "block", minHeight: "50px" }}
         data-ad-client={publisherId}

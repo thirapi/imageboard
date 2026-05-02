@@ -148,16 +148,19 @@ export default function RootLayout({
       <head>
         {jsonLd.map((schema, i) => (
           <script
-            key={i}
+            key={`jsonld-${i}`}
             type="application/ld+json"
+            suppressHydrationWarning
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
           />
         ))}
         {publisherId && (
           <script
+            key="adsense-script"
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`}
             crossOrigin="anonymous"
+            suppressHydrationWarning
           />
         )}
       </head>
