@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, X, Send, Image as ImageIcon } from "lucide-react";
+import { MessageSquare, X, Send, Image as ImageIcon, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createReply } from "@/lib/actions/reply.actions";
 import { getCaptcha } from "@/lib/actions/thread.actions";
@@ -39,6 +39,7 @@ export function ReplyForm({
   const [captchaQuestion, setCaptchaQuestion] = useState("");
   const [captcha, setLocalCaptcha] = useState("");
   const [showTips, setShowTips] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
 
@@ -160,16 +161,26 @@ export function ReplyForm({
             >
               Sandi Penghapusan
             </Label>
-            <Input
-              id={`${prefix}reply-deletionPassword`}
-              name="deletionPassword"
-              type="password"
-              placeholder="(Opsional)"
-              maxLength={255}
-              className="h-8 text-sm bg-muted/20"
-              value={state.deletionPassword}
-              onChange={(e) => setDeletionPassword(e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                id={`${prefix}reply-deletionPassword`}
+                name="deletionPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Default password"
+                maxLength={255}
+                className="h-8 text-sm bg-muted/20 pr-8"
+                value={state.deletionPassword}
+                onChange={(e) => setDeletionPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              </button>
+            </div>
           </div>
         </div>
 

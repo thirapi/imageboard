@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useDefaultPassword } from "@/hooks/use-default-password";
 
 interface ReplyState {
   author: string;
@@ -31,14 +32,20 @@ export function ReplyProvider({ children }: { children: React.ReactNode }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isNsfw, setIsNsfw] = useState(false);
   const [isSpoiler, setIsSpoiler] = useState(false);
+  const [savedPassword, setSavedPassword] = useDefaultPassword();
 
   // Load persistent fields from localStorage
   useEffect(() => {
     const savedAuthor = localStorage.getItem("ib-author");
-    const savedPassword = localStorage.getItem("ib-deletion-password");
     if (savedAuthor) setAuthorState(savedAuthor);
-    if (savedPassword) setDeletionPasswordState(savedPassword);
   }, []);
+
+  // Sync auto-generated default password into form state
+  useEffect(() => {
+    if (savedPassword) {
+      setDeletionPasswordState(savedPassword);
+    }
+  }, [savedPassword]);
 
   const setAuthor: React.Dispatch<React.SetStateAction<string>> = (val) => {
     setAuthorState((prev) => {
@@ -53,7 +60,7 @@ export function ReplyProvider({ children }: { children: React.ReactNode }) {
   ) => {
     setDeletionPasswordState((prev) => {
       const newVal = typeof val === "function" ? val(prev) : val;
-      localStorage.setItem("ib-deletion-password", newVal);
+      setSavedPassword(newVal);
       return newVal;
     });
   };

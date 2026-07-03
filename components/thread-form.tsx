@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Plus, ChevronUp, RefreshCcw } from "lucide-react";
+import { Send, Plus, ChevronUp, RefreshCcw, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createThread, getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import posthog from "posthog-js";
 import { useThreadWatcher } from "./thread-watcher-provider";
 import { uploadImageClient } from "@/lib/utils/cloudinary-client";
+import { useDefaultPassword } from "@/hooks/use-default-password";
 
 interface ThreadFormProps {
   boardId: number;
@@ -34,6 +35,8 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
   const { addMyPost } = useThreadWatcher();
 
   const [content, setContent] = useState("");
+  const [password, setPassword] = useDefaultPassword();
+  const [showPassword, setShowPassword] = useState(false);
 
   // Load preferences from localStorage on mount
   useEffect(() => {
@@ -255,13 +258,25 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
                   <Label htmlFor="deletionPassword" className="text-xs font-bold opacity-70">
                     Sandi Penghapusan
                   </Label>
-                  <Input
-                    id="deletionPassword"
-                    name="deletionPassword"
-                    type="password"
-                    placeholder="Untuk hapus nanti"
-                    className="bg-muted/30 focus-visible:ring-accent h-8 text-xs"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="deletionPassword"
+                      name="deletionPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Untuk hapus nanti"
+                      className="bg-muted/30 focus-visible:ring-accent h-8 text-xs pr-8"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-1.5 min-w-[120px]">
                   <div className="flex items-center justify-between">
