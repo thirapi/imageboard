@@ -48,14 +48,14 @@ export function SiteFooter() {
               peraturan
             </Link>
             <span className="text-muted-foreground">•</span>
-            <Link
+            {/* <Link
               href="/donasi"
               className="text-accent hover:underline"
               title="Dukung operasional server"
             >
               <s>donasi</s>&nbsp;faq
             </Link>
-            <span className="text-muted-foreground">•</span>
+            <span className="text-muted-foreground">•</span> */}
             <button
               onClick={() => setShowStats(!showStats)}
               className="text-accent hover:underline focus:outline-none disabled:opacity-50"

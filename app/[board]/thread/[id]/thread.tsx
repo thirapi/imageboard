@@ -32,6 +32,26 @@ interface ThreadClientProps {
   userRole?: string;
 }
 
+const POSTER_ID_STYLES = [
+  "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300",
+  "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300",
+  "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300",
+  "bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300",
+  "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300",
+  "bg-cyan-100 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300",
+  "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300",
+  "bg-lime-100 dark:bg-lime-900/20 text-lime-700 dark:text-lime-300",
+  "bg-teal-100 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300",
+] as const;
+
+function getPosterStyle(id: string): string {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return POSTER_ID_STYLES[Math.abs(hash) % POSTER_ID_STYLES.length];
+}
+
 export function ThreadClient({
   thread,
   replies,
@@ -47,6 +67,11 @@ export function ThreadClient({
   const { isReplyHidden, hideThread, hideReply, unhideReply, isLoaded } = useHiding();
 
   const isWatched = watchedThreads.some(t => t.id === thread.id);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  const toggleHighlightId = (id: string) => {
+    setHighlightedId(prev => (prev === id ? null : id));
+  };
 
   useEffect(() => {
     markAsRead(thread.id, replies.length);
@@ -136,7 +161,13 @@ export function ThreadClient({
   return (
     <>
       {/* OP Post */}
-      <div id={`p${thread.postNumber}`} className="ib-post mb-1 scroll-mt-14">
+      <div
+        id={`p${thread.postNumber}`}
+        className={cn(
+          "ib-post mb-1 scroll-mt-14",
+          highlightedId && thread.posterId === highlightedId && "ring-1 ring-accent/30 bg-accent/[0.015] rounded-sm"
+        )}
+      >
         <div className="ib-post-metaline border-b border-muted/20 pb-1">          <Button
             variant="ghost"
             size="icon"
@@ -184,7 +215,16 @@ export function ThreadClient({
             <CapcodeMarker type={thread.capcode} className="text-base" />
           </div>
           {thread.posterId && (
-            <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
+            <span
+              className={cn(
+                "text-[10px] px-1.5 rounded font-mono ml-1 cursor-pointer transition-colors",
+                highlightedId === thread.posterId
+                  ? "text-accent bg-accent/10"
+                  : getPosterStyle(thread.posterId)
+              )}
+              onClick={() => toggleHighlightId(thread.posterId!)}
+              title="Klik untuk sorot semua post dari ID ini"
+            >
               ID: {thread.posterId}
             </span>
           )}
@@ -269,7 +309,11 @@ export function ThreadClient({
               <div
                 key={reply.id}
                 id={`p${reply.postNumber}`}
-                className={`ib-reply border border-muted/20 shadow-sm relative group sm:table block w-fit max-w-full scroll-mt-14 ${reply.isDeleted ? 'opacity-70 grayscale-[50%]' : ''}`}
+                className={cn(
+                  "ib-reply border border-muted/20 shadow-sm relative group sm:table block w-fit max-w-full scroll-mt-14",
+                  reply.isDeleted && "opacity-70 grayscale-[50%]",
+                  highlightedId && reply.posterId === highlightedId && "ring-1 ring-accent/30 bg-accent/[0.015] rounded-sm"
+                )}
               >
                 <div className={`ib-post-metaline px-2 pt-1 border-b ${reply.isDeleted ? 'bg-red-500/5' : 'bg-muted/5'}`}>
                   {reply.isDeleted && (
@@ -286,9 +330,21 @@ export function ThreadClient({
                     <CapcodeMarker type={reply.capcode} />
                   </div>
                   {reply.posterId && (
-                    <span className="text-[10px] bg-muted px-1 rounded text-muted-foreground ml-1 font-mono">
+                    <span
+                      className={cn(
+                        "text-[10px] px-1.5 rounded font-mono ml-1 cursor-pointer transition-colors",
+                        highlightedId === reply.posterId
+                          ? "text-accent bg-accent/10"
+                          : getPosterStyle(reply.posterId)
+                      )}
+                      onClick={() => toggleHighlightId(reply.posterId!)}
+                      title="Klik untuk sorot semua post dari ID ini"
+                    >
                       ID: {reply.posterId}
                     </span>
+                  )}
+                  {thread.posterId && reply.posterId === thread.posterId && (
+                    <span className="text-[10px] text-accent font-bold ml-1">OP</span>
                   )}
                   <span className="text-muted-foreground opacity-70 text-xs">
                     <FormattedDate date={reply.createdAt} />
