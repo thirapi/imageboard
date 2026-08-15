@@ -191,8 +191,8 @@ export default async function ThreadPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
       />
-      <header className="py-2 px-4 border-b flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 bg-muted/5">
-        <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-base font-mono">
+      <header className="py-1.5 px-3 border-b flex items-center justify-between gap-2 bg-muted/5 text-xs sm:text-sm">
+        <div className="flex items-center gap-2 font-mono">
           <Link
             href={`/${boardCode}`}
             className="text-accent hover:underline font-bold whitespace-nowrap"
@@ -207,12 +207,13 @@ export default async function ThreadPage({
             [ Katalog ]
           </Link>
         </div>
-        <div className="text-base sm:text-xl font-bold text-accent text-center sm:text-right truncate max-w-full">
-          /{board.code}/ - {board.name}
+        <div className="font-bold text-accent truncate max-w-[50%] sm:max-w-none text-right">
+          <span className="hidden sm:inline">/{board.code}/ - {board.name}</span>
+          <span className="sm:hidden">/{board.code}/</span>
         </div>
       </header>
 
-      <main className="mx-auto px-4 md:px-8 py-8 w-full max-w-none">
+      <main className="mx-auto px-2 sm:px-4 md:px-8 py-4 sm:py-8 w-full max-w-none">
         <ThreadPageWrapper
           thread={thread}
           replies={replies || []}

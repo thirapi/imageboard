@@ -81,6 +81,16 @@ export function ThreadClient({
     markAsRead(thread.id, replies.length);
   }, [thread.id, replies.length, markAsRead]);
 
+  // Hide global scroll-to-top/bottom buttons while the mobile reply drawer is open
+  useEffect(() => {
+    const open = isMobile && qrOpen;
+    document.body.classList.toggle("reply-drawer-open", open);
+    window.dispatchEvent(new Event("reply-drawer-toggle"));
+    return () => {
+      document.body.classList.remove("reply-drawer-open");
+    };
+  }, [isMobile, qrOpen]);
+
   const handleImageClick = (src: string) => {
     setSelectedImage(src);
     setLightboxOpen(true);
@@ -172,11 +182,12 @@ export function ThreadClient({
           highlightedId && thread.posterId === highlightedId && "ring-1 ring-accent/30 bg-accent/[0.015] rounded-sm"
         )}
       >
-        <div className="ib-post-metaline border-b border-muted/20 pb-1">          <Button
+        <div className="ib-post-metaline border-b border-muted/20 pb-1">
+          <Button
             variant="ghost"
             size="icon"
             className={cn(
-              "h-6 w-6 ml-2",
+              "h-6 w-6 ml-2 hidden sm:inline-flex",
               isWatched ? "text-accent" : "text-muted-foreground"
             )}
             onClick={() => {
@@ -232,8 +243,9 @@ export function ThreadClient({
               ID: {thread.posterId}
             </span>
           )}
-          <span className="text-muted-foreground text-xs">
-            <FormattedDate date={thread.createdAt} />
+          <span className="text-muted-foreground opacity-70 text-xs shrink-0">
+            <FormattedDate date={thread.createdAt} compact className="sm:hidden" />
+            <FormattedDate date={thread.createdAt} className="hidden sm:inline" />
           </span>
           <span className="flex items-center">
             <Link
@@ -352,8 +364,9 @@ export function ThreadClient({
                   {thread.posterId && reply.posterId === thread.posterId && (
                     <span className="text-[10px] text-accent font-bold ml-1">OP</span>
                   )}
-                  <span className="text-muted-foreground opacity-70 text-xs">
-                    <FormattedDate date={reply.createdAt} />
+                  <span className="text-muted-foreground opacity-70 text-xs shrink-0">
+                    <FormattedDate date={reply.createdAt} compact className="sm:hidden" />
+                    <FormattedDate date={reply.createdAt} className="hidden sm:inline" />
                   </span>
                   <span className="flex items-center">
                     <Link
@@ -415,14 +428,14 @@ export function ThreadClient({
       </div>
 
       {/* Reply Form Section */}
-      <div className="mt-12 border-t pt-8 flex justify-center">
-        <div className="w-full max-w-2xl bg-card p-6 rounded-xl border shadow-xl">
-          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-            <span className="text-accent underline decoration-2">
+      <div className="mt-12 border-t border-muted/20 pt-8">
+        <div className="w-full max-w-2xl mx-auto bg-muted/10 border border-muted/30 rounded-md p-4 sm:p-5">
+          <h3 className="text-base font-bold mb-3 flex items-center gap-2">
+            <span className="text-accent underline decoration-2 underline-offset-2">
               Kirim Balasan
             </span>
             {thread.isLocked && (
-              <Lock className="h-4 w-4 text-muted-foreground" />
+              <Lock className="h-3.5 w-3.5 text-muted-foreground" />
             )}
           </h3>
 
@@ -433,9 +446,9 @@ export function ThreadClient({
               userRole={userRole}
             />
           ) : (
-            <div className="py-8 text-center bg-muted/20 rounded-lg">
-              <Lock className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
-              <p className="text-muted-foreground">
+            <div className="py-6 text-center bg-muted/20 rounded">
+              <Lock className="h-7 w-7 mx-auto mb-2 text-muted-foreground opacity-50" />
+              <p className="text-muted-foreground text-sm">
                 Thread ini terkunci. Anda tidak bisa mengirim balasan baru.
               </p>
             </div>

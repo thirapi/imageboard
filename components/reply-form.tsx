@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, X, Send, Image as ImageIcon, Eye, EyeOff } from "lucide-react";
+import { X, Image as ImageIcon, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createReply } from "@/lib/actions/reply.actions";
 import { getCaptcha } from "@/lib/actions/thread.actions";
@@ -53,6 +53,11 @@ export function ReplyForm({
     setIsSpoiler,
     resetForm,
   } = useReply();
+
+  const handleClear = () => {
+    setContent("");
+    setImageFile(null);
+  };
   const { watchThread, addMyPost } = useThreadWatcher();
 
   const refreshCaptcha = async () => {
@@ -129,14 +134,14 @@ export function ReplyForm({
 
   return (
     <div className="w-full">
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
         {error && (
-          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/20 mb-4">
+          <div className="text-xs text-destructive bg-destructive/10 p-2 rounded border border-destructive/20">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <div className="space-y-1">
             <Label
               htmlFor={`${prefix}reply-author`}
@@ -149,7 +154,7 @@ export function ReplyForm({
               name="author"
               placeholder="Awanama"
               maxLength={100}
-              className="h-8 text-sm bg-muted/20"
+              className="h-7 text-xs bg-muted/10 border-muted/30"
               value={state.author}
               onChange={(e) => setAuthor(e.target.value)}
             />
@@ -168,7 +173,7 @@ export function ReplyForm({
                 type={showPassword ? "text" : "password"}
                 placeholder="Default password"
                 maxLength={255}
-                className="h-8 text-sm bg-muted/20 pr-8"
+                className="h-7 text-xs bg-muted/10 border-muted/30 pr-8"
                 value={state.deletionPassword}
                 onChange={(e) => setDeletionPassword(e.target.value)}
               />
@@ -178,7 +183,7 @@ export function ReplyForm({
                 className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                 tabIndex={-1}
               >
-                {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
               </button>
             </div>
           </div>
@@ -197,13 +202,13 @@ export function ReplyForm({
               name="content"
               placeholder="Ketik balasan Anda..."
               required
-              rows={5}
+              rows={4}
               maxLength={2000}
-              className="text-sm bg-muted/20 focus-visible:ring-accent resize-y pr-16"
+              className="text-xs bg-muted/10 border-muted/30 focus-visible:ring-accent resize-y pr-12"
               value={state.content}
               onChange={(e) => setContent(e.target.value)}
             />
-            <div className="absolute bottom-2 right-2 text-[10px] font-mono text-muted-foreground pointer-events-none opacity-50">
+            <div className="absolute bottom-1 right-2 text-[9px] font-mono text-muted-foreground/50 pointer-events-none">
               {state.content.length}/2000
             </div>
           </div>
@@ -220,10 +225,10 @@ export function ReplyForm({
             <button
               type="button"
               onClick={refreshCaptcha}
-              className="text-[10px] text-accent hover:underline flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
+              className="text-[9px] text-accent hover:underline flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
               title="Segarkan CAPTCHA"
             >
-              <RefreshCcw className="h-2.5 w-2.5" />
+              <RefreshCcw className="h-2 w-2" />
               Ganti
             </button>
           </div>
@@ -232,13 +237,13 @@ export function ReplyForm({
             name="captcha"
             placeholder="Jawaban..."
             required
-            className="h-8 text-sm bg-muted/20 w-32"
+            className="h-7 text-xs bg-muted/10 border-muted/30 w-28"
             value={captcha}
             onChange={(e) => setLocalCaptcha(e.target.value)}
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
           <div className="w-full sm:w-auto">
             <ImageUploader
               onImageSelect={setImageFile}
@@ -247,8 +252,8 @@ export function ReplyForm({
               resetTrigger={resetTrigger}
             />
 
-            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
-              <div className="flex items-center space-x-2.5">
+            <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-2 text-xs">
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id={`${prefix}isNsfw`}
                   name="isNsfw"
@@ -263,7 +268,7 @@ export function ReplyForm({
                 </Label>
               </div>
 
-              <div className="flex items-center space-x-2.5">
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id={`${prefix}isSpoiler`}
                   name="isSpoiler"
@@ -279,7 +284,7 @@ export function ReplyForm({
               </div>
 
               {userRole && (userRole === "admin" || userRole === "moderator") && (
-                <div className="flex items-center space-x-2.5">
+                <div className="flex items-center space-x-2">
                   <Checkbox id={`${prefix}withCapcode`} name="withCapcode" />
                   <Label
                     htmlFor={`${prefix}withCapcode`}
@@ -295,30 +300,35 @@ export function ReplyForm({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-48 h-10 font-bold group"
+            className="w-full sm:w-40 h-8 text-xs font-bold"
           >
-            {isSubmitting ? (
-              "Mengirim..."
-            ) : (
-              <>
-                Kirim Balasan
-                <Send className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
+            {isSubmitting ? "Mengirim..." : "Kirim Balasan"}
           </Button>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-muted/10">
-          <button
-            type="button"
-            onClick={() => setShowTips(!showTips)}
-            className="text-[10px] text-muted-foreground hover:text-accent flex items-center gap-1 mx-auto transition-colors"
-          >
-            {showTips ? "[ Sembunyikan Bantuan ]" : "[ Bantuan Posting ]"}
-          </button>
+        <div className="mt-3 pt-2 border-t border-muted/10">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => setShowTips(!showTips)}
+              className="text-[10px] text-muted-foreground hover:text-accent flex items-center gap-1 transition-colors"
+            >
+              {showTips ? "[ Sembunyikan Bantuan ]" : "[ Bantuan Posting ]"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-[10px] text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors"
+              title="Bersihkan isi balasan"
+            >
+              <X className="h-3 w-3" />
+              [ Bersihkan ]
+            </button>
+          </div>
 
           {showTips && (
-            <div className="text-[10px] text-muted-foreground italic space-y-1 text-center mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="mt-2 text-[10px] text-muted-foreground italic space-y-1 text-center">
               <p>Tip: Gunakan {`>>NomorPost`} untuk membalas post tertentu.</p>
               <p>
                 Gunakan {`[spoiler]teks[/spoiler]`} untuk menyembunyikan teks.

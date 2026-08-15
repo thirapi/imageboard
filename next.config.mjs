@@ -24,7 +24,8 @@ const nextConfig = {
       revalidate: 1200,
       expire: 7200,
     }
-  }
+  },
+  devIndicators: false
 };
 
 export default withSentryConfig(nextConfig, {

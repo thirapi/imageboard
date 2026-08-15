@@ -123,13 +123,13 @@ export function QuickReply({
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DrawerContent className="px-4 pb-8 max-h-[95vh] overflow-y-auto">
+        <DrawerContent className="px-4 pb-4" data-vaul-no-drag>
           <DrawerHeader className="px-0 pt-4 pb-2 border-b">
             <DrawerTitle className="text-left font-bold text-accent">
               Balasan Cepat
             </DrawerTitle>
           </DrawerHeader>
-          <div className="pt-4">
+          <div className="pt-3 overflow-y-auto max-h-[70vh]">
             <ReplyForm
               threadId={threadId}
               boardCode={boardCode}

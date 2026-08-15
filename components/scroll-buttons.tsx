@@ -16,10 +16,13 @@ export function ScrollButtons() {
     const checkScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          setShowTop(window.scrollY > 300);
+          // Hide when the reply drawer is open to avoid overlapping the sheet
+          const drawerOpen = document.body.classList.contains("reply-drawer-open");
+          setShowTop(!drawerOpen && window.scrollY > 300);
           setShowBottom(
-            window.innerHeight + window.scrollY <
-              document.documentElement.scrollHeight - 300
+            !drawerOpen &&
+              window.innerHeight + window.scrollY <
+                document.documentElement.scrollHeight - 300
           );
           ticking = false;
         });
@@ -29,20 +32,23 @@ export function ScrollButtons() {
 
     window.addEventListener("scroll", checkScroll, { passive: true });
     window.addEventListener("resize", checkScroll, { passive: true });
-    
+    // Re-check when the reply drawer opens/closes
+    window.addEventListener("reply-drawer-toggle", checkScroll);
+
     // Mengobservasi perubahan ukuran DOM langsung (misal: user expand gambar/postingan baru masuk via live update)
     const resizeObserver = new ResizeObserver(() => checkScroll());
     resizeObserver.observe(document.documentElement);
 
     // Initial check
     checkScroll();
-    
+
     // Fallback delay untuk layout shifts saat navigasi React/Next
     const timeoutId = setTimeout(checkScroll, 150);
 
     return () => {
       window.removeEventListener("scroll", checkScroll);
       window.removeEventListener("resize", checkScroll);
+      window.removeEventListener("reply-drawer-toggle", checkScroll);
       resizeObserver.disconnect();
       clearTimeout(timeoutId);
     };

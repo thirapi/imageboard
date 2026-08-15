@@ -161,7 +161,7 @@
   }
 
   .ib-post-metaline {
-    @apply flex flex-wrap items-center gap-2 text-sm mb-1;
+    @apply flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-1;
   }
 
   .ib-subject {
@@ -173,7 +173,7 @@
   }
 
   .ib-reply {
-    @apply bg-muted/20 border-l border-muted pl-3 sm:pl-4 py-2 my-1 sm:my-2 rounded-r-md max-w-full sm:max-w-4xl min-w-0 sm:min-w-[300px];
+    @apply bg-muted/20 border-l border-muted pl-2.5 sm:pl-4 py-1.5 sm:py-2 my-1 sm:my-2 rounded-r-md max-w-full sm:max-w-4xl min-w-0 sm:min-w-[300px];
     background-color: color-mix(in oklch, var(--muted), transparent 40%);
   }
 
