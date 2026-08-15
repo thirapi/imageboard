@@ -22,7 +22,7 @@ export function CatalogView({ threads, boardCode }: CatalogViewProps) {
 
   if (!isLoaded) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-x-3 gap-y-6 opacity-0 animate-in fade-in duration-300">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-x-3 gap-y-6 opacity-0 animate-in fade-in duration-300">
         {threads.map((thread) => (
           <div key={thread.id} className="aspect-square bg-muted/10 rounded animate-pulse" />
         ))}
@@ -64,7 +64,7 @@ export function CatalogView({ threads, boardCode }: CatalogViewProps) {
       )}
 
       {/* Catalog Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-x-3 gap-y-6">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-x-3 gap-y-6">
         {visibleThreads.map((thread) => {
           return (
             <Link

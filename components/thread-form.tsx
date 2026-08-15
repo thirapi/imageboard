@@ -161,14 +161,14 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
         }}
         className="group block w-fit mx-auto my-1 cursor-pointer select-none"
       >
-        <span className="text-[22px] font-bold text-foreground/80 group-hover:text-accent transition-colors">
+        <span className="text-xl font-bold text-foreground/80 group-hover:text-accent transition-colors">
           [<a
             href="#"
             onClick={(e) => {
               e.preventDefault();
               toggleExpand();
             }}
-            className="no-underline text-[22px] font-bold text-foreground/80 group-hover:text-accent transition-colors"
+            className="no-underline text-xl font-bold text-foreground/80 group-hover:text-accent transition-colors"
           >
             <label
               htmlFor="PostAreaToggle"

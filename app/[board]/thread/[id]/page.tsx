@@ -191,7 +191,7 @@ export default async function ThreadPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
       />
-      <header className="py-1.5 px-3 border-b flex items-center justify-between gap-2 bg-muted/5 text-xs sm:text-sm">
+      <header className="py-1.5 px-3 sm:px-4 border-b flex items-center justify-between gap-2 bg-muted/5 text-xs sm:text-sm">
         <div className="flex items-center gap-2 font-mono">
           <Link
             href={`/${boardCode}`}
@@ -213,7 +213,7 @@ export default async function ThreadPage({
         </div>
       </header>
 
-      <main className="mx-auto px-2 sm:px-4 md:px-8 py-4 sm:py-8 w-full max-w-none">
+      <main className="mx-auto px-3 sm:px-4 md:px-8 py-4 sm:py-8 w-full max-w-none">
         <ThreadPageWrapper
           thread={thread}
           replies={replies || []}

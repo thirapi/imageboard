@@ -86,7 +86,7 @@ async function BoardContent({
         "mx-auto pb-2 flex-1 w-full",
         isCatalog
           ? "px-6 md:px-12 lg:px-20 max-w-none"
-          : "px-4 md:px-8 max-w-none",
+          : "px-3 sm:px-4 md:px-8 max-w-none",
       )}
     >
       <div className="flex flex-col items-center mb-1 sm:mb-4">
@@ -191,14 +191,14 @@ export default async function BoardPage({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="py-6 sm:py-12 px-3 sm:px-4 text-center border-b mb-1 sm:mb-4 flex flex-col items-center bg-muted/5">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-accent tracking-tight">
+      <header className="py-5 sm:py-10 px-3 sm:px-4 text-center border-b mb-1 sm:mb-4 flex flex-col items-center bg-muted/5">
+        <h1 className="text-3xl sm:text-3xl lg:text-4xl font-bold text-accent tracking-tight">
           /{board.code}/
         </h1>
-        <p className="text-sm text-foreground/80 font-medium max-w-2xl line-clamp-2 mt-0.5">
+        <p className="text-base sm:text-lg font-semibold text-foreground max-w-2xl line-clamp-2 mt-1">
           {board.name}
         </p>
-        <p className="text-xs sm:text-sm text-muted-foreground italic max-w-2xl line-clamp-2 mt-1">
+        <p className="text-xs sm:text-sm text-muted-foreground italic max-w-2xl line-clamp-2 mt-2">
           {board.description}
         </p>
       </header>
