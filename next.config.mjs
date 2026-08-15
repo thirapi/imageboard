@@ -1,13 +1,14 @@
 import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  cacheComponents: true, // v16 official flag at root
+  cacheComponents: true,
   typescript: {
     ignoreBuildErrors: true,
   },
   images: {
     unoptimized: true,
   },
+  allowedDevOrigins: ['192.168.1.11'],
   experimental: {
     serverActions: { bodySizeLimit: "10mb" },
     optimizePackageImports: ['lucide-react', 'date-fns', '@radix-ui/react-icons', 'recharts'],

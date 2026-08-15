@@ -19,11 +19,13 @@ import { ReplyProvider, useReply } from "@/components/reply-context";
 import { useThreadWatcher } from "@/components/thread-watcher-provider";
 import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useHiding } from "@/hooks/use-hiding";
-import { X, Plus, MoreHorizontal } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { ChevronLeft, RefreshCw, MessageSquare } from "lucide-react";
 import { PostActions } from "@/components/post-actions";
 import { CapcodeMarker } from "@/components/capcode-marker";
+import { SelectionQuotePopover } from "@/components/selection-quote-popover";
 
 interface ThreadClientProps {
   thread: ThreadUI;
@@ -65,6 +67,8 @@ export function ThreadClient({
   const { setContent } = useReply();
   const { watchedThreads, watchThread, unwatchThread, markAsRead } = useThreadWatcher();
   const { isReplyHidden, hideThread, hideReply, unhideReply, isLoaded } = useHiding();
+  const [isPending, startTransition] = useTransition();
+  const isMobile = useIsMobile();
 
   const isWatched = watchedThreads.some(t => t.id === thread.id);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
@@ -89,7 +93,7 @@ export function ThreadClient({
     }
   };
 
-  const handleQuote = (postNumber: number, e?: React.MouseEvent) => {
+  const handleQuote = (postNumber: number, e?: React.MouseEvent, customText?: string) => {
     if (e) {
       e.preventDefault();
     }
@@ -97,8 +101,8 @@ export function ThreadClient({
     setQrOpen(true);
     
     // Selection to Quote feature - capture selection immediately
-    let selectedText = "";
-    if (typeof window !== "undefined") {
+    let selectedText = customText || "";
+    if (!selectedText && typeof window !== "undefined") {
       const selection = window.getSelection();
       if (selection && selection.toString().trim().length > 0) {
         selectedText = selection.toString().trim();
@@ -242,6 +246,7 @@ export function ThreadClient({
             <span
               className="ib-post-number cursor-pointer"
               onMouseDown={(e) => handleQuote(thread.postNumber, e)}
+              onClick={(e) => handleQuote(thread.postNumber, e)}
               title="Balas postingan ini"
             >
               {thread.postNumber}
@@ -252,6 +257,7 @@ export function ThreadClient({
               boardCode={boardCode} 
               onHide={() => hideThread(thread.id)}
               isOP={true}
+              onQuote={() => handleQuote(thread.postNumber)}
             />
           </span>
 
@@ -270,7 +276,7 @@ export function ThreadClient({
               onFullScreen={() => handleImageClick(thread.image!)}
             />
           )}
-          <div className="text-base leading-relaxed whitespace-pre-wrap break-words ib-content">
+          <div className="text-base leading-relaxed whitespace-pre-wrap break-words ib-content" data-post-content="true">
             <FormattedText content={thread.content} />
             <Backlinks links={getBacklinks(thread.postNumber)} />
           </div>
@@ -360,6 +366,7 @@ export function ThreadClient({
                     <span
                       className="ib-post-number cursor-pointer"
                       onMouseDown={(e) => handleQuote(reply.postNumber, e)}
+                      onClick={(e) => handleQuote(reply.postNumber, e)}
                       title="Balas postingan ini"
                     >
                       {reply.postNumber}
@@ -369,6 +376,7 @@ export function ThreadClient({
                       postType="reply" 
                       boardCode={boardCode} 
                       onHide={() => hideReply(reply.id)}
+                      onQuote={() => handleQuote(reply.postNumber)}
                     />
                   </span>
                 </div>
@@ -384,7 +392,7 @@ export function ThreadClient({
                       onFullScreen={() => handleImageClick(reply.image!)}
                     />
                   )}
-                  <div className="whitespace-pre-wrap break-words leading-relaxed text-sm lg:text-base">
+                  <div className="whitespace-pre-wrap break-words leading-relaxed text-sm lg:text-base" data-post-content="true">
                     <FormattedText content={reply.content} />
                     <Backlinks links={getBacklinks(reply.postNumber)} />
                   </div>
@@ -449,6 +457,76 @@ export function ThreadClient({
         onClose={() => setQrOpen(false)}
         userRole={userRole}
       />
+
+      <SelectionQuotePopover
+        onQuote={(postNumber, selectedText) => handleQuote(postNumber, undefined, selectedText)}
+      />
+
+      {/* Mobile Floating Bottom Bar */}
+      {isMobile && (
+        <div className="fixed bottom-3 left-1/2 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 z-40 bg-card/90 backdrop-blur-md border border-border shadow-xl rounded-full px-2.5 py-1.5 flex items-center gap-1 overflow-x-auto">
+          <Link
+            href={`/${boardCode}`}
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 text-xs font-semibold whitespace-nowrap"
+            title="Kembali ke Board"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span>/{boardCode}/</span>
+          </Link>
+
+          <div className="w-[1px] h-4 bg-border shrink-0" />
+
+          <button
+            onClick={() => {
+              startTransition(() => {
+                router.refresh();
+              });
+            }}
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors shrink-0 cursor-pointer"
+            title="Segarkan Halaman"
+          >
+            <RefreshCw className={cn("h-4 w-4", isPending && "animate-spin")} />
+          </button>
+
+          <button
+            onClick={() => {
+              if (isWatched) {
+                unwatchThread(thread.id);
+              } else {
+                watchThread({
+                  id: thread.id,
+                  boardCode: boardCode,
+                  subject: thread.subject,
+                  lastReadReplyCount: replies.length,
+                  snippet: thread.content.substring(0, 50) + (thread.content.length > 50 ? "..." : "")
+                });
+              }
+            }}
+            className={cn(
+              "p-2 transition-colors shrink-0 cursor-pointer",
+              isWatched ? "text-accent" : "text-muted-foreground hover:text-foreground"
+            )}
+            title={isWatched ? "Berhenti pantau thread" : "Pantau thread"}
+          >
+            {isWatched ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+
+          {!thread.isLocked && (
+            <>
+              <div className="w-[1px] h-4 bg-border shrink-0" />
+              <Button
+                onClick={() => setQrOpen(true)}
+                size="sm"
+                className="h-8 px-3 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 flex items-center gap-1.5 text-xs font-bold shadow shrink-0 cursor-pointer"
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+                <span>Balas</span>
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+
       <div id="bottom" />
     </>
   );

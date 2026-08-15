@@ -5,6 +5,13 @@ import { X, GripHorizontal, Minimize2, Maximize2 } from "lucide-react";
 import { ReplyForm } from "./reply-form";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 interface QuickReplyProps {
   threadId: number;
@@ -28,6 +35,7 @@ export function QuickReply({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const qrRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   // Set initial position on mount (right side of screen)
   useEffect(() => {
@@ -66,7 +74,7 @@ export function QuickReply({
 
   // Handle dragging
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (qrRef.current) {
+    if (qrRef.current && !isMobile) {
       setIsDragging(true);
       const rect = qrRef.current.getBoundingClientRect();
       setDragOffset({
@@ -78,7 +86,7 @@ export function QuickReply({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && qrRef.current) {
+      if (isDragging && qrRef.current && !isMobile) {
         const newX = e.clientX - dragOffset.x;
         const newY = e.clientY - dragOffset.y;
 
@@ -108,9 +116,31 @@ export function QuickReply({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, dragOffset]);
+  }, [isDragging, dragOffset, isMobile]);
 
   if (!isOpen) return null;
+
+  if (isMobile) {
+    return (
+      <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DrawerContent className="px-4 pb-8 max-h-[95vh] overflow-y-auto">
+          <DrawerHeader className="px-0 pt-4 pb-2 border-b">
+            <DrawerTitle className="text-left font-bold text-accent">
+              Balasan Cepat
+            </DrawerTitle>
+          </DrawerHeader>
+          <div className="pt-4">
+            <ReplyForm
+              threadId={threadId}
+              boardCode={boardCode}
+              idPrefix="qr"
+              userRole={userRole}
+            />
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
 
   return (
     <div

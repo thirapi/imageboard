@@ -19,6 +19,7 @@ interface PostActionsProps {
   onHide: () => void;
   className?: string;
   isOP?: boolean;
+  onQuote?: () => void;
 }
 
 export function PostActions({
@@ -28,6 +29,7 @@ export function PostActions({
   onHide,
   className,
   isOP = false,
+  onQuote,
 }: PostActionsProps) {
   const [showDelete, setShowDelete] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -48,6 +50,15 @@ export function PostActions({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-36 rounded-sm border-muted/30 shadow-sm">
+          {onQuote && (
+            <>
+              <DropdownMenuItem onClick={onQuote} className="cursor-pointer text-xs py-1 text-accent font-semibold focus:text-accent">
+                Balas Postingan
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="my-0.5 opacity-50" />
+            </>
+          )}
+
           <DropdownMenuItem onClick={onHide} className="cursor-pointer text-xs py-1">
             Sembunyikan
           </DropdownMenuItem>
