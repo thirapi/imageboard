@@ -16,11 +16,13 @@ export function ScrollButtons() {
     const checkScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          // Hide when the reply drawer is open to avoid overlapping the sheet
+          // Hide when the reply drawer / thread floating bar is open to avoid overlap
           const drawerOpen = document.body.classList.contains("reply-drawer-open");
-          setShowTop(!drawerOpen && window.scrollY > 300);
+          const fabOpen = document.body.classList.contains("thread-fab-open");
+          setShowTop(!drawerOpen && !fabOpen && window.scrollY > 300);
           setShowBottom(
             !drawerOpen &&
+              !fabOpen &&
               window.innerHeight + window.scrollY <
                 document.documentElement.scrollHeight - 300
           );
@@ -60,13 +62,13 @@ export function ScrollButtons() {
   if (!showTop && !showBottom) return null;
 
   return (
-    <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-[calc(1rem+env(safe-area-inset-right,0px))] z-[90] flex flex-col gap-2 opacity-80 hover:opacity-100 transition-opacity focus-within:opacity-100 duration-300 pointer-events-none">
-      <div className="pointer-events-auto flex flex-col gap-2">
+    <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-[calc(1rem+env(safe-area-inset-right,0px))] z-[90] opacity-80 hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none">
+      <div className="pointer-events-auto flex flex-col gap-1 rounded-2xl border border-accent/30 bg-accent/10 p-1 shadow-lg backdrop-blur-md">
         {showTop && (
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            className="rounded bg-accent/10 backdrop-blur-sm border-accent text-accent hover:bg-accent/20 hover:border-accent hover:text-accent shadow-sm"
+            className="size-9 rounded-xl text-accent hover:bg-accent/15 hover:text-accent"
             onClick={scrollToTop}
             title="Ke Paling Atas"
           >
@@ -76,9 +78,9 @@ export function ScrollButtons() {
         )}
         {showBottom && (
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            className="rounded bg-accent/10 backdrop-blur-sm border-accent text-accent hover:bg-accent/20 hover:border-accent hover:text-accent shadow-sm"
+            className="size-9 rounded-xl text-accent hover:bg-accent/15 hover:text-accent"
             onClick={scrollToBottom}
             title="Ke Paling Bawah"
           >

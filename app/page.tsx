@@ -78,7 +78,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header
-        className="relative py-12 text-center overflow-hidden 
+        className="relative py-8 sm:py-10 text-center overflow-hidden 
              bg-gradient-to-b from-accent/15 to-transparent 
              dark:from-accent/5 dark:to-transparent"
       >
@@ -94,18 +94,15 @@ export default async function HomePage() {
 
       <AdBanner className="mt-2" />
 
-      <main className="container mx-auto px-4 py-8 flex-1 max-w-6xl">
+      <main className="container mx-auto px-4 py-6 sm:py-8 flex-1 max-w-6xl">
         <HomeAnnouncement announcements={announcements} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 md:gap-y-10">
           {categoryNames.map((categoryName) => (
-            <section
-              key={categoryName}
-              className="bg-card/30 p-4 rounded-lg border border-border/50 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none"
-            >
+              <section key={categoryName}>
               <h2 className="text-xl font-semibold mb-3 text-accent border-b pb-1">
                 {categoryName}
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-2 md:gap-y-1 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-2 md:gap-y-1 text-sm">
                 {groupedBoards.get(categoryName)!.map((board) => (
                   <div key={board.id} className="leading-relaxed">
                     <BoardLink

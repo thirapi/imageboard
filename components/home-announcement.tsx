@@ -62,7 +62,7 @@ export function HomeAnnouncement({ announcements }: HomeAnnouncementProps) {
                                 </p>
                             )}
 
-                            <p className="line-clamp-1 text-xs text-muted-foreground">
+                            <p className="line-clamp-3 text-xs text-muted-foreground sm:line-clamp-1">
                                 {announcement.content}
                             </p>
                         </div>

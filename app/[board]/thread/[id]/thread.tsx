@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useTransition } from "react";
 import { useHiding } from "@/hooks/use-hiding";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ChevronLeft, RefreshCw, MessageSquare } from "lucide-react";
+import { ChevronLeft, RefreshCw, MessageSquare, ArrowUp, ArrowDown } from "lucide-react";
 import { PostActions } from "@/components/post-actions";
 import { CapcodeMarker } from "@/components/capcode-marker";
 import { SelectionQuotePopover } from "@/components/selection-quote-popover";
@@ -69,6 +69,37 @@ export function ThreadClient({
   const { isReplyHidden, hideThread, hideReply, unhideReply, isLoaded } = useHiding();
   const [isPending, startTransition] = useTransition();
   const isMobile = useIsMobile();
+
+  const [fabCanScroll, setFabCanScroll] = useState(false);
+  const [fabAtTop, setFabAtTop] = useState(true);
+  const [fabAtBottom, setFabAtBottom] = useState(false);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    document.body.classList.add("thread-fab-open");
+    return () => document.body.classList.remove("thread-fab-open");
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const check = () => {
+      const scrollable =
+        document.documentElement.scrollHeight - window.innerHeight > 300;
+      setFabCanScroll(scrollable);
+      setFabAtTop(window.scrollY <= 300);
+      setFabAtBottom(
+        window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 300
+      );
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, [isMobile]);
 
   const isWatched = watchedThreads.some(t => t.id === thread.id);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
@@ -535,6 +566,38 @@ export function ThreadClient({
                 <MessageSquare className="h-3.5 w-3.5" />
                 <span>Balas</span>
               </Button>
+            </>
+          )}
+
+          {fabCanScroll && (
+            <>
+              <div className="w-[1px] h-4 bg-border shrink-0" />
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                disabled={fabAtTop}
+                className={cn(
+                  "p-2 transition-colors shrink-0 cursor-pointer",
+                  fabAtTop
+                    ? "text-muted-foreground/40 cursor-default pointer-events-none"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Ke Atas"
+              >
+                <ArrowUp className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })}
+                disabled={fabAtBottom}
+                className={cn(
+                  "p-2 transition-colors shrink-0 cursor-pointer",
+                  fabAtBottom
+                    ? "text-muted-foreground/40 cursor-default pointer-events-none"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Ke Bawah"
+              >
+                <ArrowDown className="h-4 w-4" />
+              </button>
             </>
           )}
         </div>
