@@ -89,7 +89,7 @@ async function BoardContent({
           : "px-4 md:px-8 max-w-none",
       )}
     >
-      <div className="flex flex-col items-center mb-12">
+      <div className="flex flex-col items-center mb-1 sm:mb-4">
         <div className="w-full max-w-2xl">
           <ThreadForm
             boardId={board.id}
@@ -99,12 +99,12 @@ async function BoardContent({
         </div>
       </div>
 
-      <div className="pt-2">
-        <div className="flex flex-row items-center justify-between gap-2 mb-4 py-2 border-y font-mono text-xs w-full">
-          <div className="flex-1">
+      <div className="pt-0">
+        <div className="flex flex-col gap-2 mb-4 py-2 border-y font-mono text-xs w-full sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:flex-1">
             <BoardSearch />
           </div>
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center justify-between gap-2 shrink-0 sm:justify-end">
             <BoardSort />
             <BoardViewToggle />
           </div>
@@ -191,11 +191,14 @@ export default async function BoardPage({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="py-12 px-4 text-center border-b mb-8 flex flex-col items-center bg-muted/5">
-        <h1 className="text-3xl sm:text-4xl font-bold text-accent mb-2 tracking-tight truncate max-w-full">
-          /{board.code}/ - {board.name}
+      <header className="py-6 sm:py-12 px-3 sm:px-4 text-center border-b mb-1 sm:mb-4 flex flex-col items-center bg-muted/5">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-accent tracking-tight">
+          /{board.code}/
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground italic max-w-2xl line-clamp-2">
+        <p className="text-sm text-foreground/80 font-medium max-w-2xl line-clamp-2 mt-0.5">
+          {board.name}
+        </p>
+        <p className="text-xs sm:text-sm text-muted-foreground italic max-w-2xl line-clamp-2 mt-1">
           {board.description}
         </p>
       </header>

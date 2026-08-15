@@ -110,7 +110,7 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
 
         {/* Reply Previews - Moved inside to allow flow around OP image */}
         {thread.replies && thread.replies.length > 0 && (
-          <div className="mt-1 space-y-1">
+          <div className="mt-1 space-y-1 clear-both sm:clear-none">
             {thread.replies
               .slice()
               .reverse()
@@ -123,7 +123,7 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
                   </span>
                   <div
                     id={`p${reply.postNumber}`}
-                    className="ib-reply shadow-sm border border-muted/20 table max-w-none scroll-mt-14"
+                    className="ib-reply shadow-sm border border-muted/20 flex-1 min-w-0 max-w-full sm:flex-none sm:table sm:max-w-none sm:w-auto scroll-mt-14"
                   >
                     <div className="ib-post-metaline text-xs px-2 pt-1 border-b border-muted/5 bg-muted/5">
                       <div className="flex items-baseline gap-1">
@@ -154,7 +154,7 @@ export function ThreadListItem({ thread, boardCode }: ThreadListItemProps) {
                         </Link>
                       </span>
                     </div>
-                    <div className="p-1 px-2 block overflow-hidden">
+                    <div className="p-1 px-2 block overflow-hidden break-words">
                       {reply.image && (
                         <ExpandableImage
                           src={reply.image}

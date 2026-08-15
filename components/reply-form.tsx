@@ -18,6 +18,7 @@ import { useReply } from "./reply-context";
 import { useThreadWatcher } from "./thread-watcher-provider";
 import posthog from "posthog-js";
 import { uploadImageClient } from "@/lib/utils/cloudinary-client";
+import { PostFormRow } from "./post-form-row";
 
 interface ReplyFormProps {
   threadId: number;
@@ -134,68 +135,49 @@ export function ReplyForm({
 
   return (
     <div className="w-full">
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-2">
         {error && (
           <div className="text-xs text-destructive bg-destructive/10 p-2 rounded border border-destructive/20">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <div className="space-y-1">
-            <Label
-              htmlFor={`${prefix}reply-author`}
-              className="text-[10px] font-bold opacity-60"
-            >
-              Nama
-            </Label>
-            <Input
-              id={`${prefix}reply-author`}
-              name="author"
-              placeholder="Awanama"
-              maxLength={100}
-              className="h-7 text-xs bg-muted/10 border-muted/30"
-              value={state.author}
-              onChange={(e) => setAuthor(e.target.value)}
-            />
-          </div>
-          <div className="space-y-1 md:col-span-2">
-            <Label
-              htmlFor={`${prefix}reply-deletionPassword`}
-              className="text-[10px] font-bold opacity-60"
-            >
-              Sandi Penghapusan
-            </Label>
-            <div className="relative">
-              <Input
-                id={`${prefix}reply-deletionPassword`}
-                name="deletionPassword"
-                type={showPassword ? "text" : "password"}
-                placeholder="Default password"
-                maxLength={255}
-                className="h-7 text-xs bg-muted/10 border-muted/30 pr-8"
-                value={state.deletionPassword}
-                onChange={(e) => setDeletionPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-              </button>
-            </div>
-          </div>
-        </div>
+        <PostFormRow label="Nama" htmlFor={`${prefix}reply-author`}>
+          <Input
+            id={`${prefix}reply-author`}
+            name="author"
+            placeholder="Awanama"
+            maxLength={100}
+            className="h-8 text-xs bg-muted/10 border-muted/30"
+            value={state.author}
+            onChange={(e) => setAuthor(e.target.value)}
+          />
+        </PostFormRow>
 
-        <div className="space-y-1">
-          <Label
-            htmlFor={`${prefix}reply-content`}
-            className="text-[10px] font-bold opacity-60"
-          >
-            Balasan
-          </Label>
+        <PostFormRow label="Sandi" htmlFor={`${prefix}reply-deletionPassword`}>
+          <div className="relative">
+            <Input
+              id={`${prefix}reply-deletionPassword`}
+              name="deletionPassword"
+              type={showPassword ? "text" : "password"}
+              placeholder="Default password"
+              maxLength={255}
+              className="h-8 text-xs bg-muted/10 border-muted/30 pr-8"
+              value={state.deletionPassword}
+              onChange={(e) => setDeletionPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+            </button>
+          </div>
+        </PostFormRow>
+
+        <PostFormRow label="Balasan" htmlFor={`${prefix}reply-content`}>
           <div className="relative">
             <Textarea
               id={`${prefix}reply-content`}
@@ -212,91 +194,90 @@ export function ReplyForm({
               {state.content.length}/2000
             </div>
           </div>
-        </div>
+        </PostFormRow>
 
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <Label
-              htmlFor={`${prefix}reply-captcha`}
-              className="text-[10px] font-bold opacity-60"
-            >
-              Verifikasi: {captchaQuestion || "Memuat..."}
-            </Label>
-            <button
-              type="button"
-              onClick={refreshCaptcha}
-              className="text-[9px] text-accent hover:underline flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
-              title="Segarkan CAPTCHA"
-            >
-              <RefreshCcw className="h-2 w-2" />
-              Ganti
-            </button>
-          </div>
-          <Input
-            id={`${prefix}reply-captcha`}
-            name="captcha"
-            placeholder="Jawaban..."
-            required
-            className="h-7 text-xs bg-muted/10 border-muted/30 w-28"
-            value={captcha}
-            onChange={(e) => setLocalCaptcha(e.target.value)}
-          />
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
-          <div className="w-full sm:w-auto">
-            <ImageUploader
-              onImageSelect={setImageFile}
-              selectedFile={state.imageFile}
-              maxSizeMB={10}
-              resetTrigger={resetTrigger}
-            />
-
-            <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-2 text-xs">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`${prefix}isNsfw`}
-                  name="isNsfw"
-                  checked={state.isNsfw}
-                  onCheckedChange={(val) => setIsNsfw(!!val)}
-                />
-                <Label
-                  htmlFor={`${prefix}isNsfw`}
-                  className="text-xs text-destructive flex items-center gap-1 cursor-pointer font-medium"
-                >
-                  NSFW
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`${prefix}isSpoiler`}
-                  name="isSpoiler"
-                  checked={state.isSpoiler}
-                  onCheckedChange={(val) => setIsSpoiler(!!val)}
-                />
-                <Label
-                  htmlFor={`${prefix}isSpoiler`}
-                  className="text-xs text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer font-medium"
-                >
-                  Spoiler
-                </Label>
-              </div>
-
-              {userRole && (userRole === "admin" || userRole === "moderator") && (
-                <div className="flex items-center space-x-2">
-                  <Checkbox id={`${prefix}withCapcode`} name="withCapcode" />
-                  <Label
-                    htmlFor={`${prefix}withCapcode`}
-                    className="text-xs text-accent flex items-center gap-1 cursor-pointer font-medium"
-                  >
-                    Capcode ({userRole})
-                  </Label>
-                </div>
-              )}
+        <PostFormRow label="Verifikasi" htmlFor={`${prefix}reply-captcha`}>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] opacity-70 truncate">
+                {captchaQuestion || "Memuat..."}
+              </span>
+              <button
+                type="button"
+                onClick={refreshCaptcha}
+                className="text-[9px] text-accent hover:underline flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity shrink-0"
+                title="Segarkan CAPTCHA"
+              >
+                <RefreshCcw className="h-2 w-2" />
+                Ganti
+              </button>
             </div>
+            <Input
+              id={`${prefix}reply-captcha`}
+              name="captcha"
+              placeholder="Jawaban..."
+              required
+              className="h-8 text-xs bg-muted/10 border-muted/30 w-32"
+              value={captcha}
+              onChange={(e) => setLocalCaptcha(e.target.value)}
+            />
           </div>
+        </PostFormRow>
 
+        <PostFormRow label="Gambar">
+          <ImageUploader
+            onImageSelect={setImageFile}
+            selectedFile={state.imageFile}
+            maxSizeMB={10}
+            resetTrigger={resetTrigger}
+            hideLabel={true}
+          />
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-2 text-xs">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`${prefix}isNsfw`}
+                name="isNsfw"
+                checked={state.isNsfw}
+                onCheckedChange={(val) => setIsNsfw(!!val)}
+              />
+              <Label
+                htmlFor={`${prefix}isNsfw`}
+                className="text-xs text-destructive flex items-center gap-1 cursor-pointer font-medium"
+              >
+                NSFW
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`${prefix}isSpoiler`}
+                name="isSpoiler"
+                checked={state.isSpoiler}
+                onCheckedChange={(val) => setIsSpoiler(!!val)}
+              />
+              <Label
+                htmlFor={`${prefix}isSpoiler`}
+                className="text-xs text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer font-medium"
+              >
+                Spoiler
+              </Label>
+            </div>
+
+            {userRole && (userRole === "admin" || userRole === "moderator") && (
+              <div className="flex items-center space-x-2">
+                <Checkbox id={`${prefix}withCapcode`} name="withCapcode" />
+                <Label
+                  htmlFor={`${prefix}withCapcode`}
+                  className="text-xs text-accent flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  Capcode ({userRole})
+                </Label>
+              </div>
+            )}
+          </div>
+        </PostFormRow>
+
+        <div className="flex justify-end pt-1">
           <Button
             type="submit"
             disabled={isSubmitting}
@@ -306,7 +287,7 @@ export function ReplyForm({
           </Button>
         </div>
 
-        <div className="mt-3 pt-2 border-t border-muted/10">
+        <div className="mt-2 pt-2 border-t border-muted/10">
           <div className="flex items-center justify-between gap-2">
             <button
               type="button"

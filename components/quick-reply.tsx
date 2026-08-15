@@ -129,7 +129,7 @@ export function QuickReply({
               Balasan Cepat
             </DrawerTitle>
           </DrawerHeader>
-          <div className="pt-3 overflow-y-auto max-h-[70vh]">
+          <div className="px-3 pt-3 overflow-y-auto max-h-[70vh]">
             <ReplyForm
               threadId={threadId}
               boardCode={boardCode}
@@ -152,7 +152,7 @@ export function QuickReply({
         zIndex: 50,
       }}
       className={cn(
-        "w-[calc(100vw-1rem)] sm:w-[400px] max-w-[400px] bg-card border shadow-2xl rounded-xl overflow-hidden transition-shadow duration-300",
+        "w-[calc(100vw-1rem)] sm:w-[400px] max-w-[400px] bg-background border shadow-lg rounded-md overflow-hidden transition-shadow duration-300",
         isDragging ? "shadow-blue-500/20 ring-1 ring-primary/20" : "",
         isMinimized ? "h-auto" : "max-h-[90vh] overflow-y-auto",
       )}

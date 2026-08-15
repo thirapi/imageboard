@@ -22,6 +22,10 @@ export function AdBanner({
   format = "auto", 
   responsive = true 
 }: AdBannerProps) {
+  // Kill-switch: iklan hanya tampil bila env NEXT_PUBLIC_ADS_ENABLED="true".
+  // Default (tidak diset) => banner disembunyikan di seluruh situs.
+  if (process.env.NEXT_PUBLIC_ADS_ENABLED !== "true") return null;
+
   const adRef = useRef<HTMLElement>(null);
 
   useEffect(() => {

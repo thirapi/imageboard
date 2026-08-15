@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Plus, ChevronUp, RefreshCcw, Eye, EyeOff } from "lucide-react";
+import { Send, ChevronUp, RefreshCcw, Eye, EyeOff, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createThread, getCaptcha } from "@/lib/actions/thread.actions";
 import { ImageUploader } from "./image-uploader";
@@ -15,6 +15,8 @@ import posthog from "posthog-js";
 import { useThreadWatcher } from "./thread-watcher-provider";
 import { uploadImageClient } from "@/lib/utils/cloudinary-client";
 import { useDefaultPassword } from "@/hooks/use-default-password";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { PostFormRow } from "./post-form-row";
 
 interface ThreadFormProps {
   boardId: number;
@@ -33,6 +35,7 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const { addMyPost } = useThreadWatcher();
+  const isMobile = useIsMobile();
 
   const [content, setContent] = useState("");
   const [password, setPassword] = useDefaultPassword();
@@ -44,8 +47,11 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
     const savedState = localStorage.getItem(`threadForm_expanded_${boardCode}`);
     if (savedState !== null) {
       setIsExpanded(savedState === "true");
+    } else {
+      // Collapsed by default on mobile to keep the thread list unobstructed
+      setIsExpanded(!isMobile);
     }
-  }, [boardCode]);
+  }, [boardCode, isMobile]);
 
   const toggleExpand = () => {
     const newState = !isExpanded;
@@ -60,6 +66,13 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
     } catch (err) {
       console.error("Failed to load captcha", err);
     }
+  };
+
+  const handleClear = () => {
+    setContent("");
+    setImageFile(null);
+    formRef.current?.reset();
+    setResetTrigger((prev) => prev + 1);
   };
 
   useEffect(() => {
@@ -135,20 +148,47 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
 
   if (!isExpanded) {
     return (
-      <div className="text-center py-4">
-        <button
-          onClick={toggleExpand}
-          className="text-lg font-bold text-accent hover:underline cursor-pointer inline-flex items-center gap-1 group"
-        >
-          [ <Plus className="h-4 w-4 group-hover:rotate-90 transition-transform" /> Mulai Utas Baru ]
-        </button>
-      </div>
+      <span
+        id="PostAreaToggle"
+        role="button"
+        tabIndex={0}
+        onClick={toggleExpand}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleExpand();
+          }
+        }}
+        className="group block w-fit mx-auto my-1 cursor-pointer select-none"
+      >
+        <span className="text-[22px] font-bold text-foreground/80 group-hover:text-accent transition-colors">
+          [<a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              toggleExpand();
+            }}
+            className="no-underline text-[22px] font-bold text-foreground/80 group-hover:text-accent transition-colors"
+          >
+            <label
+              htmlFor="PostAreaToggle"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleExpand();
+              }}
+              className="cursor-pointer"
+            >
+              Mulai Utas Baru
+            </label>
+          </a>]
+        </span>
+      </span>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto transition-all">
-      <div className="bg-card border border-accent/20 rounded-xl overflow-hidden shadow-sm">
+      <div className="max-w-2xl mx-auto transition-all">
+        <div className="bg-background border border-muted/30 rounded-md overflow-hidden">
         {/* Header with Close Button */}
         <div className="px-4 py-2 border-b border-muted/10 bg-muted/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -164,44 +204,34 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
           </button>
         </div>
 
-        <form ref={formRef} onSubmit={handleSubmit} className="p-4 space-y-3">
+        <form ref={formRef} onSubmit={handleSubmit} className="p-4 space-y-2">
           {error && (
             <div className="text-sm text-destructive bg-destructive/10 p-2 rounded-lg border border-destructive/20">
               {error}
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="author" className="text-xs font-bold opacity-70">
-                Nama
-              </Label>
-              <Input
-                id="author"
-                name="author"
-                placeholder="Awanama"
-                maxLength={100}
-                className="bg-muted/30 focus-visible:ring-accent h-9 text-sm"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="subject" className="text-xs font-bold opacity-70">
-                Subjek
-              </Label>
-              <Input
-                id="subject"
-                name="subject"
-                placeholder="(Opsional)"
-                maxLength={200}
-                className="bg-muted/30 focus-visible:ring-accent h-9 text-sm"
-              />
-            </div>
-          </div>
+          <PostFormRow label="Nama" htmlFor="author">
+            <Input
+              id="author"
+              name="author"
+              placeholder="Awanama"
+              maxLength={100}
+              className="bg-muted/30 focus-visible:ring-accent h-8 text-sm"
+            />
+          </PostFormRow>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="content" className="text-xs font-bold opacity-70">
-              Pesan
-            </Label>
+          <PostFormRow label="Subjek" htmlFor="subject">
+            <Input
+              id="subject"
+              name="subject"
+              placeholder="(Opsional)"
+              maxLength={200}
+              className="bg-muted/30 focus-visible:ring-accent h-8 text-sm"
+            />
+          </PostFormRow>
+
+          <PostFormRow label="Pesan" htmlFor="content">
             <div className="relative">
               <Textarea
                 id="content"
@@ -218,22 +248,16 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
                 {content.length}/2000
               </div>
             </div>
-          </div>
+          </PostFormRow>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold opacity-70">
-                  Gambar <span className="text-accent">(WAJIB)</span>
-                </Label>
-                <ImageUploader
-                  onImageSelect={setImageFile}
-                  maxSizeMB={10}
-                  resetTrigger={resetTrigger}
-                  hideLabel={true}
-                />
-              </div>
-
+          <PostFormRow label="Gambar">
+            <div className="space-y-2">
+              <ImageUploader
+                onImageSelect={setImageFile}
+                maxSizeMB={10}
+                resetTrigger={resetTrigger}
+                hideLabel={true}
+              />
               <div className="flex flex-wrap gap-x-4 gap-y-2">
                 <div className="flex items-center space-x-2.5">
                   <Checkbox id="isNsfw" name="isNsfw" />
@@ -251,72 +275,82 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
                 )}
               </div>
             </div>
+          </PostFormRow>
 
-            <div className="space-y-3 flex flex-col justify-between">
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1.5">
-                  <Label htmlFor="deletionPassword" className="text-xs font-bold opacity-70">
-                    Sandi Penghapusan
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="deletionPassword"
-                      name="deletionPassword"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Untuk hapus nanti"
-                      className="bg-muted/30 focus-visible:ring-accent h-8 text-xs pr-8"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-1.5 min-w-[120px]">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="captcha" className="text-[10px] font-bold opacity-70">
-                      Verifikasi: {captchaQuestion || "..."}
-                    </Label>
-                    <button
-                      type="button"
-                      onClick={refreshCaptcha}
-                      className="text-[10px] text-accent hover:underline flex items-center gap-0.5 opacity-60"
-                      title="Ganti Pertanyaan"
-                    >
-                      <RefreshCcw className="h-2.5 w-2.5" />
-                    </button>
-                  </div>
-                  <Input
-                    id="captcha"
-                    name="captcha"
-                    placeholder="Jawaban..."
-                    required
-                    className="bg-muted/30 focus-visible:ring-accent h-8 text-xs font-mono"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-6 font-bold text-base shadow-md group"
+          <PostFormRow label="Sandi" htmlFor="deletionPassword">
+            <div className="relative">
+              <Input
+                id="deletionPassword"
+                name="deletionPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Untuk hapus nanti"
+                className="bg-muted/30 focus-visible:ring-accent h-8 text-xs pr-8"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                tabIndex={-1}
               >
-                {isSubmitting ? (
-                  "Mengirim..."
-                ) : (
-                  <>
-                    Posting Baru
-                    <Send className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </Button>
+                {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              </button>
             </div>
+          </PostFormRow>
+
+          <PostFormRow label="Verifikasi" htmlFor="captcha">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] opacity-70 truncate">
+                  {captchaQuestion || "..."}
+                </span>
+                <button
+                  type="button"
+                  onClick={refreshCaptcha}
+                  className="text-[10px] text-accent hover:underline flex items-center gap-0.5 opacity-60 shrink-0"
+                  title="Ganti Pertanyaan"
+                >
+                  <RefreshCcw className="h-2.5 w-2.5" />
+                </button>
+              </div>
+              <Input
+                id="captcha"
+                name="captcha"
+                placeholder="Jawaban..."
+                required
+                className="bg-muted/30 focus-visible:ring-accent h-8 text-xs font-mono w-32"
+              />
+            </div>
+          </PostFormRow>
+
+          <div className="flex justify-end pt-1">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-48 h-9 text-sm font-bold group"
+            >
+              {isSubmitting ? (
+                "Mengirim..."
+              ) : (
+                <>
+                  Posting Baru
+                  <Send className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </Button>
+          </div>
+
+          <div className="mt-2 pt-2 border-t border-muted/10 flex items-center justify-end">
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-[10px] text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors"
+              title="Bersihkan isi utas"
+            >
+              <X className="h-3 w-3" />
+              [ Bersihkan ]
+            </button>
           </div>
         </form>
       </div>
