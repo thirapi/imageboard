@@ -15,7 +15,7 @@ export function NavWrapper({ children }: { children: React.ReactNode }) {
   return (
     <nav
       className={cn(
-        "border-b px-3 sm:px-4 py-1 text-[11px] font-mono bg-muted/30",
+        "border-b px-3 sm:px-4 pt-[calc(env(safe-area-inset-top)+0.375rem)] pb-1.5 text-[11px] font-mono bg-muted/30",
         mounted && position === "sticky"
           ? "sticky top-0 z-50 backdrop-blur-md bg-muted/80"
           : ""

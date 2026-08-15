@@ -33,7 +33,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { logout } from "@/lib/actions/auth.actions";
 
 interface NavControlsProps {
@@ -52,7 +52,6 @@ export function NavControls({ user }: NavControlsProps) {
   } = useNav();
   const { toggleWatcher, watchedThreads } = useThreadWatcher();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const handleRefresh = () => {
@@ -60,14 +59,6 @@ export function NavControls({ user }: NavControlsProps) {
       router.refresh();
     });
   };
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <div className="h-6 w-20" />;
-  }
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-3">

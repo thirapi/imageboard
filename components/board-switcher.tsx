@@ -24,10 +24,10 @@ export function BoardSwitcher({ boards }: BoardSwitcherProps) {
   return (
     <div className="flex items-center gap-1 min-w-0">
       {/* Mobile/Compact View: Dropdown */}
-      <div className="flex sm:hidden items-center">
+        <div className="flex sm:hidden items-center flex-shrink-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 px-1.5 py-1 hover:bg-accent/10 rounded-md transition-colors text-accent font-bold cursor-pointer text-[10px] sm:text-[11px]">
+              <button className="flex items-center gap-1 px-1.5 py-1 hover:bg-accent/10 rounded-md transition-colors text-accent font-bold cursor-pointer text-[10px] sm:text-[11px] flex-shrink-0">
               <LayoutGrid className="size-3.5" />
               <span>Boards</span>
               <ChevronDown className="size-3 opacity-50" />
