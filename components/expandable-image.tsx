@@ -83,6 +83,19 @@ export function ExpandableImage({
         </span>
         
         <div className="flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity ml-auto sm:ml-0">
+          {(isNsfw || isSpoiler) && !isHidden && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isNsfw) setShowNsfw(false);
+                if (isSpoiler) setShowSpoiler(false);
+              }}
+              className="hover:text-destructive hover:underline text-[10px]"
+              title="Sensor kembali gambar ini"
+            >
+              [{isNsfw ? "hide nsfw" : "hide spoiler"}]
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();

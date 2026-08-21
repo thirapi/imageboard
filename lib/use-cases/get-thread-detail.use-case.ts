@@ -56,6 +56,7 @@ export class GetThreadDetailUseCase {
       isDeleted: r.isDeleted,
       isNsfw: r.isNsfw,
       isSpoiler: r.isSpoiler,
+      isSage: r.isSage,
       image: r.image,
       imageMetadata: r.imageMetadata,
       postNumber: r.postNumber,

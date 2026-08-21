@@ -12,6 +12,7 @@ import type { PostInfoEntity } from "@/lib/entities/post.entity";
 import { cn } from "@/lib/utils";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import { getThumbnailUrl } from "@/lib/utils/image";
+import { EMOJI_MAP } from "@/constants/custom-emojis";
 
 interface FormattedTextProps {
   content: string;
@@ -88,13 +89,13 @@ function TextLine({
   const isCrossBoardLink = /^>>>\/[a-zA-Z0-9_-]+\/?/.test(text);
   const isGreentext = text.startsWith(">") && !isPostQuote && !isCrossBoardLink;
 
-  // Parse for quotes, spoilers, and URLs
+  // Parse for quotes, spoilers, emojis, and URLs
   const parts = [];
   let lastIndex = 0;
 
-  // Regex for >>>/board/, >>123, URLs, and various formatting tags
+  // Regex for >>>/board/, >>123, emojis ::name::, URLs, and various formatting tags
   const regex =
-    />>>\/([a-zA-Z0-9_-]+)\/?|>>(\d+)|\[spoiler\](.*?)\[\/spoiler\]|(https?:\/\/[^\s]+)|(www\.[^\s]+)|\[b\](.*?)\[\/b\]|\[i\](.*?)\[\/i\]|\[u\](.*?)\[\/u\]|\[s\](.*?)\[\/s\]|\[code\](.*?)\[\/code\]/g;
+    />>>\/([a-zA-Z0-9_-]+)\/?|>>(\d+)|::([a-zA-Z0-9_-]+)::|\[spoiler\](.*?)\[\/spoiler\]|(https?:\/\/[^\s]+)|(www\.[^\s]+)|\[b\](.*?)\[\/b\]|\[i\](.*?)\[\/i\]|\[u\](.*?)\[\/u\]|\[s\](.*?)\[\/s\]|\[code\](.*?)\[\/code\]/g;
   let match;
 
   while ((match = regex.exec(text)) !== null) {
@@ -128,6 +129,24 @@ function TextLine({
         />,
       );
     } else if (match[3]) {
+      // It's a custom emoji/GIF via ::name::
+      const emojiName = match[3];
+      const emojiUrl = EMOJI_MAP.get(emojiName.toLowerCase());
+      if (emojiUrl) {
+        parts.push(
+          <img
+            key={match.index}
+            src={emojiUrl}
+            alt={emojiName}
+            title={`:${emojiName}:`}
+            className="ib-emoji"
+          />,
+        );
+      } else {
+        // Not a registered emoji, leave as raw text
+        parts.push(match[0]);
+      }
+    } else if (match[4]) {
       // It's a spoiler
       if (preview) {
         parts.push(
@@ -138,13 +157,13 @@ function TextLine({
       } else {
         parts.push(
           <span key={match.index} className="spoiler">
-            {match[3]}
+            {match[4]}
           </span>,
         );
       }
-    } else if (match[4]) {
+    } else if (match[5]) {
       // It's a URL with http:// or https://
-      const url = match[4];
+      const url = match[5];
       const videoId = getYouTubeId(url);
 
       if (videoId && !disableEmbeds && !preview) {
@@ -168,9 +187,9 @@ function TextLine({
           </a>,
         );
       }
-    } else if (match[5]) {
+    } else if (match[6]) {
       // It's a URL starting with www.
-      const url = match[5];
+      const url = match[6];
       const fullUrl = `https://${url}`;
       const videoId = getYouTubeId(fullUrl);
 
@@ -195,26 +214,26 @@ function TextLine({
           </a>,
         );
       }
-    } else if (match[6]) {
-      // [b] Bold
-      parts.push(<strong key={match.index}>{match[6]}</strong>);
     } else if (match[7]) {
-      // [i] Italic
-      parts.push(<em key={match.index}>{match[7]}</em>);
+      // [b] Bold
+      parts.push(<strong key={match.index}>{match[7]}</strong>);
     } else if (match[8]) {
-      // [u] Underline
-      parts.push(<u key={match.index}>{match[8]}</u>);
+      // [i] Italic
+      parts.push(<em key={match.index}>{match[8]}</em>);
     } else if (match[9]) {
-      // [s] Strikethrough
-      parts.push(<s key={match.index}>{match[9]}</s>);
+      // [u] Underline
+      parts.push(<u key={match.index}>{match[9]}</u>);
     } else if (match[10]) {
+      // [s] Strikethrough
+      parts.push(<s key={match.index}>{match[10]}</s>);
+    } else if (match[11]) {
       // [code] Code
       parts.push(
         <code 
           key={match.index} 
           className="bg-muted px-1.5 py-0.5 rounded text-[0.9em] font-mono border border-muted-foreground/10"
         >
-          {match[10]}
+          {match[11]}
         </code>
       );
     }

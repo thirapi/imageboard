@@ -10,6 +10,7 @@ export interface CreateReplyRequest {
   deletionPassword?: string
   isNsfw?: boolean
   isSpoiler?: boolean
+  isSage?: boolean
   ipAddress?: string
   capcode?: string | null
 }
@@ -38,6 +39,7 @@ export class ReplyController {
       deletionPassword: request.deletionPassword,
       isNsfw: request.isNsfw,
       isSpoiler: request.isSpoiler,
+      isSage: request.isSage,
       ipAddress: request.ipAddress,
       capcode: request.capcode
     })

@@ -325,6 +325,7 @@ export class ThreadRepository {
         isDeleted: replies.isDeleted,
         isNsfw: replies.isNsfw,
         isSpoiler: replies.isSpoiler,
+        isSage: replies.isSage,
         createdAt: replies.createdAt,
         postNumber: replies.postNumber,
         ipAddress: replies.ipAddress,

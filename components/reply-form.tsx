@@ -19,6 +19,7 @@ import { useThreadWatcher } from "./thread-watcher-provider";
 import posthog from "posthog-js";
 import { uploadImageClient } from "@/lib/utils/cloudinary-client";
 import { PostFormRow } from "./post-form-row";
+import { EmojiPicker } from "./emoji-picker";
 
 interface ReplyFormProps {
   threadId: number;
@@ -52,6 +53,7 @@ export function ReplyForm({
     setImageFile,
     setIsNsfw,
     setIsSpoiler,
+    setIsSage,
     resetForm,
   } = useReply();
 
@@ -179,19 +181,32 @@ export function ReplyForm({
 
         <PostFormRow label="Balasan" htmlFor={`${prefix}reply-content`}>
           <div className="relative">
-            <Textarea
-              id={`${prefix}reply-content`}
-              name="content"
-              placeholder="Ketik balasan Anda..."
-              required
-              rows={4}
-              maxLength={2000}
-              className="text-xs bg-muted/10 border-muted/30 focus-visible:ring-accent resize-y pr-12"
-              value={state.content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-            <div className="absolute bottom-1 right-2 text-[9px] font-mono text-muted-foreground/50 pointer-events-none">
-              {state.content.length}/2000
+            <div className="relative">
+              <Textarea
+                id={`${prefix}reply-content`}
+                name="content"
+                placeholder="Ketik balasan Anda..."
+                required
+                rows={4}
+                maxLength={2000}
+                className="text-xs bg-muted/10 border-muted/30 focus-visible:ring-accent resize-y pr-8"
+                value={state.content}
+                onChange={(e) => setContent(e.target.value)}
+              />
+              <div className="absolute bottom-1 right-1 flex items-center gap-1">
+                <div className="text-[9px] font-mono text-muted-foreground/50 pointer-events-none">
+                  {state.content.length}/2000
+                </div>
+                <EmojiPicker
+                  onSelect={(tag) => {
+                    setContent((prev) => prev + tag + " ");
+                    const textarea = document.getElementById(`${prefix}reply-content`) as HTMLTextAreaElement;
+                    if (textarea) {
+                      textarea.focus();
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
         </PostFormRow>
@@ -242,7 +257,7 @@ export function ReplyForm({
               />
               <Label
                 htmlFor={`${prefix}isNsfw`}
-                className="text-xs text-destructive flex items-center gap-1 cursor-pointer font-medium"
+                className="text-xs text-foreground flex items-center gap-1 cursor-pointer font-medium"
               >
                 NSFW
               </Label>
@@ -257,9 +272,24 @@ export function ReplyForm({
               />
               <Label
                 htmlFor={`${prefix}isSpoiler`}
-                className="text-xs text-yellow-600 dark:text-yellow-500 flex items-center gap-1 cursor-pointer font-medium"
+                className="text-xs text-foreground flex items-center gap-1 cursor-pointer font-medium"
               >
                 Spoiler
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`${prefix}isSage`}
+                name="isSage"
+                checked={state.isSage}
+                onCheckedChange={(val) => setIsSage(!!val)}
+              />
+              <Label
+                htmlFor={`${prefix}isSage`}
+                className="text-xs text-foreground flex items-center gap-1 cursor-pointer font-medium"
+              >
+                Sage
               </Label>
             </div>
 
@@ -268,7 +298,7 @@ export function ReplyForm({
                 <Checkbox id={`${prefix}withCapcode`} name="withCapcode" />
                 <Label
                   htmlFor={`${prefix}withCapcode`}
-                  className="text-xs text-accent flex items-center gap-1 cursor-pointer font-medium"
+                  className="text-xs text-foreground flex items-center gap-1 cursor-pointer font-medium"
                 >
                   Capcode ({userRole})
                 </Label>

@@ -35,6 +35,7 @@ export async function createReply(formData: FormData) {
     const deletionPassword = formData.get("deletionPassword") as string
     const isNsfw = formData.get("isNsfw") === "on"
     const isSpoiler = formData.get("isSpoiler") === "on"
+    const isSage = formData.get("isSage") === "on"
     const withCapcode = formData.get("withCapcode") === "on"
 
     let userRole: string | undefined
@@ -62,6 +63,7 @@ export async function createReply(formData: FormData) {
       deletionPassword,
       isNsfw,
       isSpoiler,
+      isSage,
       ipAddress,
       capcode: userRole,
     })

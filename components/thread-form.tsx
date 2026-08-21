@@ -17,6 +17,7 @@ import { uploadImageClient } from "@/lib/utils/cloudinary-client";
 import { useDefaultPassword } from "@/hooks/use-default-password";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PostFormRow } from "./post-form-row";
+import { EmojiPicker } from "./emoji-picker";
 
 interface ThreadFormProps {
   boardId: number;
@@ -240,12 +241,21 @@ export function ThreadForm({ boardId, boardCode, userRole }: ThreadFormProps) {
                 required
                 rows={5}
                 maxLength={2000}
-                className="bg-muted/30 focus-visible:ring-accent resize-y min-h-[120px] text-sm"
+                className="bg-muted/30 focus-visible:ring-accent resize-y min-h-[120px] text-sm pr-8"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
-              <div className="absolute bottom-2 right-2 text-[10px] font-mono text-muted-foreground opacity-50">
-                {content.length}/2000
+              <div className="absolute bottom-2 right-2 flex items-center gap-1">
+                <div className="text-[10px] font-mono text-muted-foreground opacity-50">
+                  {content.length}/2000
+                </div>
+                <EmojiPicker
+                  onSelect={(tag) => {
+                    setContent((prev) => prev + tag + " ");
+                    const textarea = document.getElementById("content") as HTMLTextAreaElement;
+                    if (textarea) textarea.focus();
+                  }}
+                />
               </div>
             </div>
           </PostFormRow>

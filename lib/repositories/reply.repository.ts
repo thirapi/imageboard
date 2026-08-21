@@ -17,6 +17,7 @@ export class ReplyRepository {
         deletionPassword: input.deletionPassword ?? null,
         isNsfw: input.isNsfw ?? false,
         isSpoiler: input.isSpoiler ?? false,
+        isSage: input.isSage ?? false,
         postNumber: input.postNumber,
         ipAddress: input.ipAddress ?? null,
         capcode: input.capcode ?? null,
@@ -43,6 +44,7 @@ export class ReplyRepository {
       deletionPassword: input.deletionPassword ?? null,
       isNsfw: input.isNsfw ?? false,
       isSpoiler: input.isSpoiler ?? false,
+      isSage: input.isSage ?? false,
       postNumber: input.postNumber,
       ipAddress: input.ipAddress ?? null,
       createdAt: input.createdAt, // Optional overwrite
@@ -68,6 +70,7 @@ export class ReplyRepository {
         isDeleted: replies.isDeleted,
         isNsfw: replies.isNsfw,
         isSpoiler: replies.isSpoiler,
+        isSage: replies.isSage,
         createdAt: replies.createdAt,
         postNumber: replies.postNumber,
         ipAddress: replies.ipAddress,
@@ -84,6 +87,7 @@ export class ReplyRepository {
       isDeleted: row.isDeleted ?? false,
       isNsfw: row.isNsfw ?? false,
       isSpoiler: row.isSpoiler ?? false,
+      isSage: row.isSage ?? false,
       postNumber: row.postNumber!,
     }))
   }
@@ -153,6 +157,7 @@ export class ReplyRepository {
       isDeleted: row.isDeleted ?? false,
       isNsfw: row.isNsfw ?? false,
       isSpoiler: row.isSpoiler ?? false,
+      isSage: row.isSage ?? false,
       image: row.image,
       imageMetadata: row.imageMetadata,
       deletionPassword: row.deletionPassword,

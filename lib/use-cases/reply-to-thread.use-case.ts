@@ -4,9 +4,9 @@ import type { ImageRepository } from "@/lib/repositories/image.repository"
 import type { CloudinaryService } from "@/lib/services/cloudinary.service"
 import type { CreateReplyCommand } from "@/lib/entities/reply.entity"
 import type { BanRepository } from "@/lib/repositories/ban.repository"
-import { SequenceService } from "../services/sequence.service"
+import type { SequenceService } from "../services/sequence.service"
 import { generateTripcode } from "../utils/tripcode"
-import { PasswordService } from "../services/password.service"
+import type { PasswordService } from "../services/password.service"
 import type { AIModerationService } from "../services/ai-moderation.service"
 import type { CreateReportUseCase } from "./create-report.use-case"
 
@@ -107,6 +107,7 @@ export class ReplyToThreadUseCase {
       deletionPassword: hashedPassword,
       isNsfw: input.isNsfw ?? false,
       isSpoiler: input.isSpoiler ?? false,
+      isSage: input.isSage ?? false,
       postNumber: postNumber,
       ipAddress: input.ipAddress,
       capcode: input.capcode
@@ -125,8 +126,9 @@ export class ReplyToThreadUseCase {
     }
 
     // Business rule: Bump thread when reply is added (if under bumplimit 450 replies)
+    // Sage: do not bump if the reply is saged.
     const replyCount = await this.replyRepository.countByThreadId(input.threadId)
-    if (replyCount <= 450) {
+    if (!input.isSage && replyCount <= 450) {
       await this.threadRepository.updateBumpTime(input.threadId)
     }
 

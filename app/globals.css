@@ -208,4 +208,13 @@
     background-color: color-mix(in oklch, var(--muted-foreground), transparent 55%);
     border-radius: 20px;
   }
+
+  .ib-emoji {
+    display: inline-block;
+    vertical-align: middle;
+    height: 1.4em;
+    width: 1.4em;
+    object-fit: contain;
+    margin: 0 0.15em;
+  }
 }

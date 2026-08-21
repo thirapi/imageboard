@@ -7,6 +7,7 @@ export interface ReplyEntity {
   isDeleted: boolean
   isNsfw: boolean
   isSpoiler: boolean
+  isSage: boolean
   image?: string | null
   imageMetadata?: string | null
   deletionPassword?: string | null
@@ -25,6 +26,7 @@ export interface CreateReplyCommand {
   deletionPassword?: string
   isNsfw?: boolean
   isSpoiler?: boolean
+  isSage?: boolean
   ipAddress?: string
   capcode?: string | null
 }
@@ -38,6 +40,7 @@ export interface CreateReplyInput {
   deletionPassword?: string | null
   isNsfw?: boolean
   isSpoiler?: boolean
+  isSage?: boolean
   postNumber: number
   ipAddress?: string
   createdAt?: Date
@@ -53,6 +56,7 @@ export interface ReplyUI {
   isDeleted: boolean
   isNsfw: boolean
   isSpoiler: boolean
+  isSage: boolean
   image?: string | null
   imageMetadata?: string | null
   postNumber: number
